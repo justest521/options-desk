@@ -192,9 +192,7 @@ header{background:#212121;border-bottom:1px solid #3a3a3a;padding:0 20px;height:
     <button class="nav-tab active" onclick="showPage('dashboard',this)">總覽</button>
     <button class="nav-tab" onclick="showPage('positions',this)">倉位</button>
     <button class="nav-tab" onclick="showPage('flow',this)">大單流</button>
-    <button class="nav-tab" onclick="showPage('chart',this)">圖表</button>
     <button class="nav-tab" onclick="showPage('chat',this)">群組</button>
-    <button class="nav-tab" onclick="showPage('chain',this)">期權鏈</button>
     <button class="nav-tab" onclick="showPage('ai',this)">🤖 AI 分析</button>
   </div>
   <div class="header-right">
@@ -414,24 +412,7 @@ header{background:#212121;border-bottom:1px solid #3a3a3a;padding:0 20px;height:
   </div>
 </div>
 
-<!-- PAGE: CHART -->
-<div id="page-chart" class="page">
-  <div class="card">
-    <div class="card-head">
-      <span class="card-title">/ K線圖表</span>
-      <div class="tv-controls">
-        <input type="text" id="tv-symbol" class="ticker-input" value="AEHR" placeholder="代碼">
-        <button class="btn" onclick="loadChart()">載入</button>
-        <button class="fbtn" onclick="setIv('15')">15分</button>
-        <button class="fbtn" onclick="setIv('60')">1H</button>
-        <button class="fbtn active" onclick="setIv('D')">日</button>
-        <button class="fbtn" onclick="setIv('W')">週</button>
-        <button class="fbtn" onclick="setIv('M')">月</button>
-      </div>
-    </div>
-    <div id="tv-widget-container" style="height:620px;width:100%;"></div>
-  </div>
-</div>
+
 
 <!-- PAGE: CHAT -->
 <div id="page-chat" class="page">
@@ -461,61 +442,7 @@ header{background:#212121;border-bottom:1px solid #3a3a3a;padding:0 20px;height:
     </div>
   </div>
 
-<!-- PAGE: OPTIONS CHAIN -->
-<div id="page-chain" class="page">
-  <div class="card">
-    <div class="card-head">
-      <span class="card-title">/ 期權鏈</span>
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-        <input type="text" id="chain-symbol" class="ticker-input" value="AAPL" placeholder="代碼" style="width:80px;">
-        <select id="chain-expiry" class="form-input" style="width:160px;padding:5px 8px;background:#1a1a1a;border:1px solid #3a3a3a;color:#fff;font-family:var(--mono);font-size:13px;border-radius:4px;">
-          <option value="">選擇到期日</option>
-        </select>
-        <button class="btn" onclick="loadChain()">載入</button>
-        <span id="chain-price" style="font-family:var(--mono);font-size:16px;color:#ff2d78;"></span>
-        <span id="chain-status" style="font-size:13px;color:#888;font-family:var(--mono);"></span>
-      </div>
-    </div>
-    <div style="padding:8px 16px;display:flex;gap:16px;align-items:center;border-bottom:1px solid #3a3a3a;flex-wrap:wrap;background:#212121;">
-      <label style="font-size:13px;color:#888;display:flex;align-items:center;gap:6px;cursor:pointer;">
-        <input type="checkbox" id="chain-itm" onchange="renderChain()" style="accent-color:#ff2d78;"> 只顯示 ITM
-      </label>
-      <label style="font-size:13px;color:#888;display:flex;align-items:center;gap:6px;cursor:pointer;">
-        <input type="checkbox" id="chain-highlight" checked onchange="renderChain()" style="accent-color:#ff2d78;"> 高亮高OI
-      </label>
-      <span style="font-size:12px;color:#555;font-family:var(--mono);">點擊履約價可帶入倉位</span>
-    </div>
-    <div style="overflow-x:auto;max-height:600px;overflow-y:auto;">
-      <table style="width:100%;border-collapse:collapse;font-family:var(--mono);">
-        <thead style="position:sticky;top:0;z-index:2;">
-          <tr style="background:#2a2a2a;">
-            <th colspan="6" style="text-align:center;padding:8px;color:#ff2d78;font-size:13px;border-right:2px solid #ff2d78;letter-spacing:1px;">─── CALL ───</th>
-            <th style="text-align:center;padding:8px;color:#ffffff;font-size:13px;background:#1a1a1a;letter-spacing:2px;min-width:80px;">STRIKE</th>
-            <th colspan="6" style="text-align:center;padding:8px;color:#888;font-size:13px;border-left:2px solid #444;letter-spacing:1px;">─── PUT ───</th>
-          </tr>
-          <tr style="background:#212121;font-size:12px;color:#666;letter-spacing:1px;">
-            <th style="padding:5px 8px;text-align:right;font-weight:normal;">BID</th>
-            <th style="padding:5px 8px;text-align:right;font-weight:normal;">ASK</th>
-            <th style="padding:5px 8px;text-align:right;font-weight:normal;">LAST</th>
-            <th style="padding:5px 8px;text-align:right;font-weight:normal;">CHG%</th>
-            <th style="padding:5px 8px;text-align:right;font-weight:normal;">VOL</th>
-            <th style="padding:5px 8px;text-align:right;border-right:2px solid #ff2d78;font-weight:normal;">OI</th>
-            <th style="padding:5px 10px;text-align:center;background:#1a1a1a;color:#aaa;font-size:12px;font-weight:normal;"></th>
-            <th style="padding:5px 8px;text-align:left;border-left:2px solid #444;font-weight:normal;">OI</th>
-            <th style="padding:5px 8px;text-align:left;font-weight:normal;">VOL</th>
-            <th style="padding:5px 8px;text-align:left;font-weight:normal;">LAST</th>
-            <th style="padding:5px 8px;text-align:left;font-weight:normal;">ASK</th>
-            <th style="padding:5px 8px;text-align:left;font-weight:normal;">BID</th>
-            <th style="padding:5px 8px;text-align:left;font-weight:normal;">CHG%</th>
-          </tr>
-        </thead>
-        <tbody id="chain-body">
-          <tr><td colspan="13" style="text-align:center;padding:40px;color:#888;font-family:var(--mono);font-size:14px;">輸入代碼並按載入</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
+
 
 <!-- PAGE: AI ANALYSIS -->
 <div id="page-ai" class="page">
@@ -640,10 +567,14 @@ let chatChannel   = null;
 function showPage(id, btn) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
-  document.getElementById('page-' + id).classList.add('active');
+  const pg = document.getElementById('page-' + id);
+  if (!pg) return;
+  pg.classList.add('active');
   if(btn) btn.classList.add('active');
-  if(id === 'chart') setTimeout(loadChart, 100);
-  if(id === 'chat')  loadChat();
+  if(id === 'chat')      loadChat();
+  if(id === 'positions') { loadMyPositions(); startPriceRefresh(); }
+  if(id === 'flow')      refreshFlow(true);
+  if(id === 'ai')        buildAIPositionsPreview();
 }
 
 // ============ USER ============
@@ -1042,6 +973,13 @@ function updateArticleCount() {
 function clearArticle() {
   const el = document.getElementById('ai-article');
   if (el) { el.value = ''; updateArticleCount(); }
+}
+function buildAIPositionsPreview() {
+  const posData = document.getElementById('ai-pos-data');
+  const preview = document.getElementById('ai-positions-preview');
+  if (!posData || !myPositions.length) return;
+  posData.textContent = buildPositionsSummary();
+  if (preview) preview.style.display = 'block';
 }
 async function runAIAnalysis() {
   const mode = document.getElementById('ai-mode').value;
@@ -1538,7 +1476,7 @@ async function fetchOptionPrice(ticker, strike, expiry, optionType) {
     ];
     for (const proxyFn of proxies) {
       try {
-        const res = await fetch(proxyFn(url), { signal: AbortSignal.timeout(6000) });
+        const res = await fetch(proxyFn(url), { signal: AbortSignal.timeout(4000) });
         if (!res.ok) continue;
         const json = await res.json();
         const chain = json?.optionChain?.result?.[0];
@@ -1561,17 +1499,16 @@ async function fetchOptionPrice(ticker, strike, expiry, optionType) {
 async function refreshAllPrices() {
   if (!myPositions.length) return;
 
-  for (const pos of myPositions) {
+  // Parallel fetch - much faster
+  await Promise.allSettled(myPositions.map(async pos => {
     try {
       const result = await fetchOptionPrice(pos.ticker, pos.strike, pos.expiry, pos.option_type || pos.type || 'CALL');
       if (result) {
-        if (result.optPrice)   pos._livePrice   = parseFloat(result.optPrice);
-        if (result.stockPrice) pos._stockPrice  = parseFloat(result.stockPrice);
+        if (result.optPrice != null)   pos._livePrice   = parseFloat(result.optPrice);
+        if (result.stockPrice != null) pos._stockPrice  = parseFloat(result.stockPrice);
       }
     } catch(e) {}
-    // small delay between fetches to avoid rate limiting
-    await new Promise(r => setTimeout(r, 300));
-  }
+  }));
   renderPositions();
   updateDashboard();
 
@@ -1606,7 +1543,7 @@ async function fetchExpiryDates(sym) {
     try {
       const url = `https://query1.finance.yahoo.com/v7/finance/options/${sym}`;
       const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(url)}`;
-      const res = await fetch(proxyUrl, { signal: AbortSignal.timeout(6000) });
+      const res = await fetch(proxyUrl, { signal: AbortSignal.timeout(4000) });
       const json = await res.json();
       const timestamps = json?.optionChain?.result?.[0]?.expirationDates || [];
       // Convert unix timestamps to dates
@@ -1699,47 +1636,11 @@ function handleExpiryKey(e, el) {
 }
 
 // ============ CHART (TradingView) ============
-function loadChart() {
-  const sym = document.getElementById('tv-symbol').value.trim().toUpperCase() || 'AEHR';
-  currentSymbol = sym;
-  document.querySelectorAll('#page-chart .fbtn').forEach(b => b.classList.remove('active'));
-  renderChart();
-}
+// function loadChart removed
 
-function setIv(iv) {
-  currentIv = iv;
-  document.querySelectorAll('#page-chart .fbtn').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
-  renderChart();
-}
+// function setIv removed
 
-function renderChart() {
-  const container = document.getElementById('tv-widget-container');
-  if (!container) return;
-  const uid = 'tv_' + Date.now();
-  container.innerHTML = `
-    <div class="tradingview-widget-container" style="height:620px;width:100%;">
-      <div id="${uid}" style="height:620px;width:100%;"></div>
-      <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
-      {
-        "container_id": "${uid}",
-        "autosize": true,
-        "symbol": "${currentSymbol}",
-        "interval": "${currentIv}",
-        "timezone": "America/New_York",
-        "theme": "dark",
-        "style": "1",
-        "locale": "zh_TW",
-        "withdateranges": true,
-        "hide_side_toolbar": false,
-        "allow_symbol_change": true,
-        "watchlist": ["AEHR","NVDA","TSLA","QQQ","SPY","CRWD","META","AAPL"],
-        "studies": ["RSI@tv-basicstudies","MACD@tv-basicstudies","Volume@tv-basicstudies"],
-        "support_host": "https://www.tradingview.com"
-      }
-      <\/script>
-    </div>`;
-}
+// function renderChart removed
 
 // ============ CHAT (Supabase Realtime) ============
 async function loadChat() {
