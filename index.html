@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Options Desk — 選擇權交易儀表板</title>
-<script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;600&family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
@@ -387,7 +386,7 @@ let myPositions  = [];
 let allPositions = [];
 let flowData     = [];
 let flowFilter   = 'all';
-let lwMainChart, lwRsiChart, candleSeries, volSeries, rsiSeries;
+
 let currentSymbol = 'AEHR';
 let currentIv     = 'D';
 let pnlChart      = null;
@@ -685,10 +684,11 @@ function fillPosition(ticker, type, strike, expiry) {
   }, 200);
 }
 
-// ============ CHART ============
+// ============ CHART (TradingView) ============
 function loadChart() {
   const sym = document.getElementById('tv-symbol').value.trim().toUpperCase() || 'AEHR';
   currentSymbol = sym;
+  document.querySelectorAll('#page-chart .fbtn').forEach(b => b.classList.remove('active'));
   renderChart();
 }
 
@@ -699,116 +699,41 @@ function setIv(iv) {
   renderChart();
 }
 
-async function fetchOHLC(symbol, interval) {
-  const ivMap = { 'D':'1d','W':'1wk','M':'1mo','60':'1h','15':'15m' };
-  const rngMap = { 'D':'6mo','W':'2y','M':'5y','60':'5d','15':'2d' };
-  const iv = ivMap[interval] || '1d';
-  const rng = rngMap[interval] || '6mo';
-
-  // Try multiple Yahoo Finance endpoints + proxies
-  const yahooUrl1 = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=${iv}&range=${rng}`;
-  const yahooUrl2 = `https://query2.finance.yahoo.com/v8/finance/chart/${symbol}?interval=${iv}&range=${rng}`;
-  const proxies = [
-    u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
-    u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
-    u => `https://thingproxy.freeboard.io/fetch/${u}`,
-  ];
-
-  for (const baseUrl of [yahooUrl1, yahooUrl2]) {
-    for (const proxy of proxies) {
-      try {
-        const res = await fetch(proxy(baseUrl), { signal: AbortSignal.timeout(8000) });
-        if (!res.ok) continue;
-        const data = await res.json();
-        const result = data?.chart?.result?.[0];
-        if (!result || !result.timestamp) continue;
-        const ts = result.timestamp, q = result.indicators.quote[0];
-        const candles = [], volumes = [];
-        for (let i = 0; i < ts.length; i++) {
-          if (!q.open[i]||!q.close[i]) continue;
-          candles.push({time:ts[i],open:+q.open[i].toFixed(2),high:+q.high[i].toFixed(2),low:+q.low[i].toFixed(2),close:+q.close[i].toFixed(2)});
-          volumes.push({time:ts[i],value:q.volume[i]||0,color:q.close[i]>=q.open[i]?'rgba(0,229,176,0.4)':'rgba(244,63,94,0.4)'});
-        }
-        if (candles.length > 0) return { candles, volumes };
-      } catch(e) { continue; }
-    }
-  }
-  throw new Error('無法取得資料，請稍後再試');
-}
-
-function calcRSI(candles, period=14) {
-  const rsi = []; let g=0,l=0;
-  for (let i=1;i<=period;i++){const d=candles[i].close-candles[i-1].close;if(d>0)g+=d;else l+=Math.abs(d);}
-  let ag=g/period,al=l/period;
-  for (let i=period+1;i<candles.length;i++){
-    const d=candles[i].close-candles[i-1].close;
-    ag=(ag*(period-1)+Math.max(d,0))/period;
-    al=(al*(period-1)+Math.max(-d,0))/period;
-    const rs=al===0?100:ag/al;
-    rsi.push({time:candles[i].time,value:+(100-100/(1+rs)).toFixed(2)});
-  }
-  return rsi;
-}
-
 function renderChart() {
-  const mainEl = document.getElementById('lw-main');
-  const rsiEl  = document.getElementById('lw-rsi');
-  if (!mainEl || !rsiEl) return;
-  mainEl.innerHTML = '<div class="loading" style="height:420px;justify-content:center;"><div class="spin"></div>載入 ' + currentSymbol + '...</div>';
-  rsiEl.innerHTML  = '';
+  const container = document.getElementById('tv-widget-container');
+  if (!container) return;
+  container.innerHTML = '';
 
-  if (lwMainChart) { try { lwMainChart.remove(); } catch(e){} lwMainChart = null; }
-  if (lwRsiChart)  { try { lwRsiChart.remove(); }  catch(e){} lwRsiChart  = null; }
+  const wrapper = document.createElement('div');
+  wrapper.className = 'tradingview-widget-container';
+  wrapper.style.cssText = 'height:600px;width:100%;';
 
-  fetchOHLC(currentSymbol, currentIv).then(({ candles, volumes }) => {
-    mainEl.innerHTML = '';
-    rsiEl.innerHTML  = '';
+  const widgetDiv = document.createElement('div');
+  widgetDiv.id = 'tv-advanced-chart-' + Date.now();
+  widgetDiv.style.cssText = 'height:600px;width:100%;';
+  wrapper.appendChild(widgetDiv);
 
-    lwMainChart = LightweightCharts.createChart(mainEl, {
-      width: mainEl.offsetWidth, height: 420,
-      layout: { background: { color: '#0d1117' }, textColor: '#94a3b8' },
-      grid: { vertLines: { color: '#1c2330' }, horzLines: { color: '#1c2330' } },
-      crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
-      rightPriceScale: { borderColor: '#21293a' },
-      timeScale: { borderColor: '#21293a', timeVisible: true, secondsVisible: false },
-    });
-
-    candleSeries = lwMainChart.addCandlestickSeries({ upColor:'#00e5b0',downColor:'#f43f5e',borderUpColor:'#00e5b0',borderDownColor:'#f43f5e',wickUpColor:'#00e5b0',wickDownColor:'#f43f5e' });
-    volSeries = lwMainChart.addHistogramSeries({ priceFormat:{type:'volume'}, priceScaleId:'vol', scaleMargins:{top:0.85,bottom:0} });
-    candleSeries.setData(candles);
-    volSeries.setData(volumes);
-
-    lwRsiChart = LightweightCharts.createChart(rsiEl, {
-      width: rsiEl.offsetWidth, height: 140,
-      layout: { background: { color: '#0d1117' }, textColor: '#475569' },
-      grid: { vertLines: { color: '#1c2330' }, horzLines: { color: 'transparent' } },
-      rightPriceScale: { borderColor: '#21293a', scaleMargins:{top:0.1,bottom:0.1} },
-      timeScale: { borderColor: '#21293a', timeVisible: true },
-    });
-    rsiSeries = lwRsiChart.addLineSeries({ color: '#fbbf24', lineWidth: 1.5, priceLineVisible: false });
-    const rsiData = calcRSI(candles);
-    rsiSeries.setData(rsiData);
-    rsiSeries.createPriceLine({ price:70, color:'rgba(244,63,94,0.4)', lineWidth:1, lineStyle:2 });
-    rsiSeries.createPriceLine({ price:30, color:'rgba(0,229,176,0.4)', lineWidth:1, lineStyle:2 });
-
-    if (rsiData.length) {
-      const last = rsiData[rsiData.length-1].value;
-      const re = document.getElementById('rsi-val');
-      re.textContent = last.toFixed(1);
-      re.style.color = last > 70 ? 'var(--red)' : last < 30 ? 'var(--green)' : 'var(--yellow)';
-    }
-
-    lwMainChart.timeScale().subscribeVisibleLogicalRangeChange(r => lwRsiChart.timeScale().setVisibleLogicalRange(r));
-    lwMainChart.timeScale().fitContent();
-
-    const ro = new ResizeObserver(() => {
-      if(lwMainChart) lwMainChart.applyOptions({width:mainEl.offsetWidth});
-      if(lwRsiChart)  lwRsiChart.applyOptions({width:rsiEl.offsetWidth});
-    });
-    ro.observe(mainEl);
-  }).catch(err => {
-    mainEl.innerHTML = `<div class="empty" style="color:var(--red)">❌ 載入失敗: ${err.message}</div>`;
+  const script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
+  script.async = true;
+  script.innerHTML = JSON.stringify({
+    container_id: widgetDiv.id,
+    autosize: true,
+    symbol: currentSymbol,
+    interval: currentIv === '60' ? '60' : currentIv === '15' ? '15' : currentIv,
+    timezone: "America/New_York",
+    theme: "dark",
+    style: "1",
+    locale: "zh_TW",
+    withdateranges: true,
+    hide_side_toolbar: false,
+    allow_symbol_change: true,
+    studies: ["RSI@tv-basicstudies","MACD@tv-basicstudies","Volume@tv-basicstudies"],
+    support_host: "https://www.tradingview.com"
   });
+  wrapper.appendChild(script);
+  container.appendChild(wrapper);
 }
 
 // ============ CHAT (Supabase Realtime) ============
