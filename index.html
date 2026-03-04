@@ -1143,7 +1143,22 @@ ${userCtx ? `【補充背景】${userCtx}` : ''}
     });
 
     const data = await response.json();
-    const text = data?.content?.[0]?.text || '無回應';
+    console.log('Claude API response:', JSON.stringify(data).substring(0, 500));
+    
+    // Handle API errors
+    if (!response.ok || data.error) {
+      const errMsg = data?.error?.message || data?.error?.type || `HTTP ${response.status}`;
+      output.innerHTML = `<div style="color:#ff5555;padding:20px;font-family:var(--mono);font-size:13px;">
+        ❌ API 錯誤：${errMsg}<br><br>
+        <span style="color:#555;font-size:11px;">請確認 API Key 正確且有額度</span>
+      </div>`;
+      btn.disabled = false; btn.textContent = '▶ 開始分析';
+      return;
+    }
+    
+    const text = data?.content?.[0]?.text 
+              || data?.content?.map?.(c => c.text).filter(Boolean).join('\n') 
+              || '無回應';
 
     // Render markdown-like text
     const html = text
