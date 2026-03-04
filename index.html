@@ -560,8 +560,12 @@ AI 會自動吸收並結合你的倉位來分析。"
   <div class="card" style="margin-bottom:16px;">
     <div class="card-head">
       <span class="card-title">/ AI 研究引擎</span>
-      <div style="display:flex;gap:8px;align-items:center;">
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
         <span id="res-ticker-tags" style="display:flex;gap:4px;flex-wrap:wrap;"></span>
+        <input type="password" id="res-claude-key" class="form-input"
+          placeholder="Claude API Key (sk-ant-...)"
+          style="width:200px;padding:5px 10px;font-size:12px;font-family:var(--mono);"
+          oninput="localStorage.setItem('claude_api_key',this.value)">
         <button class="btn primary" id="res-run-btn" onclick="runResearch()" style="min-width:120px;padding:7px 20px;font-size:14px;letter-spacing:1px;">⚡ 開始研究</button>
       </div>
     </div>
@@ -1320,7 +1324,8 @@ function saveClaudioKey(val) {
 }
 
 function getClaudeKey() {
-  return document.getElementById('claude-key-input')?.value.trim() 
+  return document.getElementById('res-claude-key')?.value.trim()
+      || document.getElementById('claude-key-input')?.value.trim() 
       || localStorage.getItem('claude_api_key') 
       || '';
 }
@@ -2707,10 +2712,13 @@ function exportReport() {
 }
 
 function initResearch() {
-  // Sync Claude key from AI page
   const savedKey = localStorage.getItem('claude_api_key');
-  const keyInput = document.getElementById('claude-key-input');
-  if (savedKey && keyInput && !keyInput.value) keyInput.value = savedKey;
+  const k1 = document.getElementById('claude-key-input');
+  const k2 = document.getElementById('res-claude-key');
+  if (savedKey) {
+    if (k1 && !k1.value) k1.value = savedKey;
+    if (k2 && !k2.value) k2.value = savedKey;
+  }
   renderDetectedTickers();
 }
 
