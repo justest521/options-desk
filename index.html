@@ -287,69 +287,90 @@ header{background:#212121;border-bottom:1px solid #3a3a3a;padding:0 20px;height:
     </div>
     <div class="card-body">
       <!-- Ticker with AI search -->
-      <div style="position:relative;margin-bottom:8px;">
-        <div style="display:flex;gap:8px;align-items:center;">
-          <div style="position:relative;flex:1;">
-            <input class="form-input" id="p-ticker" placeholder="股票代碼，例：AAPL、NVDA、TSLA" autocomplete="off" oninput="tickerSearch(this.value)" onblur="if(this.value)fetchLivePrice(this.value.trim().toUpperCase())" style="padding-right:36px;">
-            <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:11px;color:#555;font-family:var(--mono);">AI</span>
-            <div id="ticker-dropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:#212121;border:1px solid #3a3a3a;border-radius:4px;z-index:100;max-height:200px;overflow-y:auto;"></div>
-          </div>
-          <div style="flex:1.5;">
-            <select class="form-input" id="p-type" style="cursor:pointer;">
-              <optgroup label="─ 單腿策略 ─" style="color:#555;">
-                <option value="CALL">📈 CALL（買進看漲）</option>
-                <option value="PUT">📉 PUT（買進看跌）</option>
-                <option value="SELL CALL">SHORT CALL（賣出看漲）</option>
-                <option value="SELL PUT">SHORT PUT（賣出看跌）</option>
-              </optgroup>
-              <optgroup label="─ 價差策略 ─" style="color:#555;">
-                <option value="Bull Call Spread">Bull Call Spread（牛市看漲）</option>
-                <option value="Bear Put Spread">Bear Put Spread（熊市看跌）</option>
-                <option value="Bear Call Spread">Bear Call Spread（熊市看漲賣）</option>
-                <option value="Bull Put Spread">Bull Put Spread（牛市看跌賣）</option>
-              </optgroup>
-              <optgroup label="─ 中性策略 ─" style="color:#555;">
-                <option value="Iron Condor">Iron Condor（鐵兀鷹）</option>
-                <option value="Straddle">Straddle（跨式）</option>
-                <option value="Strangle">Strangle（勒式）</option>
-                <option value="Butterfly">Butterfly（蝴蝶）</option>
-              </optgroup>
-              <optgroup label="─ 其他 ─" style="color:#555;">
-                <option value="Covered Call">Covered Call（備兌賣權）</option>
-                <option value="Cash Secured Put">Cash Secured Put（現金擔保賣權）</option>
-                <option value="LEAPS">LEAPS（長期選擇權）</option>
-                <option value="其他">其他</option>
-              </optgroup>
-            </select>
-          </div>
-        </div>
-      </div>
-      <div class="pos-form" style="grid-template-columns:1fr 1fr 1fr 1fr 1fr;">
+      <div style="display:grid;grid-template-columns:2fr 2fr 1fr 1fr 1fr 1fr;gap:8px;margin-bottom:8px;align-items:end;">
+
+        <!-- 股票代碼 -->
         <div style="position:relative;">
-          <input class="form-input" id="p-strike" placeholder="履約價，例：150" type="number" style="padding-top:20px;">
-          <span style="position:absolute;top:5px;left:10px;font-size:11px;color:#555;font-family:var(--mono);pointer-events:none;">履約價 $</span>
+          <span style="position:absolute;top:5px;left:10px;font-size:11px;color:#555;font-family:var(--mono);pointer-events:none;z-index:1;">股票代碼</span>
+          <input class="form-input" id="p-ticker" placeholder="AAPL、NVDA、TSLA..." autocomplete="off"
+            oninput="tickerSearch(this.value)"
+            onblur="if(this.value)fetchLivePrice(this.value.trim().toUpperCase())"
+            style="padding-top:22px;padding-right:36px;">
+          <span style="position:absolute;right:10px;top:14px;font-size:11px;color:#555;font-family:var(--mono);">AI</span>
+          <div id="ticker-dropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:#212121;border:1px solid #3a3a3a;border-radius:4px;z-index:100;max-height:200px;overflow-y:auto;"></div>
         </div>
+
+        <!-- 期權玩法 -->
         <div style="position:relative;">
-          <input class="form-input" id="p-expiry" placeholder="MM/DD/YY" maxlength="8"
-            style="padding-top:20px;letter-spacing:2px;"
+          <span style="position:absolute;top:5px;left:10px;font-size:11px;color:#555;font-family:var(--mono);pointer-events:none;z-index:1;">期權玩法</span>
+          <select class="form-input" id="p-type" style="cursor:pointer;padding-top:22px;">
+            <optgroup label="─ 單腿 ─" style="color:#555;">
+              <option value="CALL">CALL 買進看漲</option>
+              <option value="PUT">PUT 買進看跌</option>
+              <option value="SELL CALL">SHORT CALL 賣出看漲</option>
+              <option value="SELL PUT">SHORT PUT 賣出看跌</option>
+            </optgroup>
+            <optgroup label="─ 價差 ─" style="color:#555;">
+              <option value="Bull Call Spread">Bull Call Spread</option>
+              <option value="Bear Put Spread">Bear Put Spread</option>
+              <option value="Bear Call Spread">Bear Call Spread</option>
+              <option value="Bull Put Spread">Bull Put Spread</option>
+            </optgroup>
+            <optgroup label="─ 中性 ─" style="color:#555;">
+              <option value="Iron Condor">Iron Condor</option>
+              <option value="Straddle">Straddle</option>
+              <option value="Strangle">Strangle</option>
+              <option value="Butterfly">Butterfly</option>
+            </optgroup>
+            <optgroup label="─ 其他 ─" style="color:#555;">
+              <option value="Covered Call">Covered Call</option>
+              <option value="LEAPS">LEAPS</option>
+              <option value="其他">其他</option>
+            </optgroup>
+          </select>
+        </div>
+
+        <!-- 履約價 -->
+        <div style="position:relative;">
+          <span style="position:absolute;top:5px;left:10px;font-size:11px;color:#555;font-family:var(--mono);pointer-events:none;z-index:1;">履約價 $</span>
+          <input class="form-input" id="p-strike" placeholder="150" type="number" style="padding-top:22px;">
+        </div>
+
+        <!-- 到期日 -->
+        <div style="position:relative;">
+          <span style="position:absolute;top:5px;left:10px;font-size:11px;color:#555;font-family:var(--mono);pointer-events:none;z-index:1;">到期 MM/DD/YY</span>
+          <input class="form-input" id="p-expiry" placeholder="032126" maxlength="8"
+            style="padding-top:22px;letter-spacing:2px;"
             oninput="fmtExpiry(this)" onkeydown="handleExpiryKey(event,this)">
-          <span style="position:absolute;top:5px;left:10px;font-size:11px;color:#555;font-family:var(--mono);pointer-events:none;">到期 MM/DD/YY</span>
         </div>
+
+        <!-- 成本 -->
         <div style="position:relative;">
-          <input class="form-input" id="p-cost" placeholder="每口買入成本" type="number" step="0.01" style="padding-top:20px;">
-          <span style="position:absolute;top:5px;left:10px;font-size:11px;color:#555;font-family:var(--mono);pointer-events:none;">成本 $ / 口</span>
+          <span style="position:absolute;top:5px;left:10px;font-size:11px;color:#555;font-family:var(--mono);pointer-events:none;z-index:1;">成本 $ / 口</span>
+          <input class="form-input" id="p-cost" placeholder="3.82" type="number" step="0.01" style="padding-top:22px;">
         </div>
+
+        <!-- 口數 -->
         <div style="position:relative;">
-          <input class="form-input" id="p-current" placeholder="自動抓取中..." type="number" step="0.01" style="padding-top:20px;color:#ff2d78;" readonly>
-          <span style="position:absolute;top:5px;left:10px;font-size:11px;color:#555;font-family:var(--mono);pointer-events:none;">現價 $ / 口</span>
-          <span id="price-status" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:11px;color:#555;font-family:var(--mono);">—</span>
+          <span style="position:absolute;top:5px;left:10px;font-size:11px;color:#555;font-family:var(--mono);pointer-events:none;z-index:1;">口數（張）</span>
+          <input class="form-input" id="p-qty" placeholder="1" type="number" value="1" style="padding-top:22px;">
         </div>
-        <div style="position:relative;">
-          <input class="form-input" id="p-qty" placeholder="1" type="number" style="padding-top:20px;">
-          <span style="position:absolute;top:5px;left:10px;font-size:11px;color:#555;font-family:var(--mono);pointer-events:none;">口數（張）</span>
-        </div>
+
       </div>
-      <button class="btn primary" onclick="addPosition()" style="width:100%;margin-bottom:16px;padding:9px;">＋ 新增倉位</button>
+
+      <!-- 股票即時價格顯示 -->
+      <div id="stock-price-bar" style="display:none;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:4px;padding:8px 14px;margin-bottom:8px;display:flex;gap:20px;align-items:center;font-family:var(--mono);flex-wrap:wrap;">
+        <span style="color:#888;font-size:12px;">即時行情</span>
+        <span id="bar-ticker" style="color:#ff2d78;font-size:15px;font-weight:600;"></span>
+        <span id="bar-stock-price" style="color:#ffffff;font-size:15px;"></span>
+        <span id="bar-stock-chg" style="font-size:13px;"></span>
+        <span style="color:#555;font-size:12px;">｜</span>
+        <span style="color:#888;font-size:12px;">期權現價</span>
+        <span id="bar-option-price" style="color:#ff2d78;font-size:15px;"></span>
+        <span id="bar-price-time" style="color:#555;font-size:11px;margin-left:auto;"></span>
+      </div>
+
+      <button class="btn primary" onclick="addPosition()" style="width:100%;margin-bottom:16px;padding:11px;font-size:15px;letter-spacing:2px;">＋ 新增倉位</button>
       <div class="stats-row">
         <div class="stat-cell"><div class="lbl">總成本</div><div class="val" id="p-total-cost">$0</div></div>
         <div class="stat-cell"><div class="lbl">總市值</div><div class="val" id="p-total-value">$0</div></div>
@@ -566,62 +587,66 @@ async function loadAllPositions() {
 async function addPosition() {
   if (!currentUser) { showToast('請先輸入名字', 'info'); return; }
 
-  // Safely extract all values as plain strings/numbers
-  const ticker  = String(document.getElementById('p-ticker').value || '').toUpperCase().trim();
-  const typeEl  = document.getElementById('p-type');
-  const type    = String(typeEl.options ? typeEl.options[typeEl.selectedIndex].value : typeEl.value || 'CALL').trim();
-  const strike  = parseFloat(document.getElementById('p-strike').value) || 0;
-  const expiry  = String(document.getElementById('p-expiry').value || '').trim();
-  const cost    = parseFloat(document.getElementById('p-cost').value) || 0;
-  const current = parseFloat(document.getElementById('p-current').value) || 0;
-  const qty     = parseInt(document.getElementById('p-qty').value) || 1;
+  const ticker = String(document.getElementById('p-ticker').value || '').toUpperCase().trim();
+  const typeEl = document.getElementById('p-type');
+  const type   = String(typeEl.options ? typeEl.options[typeEl.selectedIndex].value : typeEl.value || 'CALL').trim();
+  const strike = parseFloat(document.getElementById('p-strike').value) || 0;
+  const expiry = String(document.getElementById('p-expiry').value || '').trim();
+  const cost   = parseFloat(document.getElementById('p-cost').value) || 0;
+  const qty    = parseInt(document.getElementById('p-qty').value) || 1;
 
   if (!ticker) { showToast('請填入股票代碼', 'info'); return; }
-  if (!cost)   { showToast('請填入成本', 'info'); return; }
-  if (!current){ showToast('請填入現價', 'info'); return; }
+  if (!cost)   { showToast('請填入成本 $ / 口', 'info'); return; }
+  if (!expiry) { showToast('請填入到期日', 'info'); return; }
 
-  // Build a plain serializable object
-  const payload = {
-    user_name:     String(currentUser),
-    ticker:        ticker,
-    type:          type,
-    strike:        Number(strike),
-    expiry:        expiry,
-    cost:          Number(cost),
-    current_price: Number(current),
-    qty:           Number(qty)
-  };
+  // Auto-fetch current stock price (silent - don't block if fails)
+  let current_price = 0;
+  try {
+    const proxies = [
+      `https://corsproxy.io/?${encodeURIComponent(`https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=1d`)}`,
+      `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=1d`)}`,
+    ];
+    for (const url of proxies) {
+      try {
+        const res = await fetch(url, { signal: AbortSignal.timeout(4000) });
+        if (!res.ok) continue;
+        const json = await res.json();
+        const p = json?.chart?.result?.[0]?.meta?.regularMarketPrice;
+        if (p) { current_price = parseFloat(p); break; }
+      } catch(e) { continue; }
+    }
+  } catch(e) {}
+  // current_price=0 is fine, will be updated by refreshAllPrices later
 
   try {
-    // v1 SDK: insert array of plain objects
     const { data, error } = await db.from('positions').insert([{
-      user_name: String(currentUser),
-      ticker:    String(ticker),
-      option_type: String(type),
-      strike:    Number(strike),
-      expiry:    String(expiry),
-      cost:      Number(cost),
-      current_price: Number(current),
-      qty:       Number(qty)
+      user_name:     String(currentUser),
+      ticker:        String(ticker),
+      option_type:   String(type),
+      strike:        Number(strike),
+      expiry:        String(expiry),
+      cost:          Number(cost),
+      current_price: Number(current_price),
+      qty:           Number(qty)
     }]);
     if (error) throw new Error(error.message);
 
-    // Reset form
     document.getElementById('p-ticker').value = '';
     document.getElementById('p-strike').value = '';
     document.getElementById('p-expiry').value = '';
     document.getElementById('p-cost').value = '';
-    document.getElementById('p-current').value = '';
-    document.getElementById('p-qty').value = '';
+    document.getElementById('p-qty').value = '1';
     if (typeEl.options) typeEl.selectedIndex = 0;
+    const bar = document.getElementById('stock-price-bar');
+    if (bar) bar.style.display = 'none';
 
     await loadMyPositions();
-    checkAlertForNew(ticker, cost, current);
     showToast('✅ 已新增 ' + ticker + ' ' + type, 'info');
   } catch(e) {
-    showToast('新增失敗：' + e.message, 'stop');
+    showToast('新增失敗：' + (e.message||'請檢查網路連線'), 'stop');
   }
 }
+
 
 async function deletePosition(id) {
   const cleanId = String(id);
@@ -1129,78 +1154,72 @@ document.addEventListener('click', e => {
 
 // ============ LIVE PRICE FETCH ============
 async function fetchLivePrice(sym) {
-  const el = document.getElementById('p-current');
-  const st = document.getElementById('price-status');
-  if (!el || !sym) return;
-  el.placeholder = '抓取中...';
-  if (st) st.textContent = '⟳';
+  if (!sym) return;
+  const bar = document.getElementById('stock-price-bar');
+  const barTicker = document.getElementById('bar-ticker');
+  const barPrice  = document.getElementById('bar-stock-price');
+  const barChg    = document.getElementById('bar-stock-chg');
+  const barTime   = document.getElementById('bar-price-time');
+  if (bar) bar.style.display = 'flex';
+  if (barTicker) barTicker.textContent = sym;
+  if (barPrice)  barPrice.textContent  = '抓取中...';
 
-  // Try UW API first
-  if (UW_API_KEY && UW_API_KEY !== '在這裡貼上你的UW_API_KEY') {
-    try {
-      const data = await fetchUW(`/api/stocks/${sym}/quote`);
-      const price = data?.price || data?.last || data?.close || data?.[0]?.price;
-      if (price) {
-        el.value = parseFloat(price).toFixed(2);
-        el.style.color = '#ff2d78';
-        if (st) st.textContent = 'UW ✓';
-        return;
-      }
-    } catch(e) {}
-  }
-
-  // Fallback: Yahoo Finance via CORS proxy
   try {
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=1d&range=1d`;
-    const proxies = [
-      u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
-      u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
-    ];
-    for (const proxy of proxies) {
-      try {
-        const res = await fetch(proxy(url), { signal: AbortSignal.timeout(6000) });
-        if (!res.ok) continue;
-        const json = await res.json();
-        const price = json?.chart?.result?.[0]?.meta?.regularMarketPrice
-                   || json?.chart?.result?.[0]?.meta?.previousClose;
-        if (price) {
-          el.value = parseFloat(price).toFixed(2);
-          el.style.color = '#ff2d78';
-          if (st) st.textContent = 'YF ✓';
-          return;
-        }
-      } catch(e) { continue; }
-    }
-  } catch(e) {}
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=1d&range=2d`;
+    const proxy = u => `https://corsproxy.io/?${encodeURIComponent(u)}`;
+    const res = await fetch(proxy(url), { signal: AbortSignal.timeout(7000) });
+    const json = await res.json();
+    const meta  = json?.chart?.result?.[0]?.meta;
+    const price = meta?.regularMarketPrice || meta?.previousClose;
+    const prev  = meta?.chartPreviousClose || meta?.previousClose;
+    const chgPct = prev ? ((price - prev) / prev * 100).toFixed(2) : null;
 
-  // No price found
-  el.placeholder = '請手動輸入';
-  el.removeAttribute('readonly');
-  el.style.color = '#ffffff';
-  if (st) st.textContent = '手動';
+    if (price && barPrice) {
+      barPrice.textContent = '$' + parseFloat(price).toFixed(2);
+      if (barChg && chgPct) {
+        const up = parseFloat(chgPct) >= 0;
+        barChg.textContent  = (up ? '+' : '') + chgPct + '%';
+        barChg.style.color  = up ? '#00cc66' : '#ff5555';
+      }
+      if (barTime) barTime.textContent = '更新 ' + new Date().toLocaleTimeString('zh-TW', {timeZone:'Asia/Taipei'});
+    }
+  } catch(e) {
+    if (barPrice) barPrice.textContent = '—';
+    if (bar) bar.style.display = 'none'; // hide bar if can't fetch
+  }
+}
+
+// Periodic live price refresh for positions list
+let _priceRefreshTimer = null;
+function startPriceRefresh() {
+  if (_priceRefreshTimer) clearInterval(_priceRefreshTimer);
+  refreshAllPrices();
+  _priceRefreshTimer = setInterval(refreshAllPrices, 30000); // every 30s
 }
 
 // Auto-fetch price when positions are loaded (for P&L calculation)
 async function refreshAllPrices() {
   const tickers = [...new Set(myPositions.map(p => p.ticker))];
   for (const ticker of tickers) {
-    try {
-      const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=1d`;
-      const proxy = u => `https://corsproxy.io/?${encodeURIComponent(u)}`;
-      const res = await fetch(proxy(url), { signal: AbortSignal.timeout(5000) });
-      const json = await res.json();
-      const price = json?.chart?.result?.[0]?.meta?.regularMarketPrice;
-      if (price) {
-        // Update all positions with this ticker
-        for (const pos of myPositions) {
-          if (pos.ticker === ticker) {
-            pos._livePrice = parseFloat(price);
-          }
+    for (const proxyFn of [
+      u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
+      u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+    ]) {
+      try {
+        const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=1d`;
+        const res = await fetch(proxyFn(url), { signal: AbortSignal.timeout(5000) });
+        if (!res.ok) continue;
+        const json = await res.json();
+        const price = json?.chart?.result?.[0]?.meta?.regularMarketPrice;
+        if (price) {
+          myPositions.filter(p => p.ticker === ticker).forEach(p => p._livePrice = parseFloat(price));
+          break;
         }
-      }
-    } catch(e) {}
+      } catch(e) { continue; }
+    }
   }
   renderPositions();
+  updateDashboard();
 }
 
 // ============ EXPIRY DATE MASK ============
