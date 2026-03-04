@@ -294,7 +294,7 @@ header{background:#212121;border-bottom:1px solid #3a3a3a;padding:0 20px;height:
           <span style="position:absolute;top:5px;left:10px;font-size:11px;color:#555;font-family:var(--mono);pointer-events:none;z-index:1;">股票代碼</span>
           <input class="form-input" id="p-ticker" placeholder="AAPL、NVDA、TSLA..." autocomplete="off"
             oninput="tickerSearch(this.value)"
-            onblur="if(this.value)fetchLivePrice(this.value.trim().toUpperCase())"
+            onblur="if(this.value){const s=this.value.trim().toUpperCase();fetchLivePrice(s);fetchExpiryDates(s);}"
             style="padding-top:22px;padding-right:36px;">
           <span style="position:absolute;right:10px;top:14px;font-size:11px;color:#555;font-family:var(--mono);">AI</span>
           <div id="ticker-dropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:#212121;border:1px solid #3a3a3a;border-radius:4px;z-index:100;max-height:200px;overflow-y:auto;"></div>
@@ -338,10 +338,11 @@ header{background:#212121;border-bottom:1px solid #3a3a3a;padding:0 20px;height:
 
         <!-- 到期日 -->
         <div style="position:relative;">
-          <span style="position:absolute;top:5px;left:10px;font-size:11px;color:#555;font-family:var(--mono);pointer-events:none;z-index:1;">到期 MM/DD/YY</span>
-          <input class="form-input" id="p-expiry" placeholder="032126" maxlength="8"
-            style="padding-top:22px;letter-spacing:2px;"
-            oninput="fmtExpiry(this)" onkeydown="handleExpiryKey(event,this)">
+          <span style="position:absolute;top:5px;left:10px;font-size:11px;color:#555;font-family:var(--mono);pointer-events:none;z-index:2;">到期日</span>
+          <select class="form-input" id="p-expiry" style="padding-top:22px;cursor:pointer;color:#888;">
+            <option value="">── 先輸入股票代碼 ──</option>
+          </select>
+          <span id="expiry-loading" style="display:none;position:absolute;right:30px;top:50%;transform:translateY(-50%);font-size:11px;color:#ff2d78;font-family:var(--mono);">抓取中...</span>
         </div>
 
         <!-- 成本 -->
@@ -371,6 +372,7 @@ header{background:#212121;border-bottom:1px solid #3a3a3a;padding:0 20px;height:
       </div>
 
       <button class="btn primary" onclick="addPosition()" style="width:100%;margin-bottom:16px;padding:11px;font-size:15px;letter-spacing:2px;">＋ 新增倉位</button>
+      <div style="text-align:right;padding:0 4px 6px;"><span id="price-refresh-time" style="font-size:12px;color:#555;font-family:var(--mono);">—</span></div>
       <div class="stats-row">
         <div class="stat-cell"><div class="lbl">總成本</div><div class="val" id="p-total-cost">$0</div></div>
         <div class="stat-cell"><div class="lbl">總市值</div><div class="val" id="p-total-value">$0</div></div>
@@ -597,7 +599,7 @@ async function addPosition() {
 
   if (!ticker) { showToast('請填入股票代碼', 'info'); return; }
   if (!cost)   { showToast('請填入成本 $ / 口', 'info'); return; }
-  if (!expiry) { showToast('請填入到期日', 'info'); return; }
+  if (!expiry || expiry.includes('─') || expiry.includes('抓')) { showToast('請選擇到期日', 'info'); return; }
 
   // Auto-fetch current stock price (silent - don't block if fails)
   let current_price = 0;
@@ -1140,8 +1142,9 @@ async function tickerSearch(val) {
 function selectTicker(sym) {
   document.getElementById('p-ticker').value = sym;
   document.getElementById('ticker-dropdown').style.display = 'none';
-  document.getElementById('p-strike').focus();
+  fetchExpiryDates(sym);
   fetchLivePrice(sym);
+  document.getElementById('p-strike').focus();
 }
 
 // Close dropdown on outside click
@@ -1181,7 +1184,7 @@ async function fetchLivePrice(sym) {
         barChg.textContent  = (up ? '+' : '') + chgPct + '%';
         barChg.style.color  = up ? '#00cc66' : '#ff5555';
       }
-      if (barTime) barTime.textContent = '更新 ' + new Date().toLocaleTimeString('zh-TW', {timeZone:'Asia/Taipei'});
+      if (barTime) barTime.textContent = new Date().toLocaleTimeString('en-US',{timeZone:'America/New_York',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false})+' ET';
     }
   } catch(e) {
     if (barPrice) barPrice.textContent = '—';
@@ -1198,28 +1201,206 @@ function startPriceRefresh() {
 }
 
 // Auto-fetch price when positions are loaded (for P&L calculation)
-async function refreshAllPrices() {
-  const tickers = [...new Set(myPositions.map(p => p.ticker))];
-  for (const ticker of tickers) {
-    for (const proxyFn of [
+// Convert MM/DD/YY expiry to Yahoo Finance option date (unix timestamp)
+function expiryToUnix(expiryStr) {
+  try {
+    // MM/DD/YY format
+    const parts = expiryStr.split('/');
+    if (parts.length !== 3) return null;
+    let [mm, dd, yy] = parts;
+    const year = parseInt(yy) < 50 ? 2000 + parseInt(yy) : 1900 + parseInt(yy);
+    const d = new Date(year, parseInt(mm) - 1, parseInt(dd), 12, 0, 0);
+    return Math.floor(d.getTime() / 1000);
+  } catch(e) { return null; }
+}
+
+// Convert MM/DD/YY to YYYY-MM-DD for UW API
+function expiryToISO(expiryStr) {
+  try {
+    const [mm, dd, yy] = expiryStr.split('/');
+    const year = parseInt(yy) < 50 ? 2000 + parseInt(yy) : 1900 + parseInt(yy);
+    return `${year}-${mm.padStart(2,'0')}-${dd.padStart(2,'0')}`;
+  } catch(e) { return null; }
+}
+
+// Fetch live option price - UW first, Yahoo fallback
+async function fetchOptionPrice(ticker, strike, expiry, optionType) {
+  const strikeNum = parseFloat(strike);
+  const isCall = optionType.toUpperCase().includes('CALL');
+  const uwType = isCall ? 'call' : 'put';
+
+  // ── 1. Try Unusual Whales option quote ──
+  try {
+    const isoExpiry = expiryToISO(expiry);
+    // UW option contract symbol: TICKER YYMMDD C/P STRIKE (OCC format)
+    // Or use UW options chain endpoint
+    const data = await fetchUW(`/api/stocks/${ticker}/options?expiration=${isoExpiry}&option_type=${uwType}`);
+    const contracts = Array.isArray(data) ? data : (data?.options || []);
+    if (contracts.length) {
+      const best = contracts.reduce((prev, curr) =>
+        Math.abs((curr.strike||curr.strike_price||0) - strikeNum) <
+        Math.abs((prev.strike||prev.strike_price||0) - strikeNum) ? curr : prev
+      );
+      const optPrice = best?.ask || best?.last || best?.last_price || best?.mid_price;
+      
+      // Also get stock price from UW
+      let stockPrice = null;
+      try {
+        const quote = await fetchUW(`/api/stocks/${ticker}/quote`);
+        stockPrice = quote?.price || quote?.last || quote?.close;
+      } catch(e) {}
+
+      if (optPrice) return { optPrice: parseFloat(optPrice), stockPrice: stockPrice ? parseFloat(stockPrice) : null };
+    }
+  } catch(e) {}
+
+  // ── 2. Fallback: Yahoo Finance options chain ──
+  try {
+    const unix = expiryToUnix(expiry);
+    const url = `https://query1.finance.yahoo.com/v7/finance/options/${ticker}${unix ? '?date='+unix : ''}`;
+    const proxies = [
       u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
       u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
-    ]) {
+    ];
+    for (const proxyFn of proxies) {
       try {
-        const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=1d`;
-        const res = await fetch(proxyFn(url), { signal: AbortSignal.timeout(5000) });
+        const res = await fetch(proxyFn(url), { signal: AbortSignal.timeout(6000) });
         if (!res.ok) continue;
         const json = await res.json();
-        const price = json?.chart?.result?.[0]?.meta?.regularMarketPrice;
-        if (price) {
-          myPositions.filter(p => p.ticker === ticker).forEach(p => p._livePrice = parseFloat(price));
-          break;
-        }
+        const chain = json?.optionChain?.result?.[0];
+        if (!chain) continue;
+        const stockPrice = chain?.quote?.regularMarketPrice;
+        const contracts = isCall ? chain?.options?.[0]?.calls : chain?.options?.[0]?.puts;
+        if (!contracts?.length) continue;
+        const best = contracts.reduce((prev, curr) =>
+          Math.abs(curr.strike - strikeNum) < Math.abs(prev.strike - strikeNum) ? curr : prev
+        );
+        const optPrice = best?.lastPrice || best?.ask;
+        if (optPrice) return { optPrice: parseFloat(optPrice), stockPrice: stockPrice ? parseFloat(stockPrice) : null };
       } catch(e) { continue; }
     }
+  } catch(e) {}
+
+  return null;
+}
+
+async function refreshAllPrices() {
+  if (!myPositions.length) return;
+
+  for (const pos of myPositions) {
+    try {
+      const result = await fetchOptionPrice(pos.ticker, pos.strike, pos.expiry, pos.option_type || pos.type || 'CALL');
+      if (result) {
+        if (result.optPrice)   pos._livePrice   = parseFloat(result.optPrice);
+        if (result.stockPrice) pos._stockPrice  = parseFloat(result.stockPrice);
+      }
+    } catch(e) {}
+    // small delay between fetches to avoid rate limiting
+    await new Promise(r => setTimeout(r, 300));
   }
   renderPositions();
   updateDashboard();
+
+  // Update last refresh time
+  const t = new Date().toLocaleTimeString('en-US', {timeZone:'America/New_York', hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false}) + ' ET';
+  const el = document.getElementById('price-refresh-time');
+  if (el) el.textContent = '現價更新 ' + t;
+}
+
+// ============ EXPIRY DATE FETCH ============
+async function fetchExpiryDates(sym) {
+  const sel = document.getElementById('p-expiry');
+  const loading = document.getElementById('expiry-loading');
+  if (!sel || !sym) return;
+
+  sel.innerHTML = '<option value="">抓取中...</option>';
+  sel.style.color = '#888';
+  if (loading) loading.style.display = 'inline';
+
+  let expiries = [];
+
+  // 1. Try UW API
+  try {
+    const data = await fetchUW(`/api/options/${sym}/expirations`);
+    if (Array.isArray(data) && data.length) {
+      expiries = data.map(d => typeof d === 'string' ? d : d.expiration || d.date || '').filter(Boolean);
+    }
+  } catch(e) {}
+
+  // 2. Try Yahoo Finance options expirations
+  if (!expiries.length) {
+    try {
+      const url = `https://query1.finance.yahoo.com/v7/finance/options/${sym}`;
+      const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(url)}`;
+      const res = await fetch(proxyUrl, { signal: AbortSignal.timeout(6000) });
+      const json = await res.json();
+      const timestamps = json?.optionChain?.result?.[0]?.expirationDates || [];
+      // Convert unix timestamps to dates
+      expiries = timestamps.map(ts => {
+        const d = new Date(ts * 1000);
+        return d.toISOString().split('T')[0]; // YYYY-MM-DD
+      });
+    } catch(e) {}
+  }
+
+  // 3. Fallback: generate upcoming Fridays for next 12 months
+  if (!expiries.length) {
+    const d = new Date();
+    // Find next Friday
+    d.setDate(d.getDate() + ((5 - d.getDay() + 7) % 7 || 7));
+    for (let i = 0; i < 20; i++) {
+      expiries.push(d.toISOString().split('T')[0]);
+      d.setDate(d.getDate() + 7);
+    }
+    // Also add monthly (3rd Friday) markers
+  }
+
+  // Convert all to MM/DD/YY format for display & store
+  // Use US Eastern time as reference for DTE (options expire at market close ET)
+  const nowET = new Date(new Date().toLocaleString('en-US', {timeZone:'America/New_York'}));
+  const todayET = new Date(nowET.getFullYear(), nowET.getMonth(), nowET.getDate());
+
+  const formatted = expiries
+    .map(e => {
+      try {
+        // Parse as ET noon (options expire 4pm ET, use noon as stable reference)
+        const d = new Date(e + 'T16:00:00-05:00'); // 4pm ET expiry
+        const mm = String(d.getMonth()+1).padStart(2,'0');
+        const dd = String(d.getDate()).padStart(2,'0');
+        const yy = String(d.getFullYear()).slice(2);
+        // DTE based on ET date
+        const expDateET = new Date(new Date(e + 'T00:00:00').toLocaleString('en-US', {timeZone:'America/New_York'}));
+        const dte = Math.round((expDateET - todayET) / 86400000);
+        return { value: `${mm}/${dd}/${yy}`, label: `${mm}/${dd}/${yy}  (${dte}d ET)`, dte, d };
+      } catch(e) { return null; }
+    })
+    .filter(x => x && x.dte >= 0)
+    .sort((a,b) => a.d - b.d);
+
+  if (loading) loading.style.display = 'none';
+
+  if (!formatted.length) {
+    sel.innerHTML = '<option value="">無法取得，請手動輸入</option>';
+    // Fallback to text input
+    const newInput = document.createElement('input');
+    newInput.className = 'form-input';
+    newInput.id = 'p-expiry';
+    newInput.placeholder = 'MM/DD/YY';
+    newInput.maxLength = 8;
+    newInput.style.paddingTop = '22px';
+    newInput.style.letterSpacing = '2px';
+    newInput.setAttribute('oninput', 'fmtExpiry(this)');
+    sel.parentNode.replaceChild(newInput, sel);
+    return;
+  }
+
+  sel.style.color = '#ffffff';
+  sel.innerHTML = formatted.map((f, i) => {
+    // Group labels
+    const isWeekly = f.d.getDay() === 5;
+    const label = f.label + (f.dte <= 7 ? ' 🔥' : f.dte <= 21 ? '' : '');
+    return `<option value="${f.value}" ${i===0?'selected':''}>${label}</option>`;
+  }).join('');
 }
 
 // ============ EXPIRY DATE MASK ============
