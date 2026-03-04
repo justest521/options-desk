@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Options Desk — 選擇權交易儀表板</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@1"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;600&family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
 :root{
@@ -194,6 +194,7 @@ header{background:#212121;border-bottom:1px solid #3a3a3a;padding:0 20px;height:
     <button class="nav-tab" onclick="showPage('flow',this)">大單流</button>
     <button class="nav-tab" onclick="showPage('chart',this)">圖表</button>
     <button class="nav-tab" onclick="showPage('chat',this)">群組</button>
+    <button class="nav-tab" onclick="showPage('chain',this)">期權鏈</button>
   </div>
   <div class="header-right">
     <div id="db-dot" class="dot"></div>
@@ -285,14 +286,65 @@ header{background:#212121;border-bottom:1px solid #3a3a3a;padding:0 20px;height:
       </div>
     </div>
     <div class="card-body">
-      <div class="pos-form">
-        <input class="form-input" id="p-ticker" placeholder="代碼 AEHR">
-        <input class="form-input" id="p-type" placeholder="CALL/PUT">
-        <input class="form-input" id="p-strike" placeholder="履約價" type="number">
-        <input class="form-input" id="p-expiry" placeholder="到期 MM/DD/YY">
-        <input class="form-input" id="p-cost" placeholder="成本 $" type="number" step="0.01">
-        <input class="form-input" id="p-current" placeholder="現價 $" type="number" step="0.01">
-        <input class="form-input" id="p-qty" placeholder="口數" type="number">
+      <!-- Ticker with AI search -->
+      <div style="position:relative;margin-bottom:8px;">
+        <div style="display:flex;gap:8px;align-items:center;">
+          <div style="position:relative;flex:1;">
+            <input class="form-input" id="p-ticker" placeholder="股票代碼，例：AAPL、NVDA、TSLA" autocomplete="off" oninput="tickerSearch(this.value)" style="padding-right:36px;">
+            <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:11px;color:#555;font-family:var(--mono);">AI</span>
+            <div id="ticker-dropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:#212121;border:1px solid #3a3a3a;border-radius:4px;z-index:100;max-height:200px;overflow-y:auto;"></div>
+          </div>
+          <div style="flex:1.5;">
+            <select class="form-input" id="p-type" style="cursor:pointer;">
+              <optgroup label="─ 單腿策略 ─" style="color:#555;">
+                <option value="CALL">📈 CALL（買進看漲）</option>
+                <option value="PUT">📉 PUT（買進看跌）</option>
+                <option value="SELL CALL">SHORT CALL（賣出看漲）</option>
+                <option value="SELL PUT">SHORT PUT（賣出看跌）</option>
+              </optgroup>
+              <optgroup label="─ 價差策略 ─" style="color:#555;">
+                <option value="Bull Call Spread">Bull Call Spread（牛市看漲）</option>
+                <option value="Bear Put Spread">Bear Put Spread（熊市看跌）</option>
+                <option value="Bear Call Spread">Bear Call Spread（熊市看漲賣）</option>
+                <option value="Bull Put Spread">Bull Put Spread（牛市看跌賣）</option>
+              </optgroup>
+              <optgroup label="─ 中性策略 ─" style="color:#555;">
+                <option value="Iron Condor">Iron Condor（鐵兀鷹）</option>
+                <option value="Straddle">Straddle（跨式）</option>
+                <option value="Strangle">Strangle（勒式）</option>
+                <option value="Butterfly">Butterfly（蝴蝶）</option>
+              </optgroup>
+              <optgroup label="─ 其他 ─" style="color:#555;">
+                <option value="Covered Call">Covered Call（備兌賣權）</option>
+                <option value="Cash Secured Put">Cash Secured Put（現金擔保賣權）</option>
+                <option value="LEAPS">LEAPS（長期選擇權）</option>
+                <option value="其他">其他</option>
+              </optgroup>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="pos-form" style="grid-template-columns:1fr 1fr 1fr 1fr 1fr;">
+        <div style="position:relative;">
+          <input class="form-input" id="p-strike" placeholder="履約價，例：150" type="number" style="padding-top:20px;">
+          <span style="position:absolute;top:5px;left:10px;font-size:11px;color:#555;font-family:var(--mono);pointer-events:none;">履約價 $</span>
+        </div>
+        <div style="position:relative;">
+          <input class="form-input" id="p-expiry" placeholder="03/21/26" style="padding-top:20px;">
+          <span style="position:absolute;top:5px;left:10px;font-size:11px;color:#555;font-family:var(--mono);pointer-events:none;">到期 MM/DD/YY</span>
+        </div>
+        <div style="position:relative;">
+          <input class="form-input" id="p-cost" placeholder="每口買入成本" type="number" step="0.01" style="padding-top:20px;">
+          <span style="position:absolute;top:5px;left:10px;font-size:11px;color:#555;font-family:var(--mono);pointer-events:none;">成本 $ / 口</span>
+        </div>
+        <div style="position:relative;">
+          <input class="form-input" id="p-current" placeholder="當前市價" type="number" step="0.01" style="padding-top:20px;">
+          <span style="position:absolute;top:5px;left:10px;font-size:11px;color:#555;font-family:var(--mono);pointer-events:none;">現價 $ / 口</span>
+        </div>
+        <div style="position:relative;">
+          <input class="form-input" id="p-qty" placeholder="1" type="number" style="padding-top:20px;">
+          <span style="position:absolute;top:5px;left:10px;font-size:11px;color:#555;font-family:var(--mono);pointer-events:none;">口數（張）</span>
+        </div>
       </div>
       <button class="btn primary" onclick="addPosition()" style="width:100%;margin-bottom:16px;padding:9px;">＋ 新增倉位</button>
       <div class="stats-row">
@@ -381,6 +433,62 @@ header{background:#212121;border-bottom:1px solid #3a3a3a;padding:0 20px;height:
       </div>
     </div>
   </div>
+
+<!-- PAGE: OPTIONS CHAIN -->
+<div id="page-chain" class="page">
+  <div class="card">
+    <div class="card-head">
+      <span class="card-title">/ 期權鏈</span>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <input type="text" id="chain-symbol" class="ticker-input" value="AAPL" placeholder="代碼" style="width:80px;">
+        <select id="chain-expiry" class="form-input" style="width:160px;padding:5px 8px;background:#1a1a1a;border:1px solid #3a3a3a;color:#fff;font-family:var(--mono);font-size:13px;border-radius:4px;">
+          <option value="">選擇到期日</option>
+        </select>
+        <button class="btn" onclick="loadChain()">載入</button>
+        <span id="chain-price" style="font-family:var(--mono);font-size:16px;color:#ff2d78;"></span>
+        <span id="chain-status" style="font-size:13px;color:#888;font-family:var(--mono);"></span>
+      </div>
+    </div>
+    <div style="padding:8px 16px;display:flex;gap:16px;align-items:center;border-bottom:1px solid #3a3a3a;flex-wrap:wrap;background:#212121;">
+      <label style="font-size:13px;color:#888;display:flex;align-items:center;gap:6px;cursor:pointer;">
+        <input type="checkbox" id="chain-itm" onchange="renderChain()" style="accent-color:#ff2d78;"> 只顯示 ITM
+      </label>
+      <label style="font-size:13px;color:#888;display:flex;align-items:center;gap:6px;cursor:pointer;">
+        <input type="checkbox" id="chain-highlight" checked onchange="renderChain()" style="accent-color:#ff2d78;"> 高亮高OI
+      </label>
+      <span style="font-size:12px;color:#555;font-family:var(--mono);">點擊履約價可帶入倉位</span>
+    </div>
+    <div style="overflow-x:auto;max-height:600px;overflow-y:auto;">
+      <table style="width:100%;border-collapse:collapse;font-family:var(--mono);">
+        <thead style="position:sticky;top:0;z-index:2;">
+          <tr style="background:#2a2a2a;">
+            <th colspan="6" style="text-align:center;padding:8px;color:#ff2d78;font-size:13px;border-right:2px solid #ff2d78;letter-spacing:1px;">─── CALL ───</th>
+            <th style="text-align:center;padding:8px;color:#ffffff;font-size:13px;background:#1a1a1a;letter-spacing:2px;min-width:80px;">STRIKE</th>
+            <th colspan="6" style="text-align:center;padding:8px;color:#888;font-size:13px;border-left:2px solid #444;letter-spacing:1px;">─── PUT ───</th>
+          </tr>
+          <tr style="background:#212121;font-size:12px;color:#666;letter-spacing:1px;">
+            <th style="padding:5px 8px;text-align:right;font-weight:normal;">BID</th>
+            <th style="padding:5px 8px;text-align:right;font-weight:normal;">ASK</th>
+            <th style="padding:5px 8px;text-align:right;font-weight:normal;">LAST</th>
+            <th style="padding:5px 8px;text-align:right;font-weight:normal;">CHG%</th>
+            <th style="padding:5px 8px;text-align:right;font-weight:normal;">VOL</th>
+            <th style="padding:5px 8px;text-align:right;border-right:2px solid #ff2d78;font-weight:normal;">OI</th>
+            <th style="padding:5px 10px;text-align:center;background:#1a1a1a;color:#aaa;font-size:12px;font-weight:normal;"></th>
+            <th style="padding:5px 8px;text-align:left;border-left:2px solid #444;font-weight:normal;">OI</th>
+            <th style="padding:5px 8px;text-align:left;font-weight:normal;">VOL</th>
+            <th style="padding:5px 8px;text-align:left;font-weight:normal;">LAST</th>
+            <th style="padding:5px 8px;text-align:left;font-weight:normal;">ASK</th>
+            <th style="padding:5px 8px;text-align:left;font-weight:normal;">BID</th>
+            <th style="padding:5px 8px;text-align:left;font-weight:normal;">CHG%</th>
+          </tr>
+        </thead>
+        <tbody id="chain-body">
+          <tr><td colspan="13" style="text-align:center;padding:40px;color:#888;font-family:var(--mono);font-size:14px;">輸入代碼並按載入</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
 </div>
 
 <script>
@@ -390,8 +498,7 @@ const SUPABASE_KEY = 'sb_publishable_4wUaKatN4Ep7rqupZ82RLw_Qq96E-Vn';
 const UW_API_KEY   = 'd56cdfa6-0ffb-4421-816c-890629220505';
 
 // ============ INIT SUPABASE ============
-const { createClient } = supabase;
-const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ============ STATE ============
 let currentUser = localStorage.getItem('options_user') || '';
@@ -454,32 +561,74 @@ async function loadAllPositions() {
 
 async function addPosition() {
   if (!currentUser) { showToast('請先輸入名字', 'info'); return; }
-  const ticker  = document.getElementById('p-ticker').value.toUpperCase().trim();
-  const type    = document.getElementById('p-type').value.toUpperCase().trim() || 'CALL';
+
+  // Safely extract all values as plain strings/numbers
+  const ticker  = String(document.getElementById('p-ticker').value || '').toUpperCase().trim();
+  const typeEl  = document.getElementById('p-type');
+  const type    = String(typeEl.options ? typeEl.options[typeEl.selectedIndex].value : typeEl.value || 'CALL').trim();
   const strike  = parseFloat(document.getElementById('p-strike').value) || 0;
-  const expiry  = document.getElementById('p-expiry').value.trim();
-  const cost    = parseFloat(document.getElementById('p-cost').value);
-  const current = parseFloat(document.getElementById('p-current').value);
+  const expiry  = String(document.getElementById('p-expiry').value || '').trim();
+  const cost    = parseFloat(document.getElementById('p-cost').value) || 0;
+  const current = parseFloat(document.getElementById('p-current').value) || 0;
   const qty     = parseInt(document.getElementById('p-qty').value) || 1;
-  if (!ticker || !cost || !current) { showToast('請填代碼、成本、現價', 'info'); return; }
 
-  const { error } = await db.from('positions').insert({ user_name: currentUser, ticker, type, strike, expiry, cost, current_price: current, qty });
-  if (error) { showToast('新增失敗：' + error.message, 'stop'); return; }
+  if (!ticker) { showToast('請填入股票代碼', 'info'); return; }
+  if (!cost)   { showToast('請填入成本', 'info'); return; }
+  if (!current){ showToast('請填入現價', 'info'); return; }
 
-  ['p-ticker','p-type','p-strike','p-expiry','p-cost','p-current','p-qty'].forEach(id => document.getElementById(id).value = '');
-  await loadMyPositions();
-  checkAlertForNew(ticker, cost, current);
-  showToast('✅ 已新增 ' + ticker, 'info');
+  // Build a plain serializable object
+  const payload = {
+    user_name:     String(currentUser),
+    ticker:        ticker,
+    type:          type,
+    strike:        Number(strike),
+    expiry:        expiry,
+    cost:          Number(cost),
+    current_price: Number(current),
+    qty:           Number(qty)
+  };
+
+  try {
+    // v1 SDK: insert array of plain objects
+    const { data, error } = await db.from('positions').insert([{
+      user_name: String(currentUser),
+      ticker:    String(ticker),
+      type:      String(type),
+      strike:    Number(strike),
+      expiry:    String(expiry),
+      cost:      Number(cost),
+      current_price: Number(current),
+      qty:       Number(qty)
+    }]);
+    if (error) throw new Error(error.message);
+
+    // Reset form
+    document.getElementById('p-ticker').value = '';
+    document.getElementById('p-strike').value = '';
+    document.getElementById('p-expiry').value = '';
+    document.getElementById('p-cost').value = '';
+    document.getElementById('p-current').value = '';
+    document.getElementById('p-qty').value = '';
+    if (typeEl.options) typeEl.selectedIndex = 0;
+
+    await loadMyPositions();
+    checkAlertForNew(ticker, cost, current);
+    showToast('✅ 已新增 ' + ticker + ' ' + type, 'info');
+  } catch(e) {
+    showToast('新增失敗：' + e.message, 'stop');
+  }
 }
 
 async function deletePosition(id) {
-  await db.from('positions').delete().eq('id', id);
+  const cleanId = String(id);
+  await db.from('positions').delete().eq('id', cleanId);
   await loadMyPositions();
 }
 
 async function clearMyPositions() {
   if (!currentUser || !confirm('確定清空 ' + currentUser + ' 的所有倉位？')) return;
-  await db.from('positions').delete().eq('user_name', currentUser);
+  const name = String(currentUser);
+  await db.from('positions').delete().eq('user_name', name);
   await loadMyPositions();
 }
 
@@ -635,22 +784,62 @@ async function refreshFlow(silent=false) {
     if (!silent) showToast('請先設定 UW API Key', 'info'); 
     return; 
   }
-  try {
-    flowData = await fetchUW('/api/option-trades/flow-alerts');
+  const endpoints = [
+    '/api/option-trades/flow-alerts',
+    '/api/options/flow-alerts',
+    '/api/flow/options',
+  ];
+  let loaded = false;
+  for (const ep of endpoints) {
+    try {
+      const data = await fetchUW(ep);
+      if (Array.isArray(data) && data.length > 0) {
+        flowData = data;
+        loaded = true;
+        break;
+      }
+    } catch(e) { continue; }
+  }
+  if (loaded) {
     document.getElementById('db-dot').className = 'dot on';
     renderFlow('flow-full', flowData, flowFilter, 100);
     renderFlow('dash-flow', flowData, 'all', 10);
     if (!silent) showToast('大單已更新 ' + flowData.length + ' 筆', 'info');
-  } catch(e) {
+  } else {
     document.getElementById('db-dot').className = 'dot';
-    if (!silent) showToast('大單載入失敗', 'stop');
+    if (!silent) showToast('大單載入失敗，請檢查 API Key', 'stop');
+    // Show mock data so filters are testable
+    if (!flowData.length) {
+      flowData = getMockFlow();
+      renderFlow('flow-full', flowData, flowFilter, 100);
+      renderFlow('dash-flow', flowData, 'all', 10);
+      if (!silent) showToast('顯示示範資料', 'info');
+    }
   }
+}
+
+function getMockFlow() {
+  return [
+    {ticker:'NVDA',put_call:'CALL',strike:'900',expiry:'2026-04-17',total_premium:2500000,sentiment:'bullish',execution_type:'sweep'},
+    {ticker:'TSLA',put_call:'PUT',strike:'250',expiry:'2026-03-21',total_premium:1800000,sentiment:'bearish',execution_type:'block'},
+    {ticker:'SPY',put_call:'CALL',strike:'580',expiry:'2026-04-17',total_premium:3200000,sentiment:'bullish',execution_type:'sweep'},
+    {ticker:'AAPL',put_call:'CALL',strike:'220',expiry:'2026-05-16',total_premium:950000,sentiment:'bullish',execution_type:'block'},
+    {ticker:'QQQ',put_call:'PUT',strike:'480',expiry:'2026-03-28',total_premium:1100000,sentiment:'bearish',execution_type:'sweep'},
+    {ticker:'AMZN',put_call:'CALL',strike:'210',expiry:'2026-04-17',total_premium:780000,sentiment:'bullish',execution_type:'block'},
+    {ticker:'META',put_call:'PUT',strike:'560',expiry:'2026-03-21',total_premium:620000,sentiment:'bearish',execution_type:'sweep'},
+    {ticker:'MSFT',put_call:'CALL',strike:'430',expiry:'2026-05-16',total_premium:1400000,sentiment:'bullish',execution_type:'block'},
+    {ticker:'AMD',put_call:'CALL',strike:'130',expiry:'2026-04-17',total_premium:430000,sentiment:'bullish',execution_type:'sweep'},
+    {ticker:'GLD',put_call:'PUT',strike:'240',expiry:'2026-03-28',total_premium:890000,sentiment:'bearish',execution_type:'block'},
+  ];
 }
 
 function filterFlow(f, btn) {
   flowFilter = f;
-  document.querySelectorAll('.fbtn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#page-flow .fbtn').forEach(b => b.classList.remove('active'));
   if(btn) btn.classList.add('active');
+  if (!flowData.length) {
+    flowData = getMockFlow();
+  }
   renderFlow('flow-full', flowData, f, 100);
 }
 
@@ -696,6 +885,242 @@ function fillPosition(ticker, type, strike, expiry) {
     showToast(`已帶入 ${ticker} ${type} $${strike}，請填成本和現價`, 'info');
   }, 200);
 }
+
+
+// ============ OPTIONS CHAIN ============
+let chainData = { calls: [], puts: [] };
+let stockPrice = 0;
+
+async function loadChain() {
+  const sym = document.getElementById('chain-symbol').value.trim().toUpperCase();
+  if (!sym) return;
+  
+  const body = document.getElementById('chain-body');
+  body.innerHTML = '<tr><td colspan="13" style="text-align:center;padding:40px;color:#888;font-family:var(--mono);">載入中...</td></tr>';
+  document.getElementById('chain-status').textContent = '';
+
+  // Step 1: get expiry dates from UW
+  try {
+    const expirySelect = document.getElementById('chain-expiry');
+    expirySelect.innerHTML = '<option>載入中...</option>';
+    
+    let expiries = [];
+    try {
+      const data = await fetchUW(`/api/options/${sym}/expirations`);
+      if (Array.isArray(data)) expiries = data.slice(0, 12);
+    } catch(e) {}
+    
+    if (!expiries.length) {
+      // Generate upcoming Fridays as fallback
+      const d = new Date(); 
+      for (let i = 0; i < 8; i++) {
+        d.setDate(d.getDate() + (5 - d.getDay() + 7) % 7 || 7);
+        expiries.push(d.toISOString().split('T')[0]);
+        d.setDate(d.getDate() + 1);
+      }
+    }
+    
+    expirySelect.innerHTML = expiries.map(e => `<option value="${e}">${e}</option>`).join('');
+    
+    // Load chain for first expiry
+    await fetchChainData(sym, expiries[0]);
+    
+  } catch(e) {
+    body.innerHTML = `<tr><td colspan="13" style="text-align:center;padding:40px;color:#ff5555;">${e.message}</td></tr>`;
+  }
+}
+
+async function fetchChainData(sym, expiry) {
+  const body = document.getElementById('chain-body');
+  const statusEl = document.getElementById('chain-status');
+  body.innerHTML = '<tr><td colspan="13" style="text-align:center;padding:40px;color:#888;">載入 ' + sym + ' ' + expiry + '...</td></tr>';
+
+  try {
+    // Try UW API
+    let calls = [], puts = [];
+    try {
+      const data = await fetchUW(`/api/options/${sym}/chain?expiration=${expiry}`);
+      if (data?.calls) { calls = data.calls; puts = data.puts; }
+      else if (Array.isArray(data)) {
+        calls = data.filter(o => (o.put_call||o.type||'').toUpperCase().includes('CALL'));
+        puts  = data.filter(o => (o.put_call||o.type||'').toUpperCase().includes('PUT'));
+      }
+    } catch(e) {}
+
+    // Fallback: generate mock chain around current price
+    if (!calls.length) {
+      const mockPrice = await getMockStockPrice(sym);
+      stockPrice = mockPrice;
+      document.getElementById('chain-price').textContent = '$' + mockPrice.toFixed(2);
+      
+      const strikes = [];
+      const base = Math.round(mockPrice / 5) * 5;
+      for (let i = -10; i <= 10; i++) strikes.push(base + i * 5);
+      
+      strikes.forEach(s => {
+        const itm_call = s < mockPrice;
+        const itm_put  = s > mockPrice;
+        const dist = Math.abs(s - mockPrice) / mockPrice;
+        
+        calls.push({
+          strike: s, bid: +(Math.random()*2+0.1).toFixed(2),
+          ask: +(Math.random()*2+0.3).toFixed(2),
+          last: +(Math.random()*3+0.1).toFixed(2),
+          change_pct: +((Math.random()-0.5)*20).toFixed(2),
+          volume: Math.floor(Math.random()*2000),
+          open_interest: Math.floor(Math.random()*5000 + (itm_call?2000:500)),
+          itm: itm_call
+        });
+        puts.push({
+          strike: s, bid: +(Math.random()*2+0.1).toFixed(2),
+          ask: +(Math.random()*2+0.3).toFixed(2),
+          last: +(Math.random()*3+0.1).toFixed(2),
+          change_pct: +((Math.random()-0.5)*20).toFixed(2),
+          volume: Math.floor(Math.random()*2000),
+          open_interest: Math.floor(Math.random()*5000 + (itm_put?2000:500)),
+          itm: itm_put
+        });
+      });
+      statusEl.textContent = '示範資料';
+    } else {
+      statusEl.textContent = calls.length + ' 個履約價';
+    }
+
+    chainData = { calls, puts };
+    renderChain();
+
+  } catch(e) {
+    body.innerHTML = `<tr><td colspan="13" style="text-align:center;padding:40px;color:#ff5555;">${e.message}</td></tr>`;
+  }
+}
+
+async function getMockStockPrice(sym) {
+  const prices = {AAPL:220,NVDA:120,TSLA:280,QQQ:510,SPY:575,AMZN:210,META:580,MSFT:420,AEHR:42};
+  return prices[sym] || 100;
+}
+
+document.getElementById('chain-expiry')?.addEventListener('change', function() {
+  const sym = document.getElementById('chain-symbol').value.trim().toUpperCase();
+  if (sym && this.value) fetchChainData(sym, this.value);
+});
+
+function renderChain() {
+  const body = document.getElementById('chain-body');
+  const itmOnly = document.getElementById('chain-itm')?.checked;
+  const highlight = document.getElementById('chain-highlight')?.checked;
+  
+  const { calls, puts } = chainData;
+  if (!calls.length) return;
+
+  // Index puts by strike
+  const putMap = {};
+  puts.forEach(p => putMap[p.strike] = p);
+
+  const maxOI = Math.max(...calls.map(c => c.open_interest || 0), ...puts.map(p => p.open_interest || 0), 1);
+
+  let rows = calls
+    .filter(c => !itmOnly || c.itm)
+    .sort((a, b) => a.strike - b.strike)
+    .map(c => {
+      const p = putMap[c.strike] || {};
+      const isATM = stockPrice && Math.abs(c.strike - stockPrice) < 3;
+      const callHighOI = highlight && (c.open_interest || 0) > maxOI * 0.5;
+      const putHighOI  = highlight && (p.open_interest || 0) > maxOI * 0.5;
+      
+      const callBg = c.itm ? 'rgba(255,45,120,0.06)' : 'transparent';
+      const putBg  = p.itm ? 'rgba(100,100,100,0.06)' : 'transparent';
+      const strikeBg = isATM ? 'rgba(255,45,120,0.15)' : '#1a1a1a';
+      const strikeColor = isATM ? '#ff2d78' : '#ffffff';
+
+      const fmt = v => v != null && v !== undefined ? v : '—';
+      const fmtPct = v => v != null ? `<span style="color:${v>=0?'#ff2d78':'#888'}">${v>=0?'+':''}${v}%</span>` : '—';
+      const fmtOI = (v, hi) => `<span style="${hi?'color:#ff2d78;font-weight:600;':''}">${v?.toLocaleString?.() ?? '—'}</span>`;
+
+      return `<tr style="border-bottom:1px solid #2a2a2a;font-size:13px;" onmouseover="this.style.background='rgba(255,255,255,0.03)'" onmouseout="this.style.background=''">
+        <td style="padding:5px 8px;text-align:right;background:${callBg};color:#ccc">${fmt(c.bid)}</td>
+        <td style="padding:5px 8px;text-align:right;background:${callBg};color:#ccc">${fmt(c.ask)}</td>
+        <td style="padding:5px 8px;text-align:right;background:${callBg};color:#ccc">${fmt(c.last)}</td>
+        <td style="padding:5px 8px;text-align:right;background:${callBg}">${fmtPct(c.change_pct)}</td>
+        <td style="padding:5px 8px;text-align:right;background:${callBg};color:#aaa">${c.volume?.toLocaleString?.() ?? '—'}</td>
+        <td style="padding:5px 8px;text-align:right;background:${callBg};border-right:2px solid #ff2d78;">${fmtOI(c.open_interest, callHighOI)}</td>
+        <td onclick="fillPosition('${document.getElementById('chain-symbol').value.trim().toUpperCase()}','CALL','${c.strike}','')" 
+            style="padding:5px 10px;text-align:center;background:${strikeBg};color:${strikeColor};font-weight:600;font-size:14px;cursor:pointer;border-left:1px solid #3a3a3a;border-right:1px solid #3a3a3a;" 
+            title="點擊帶入倉位">${c.strike}</td>
+        <td style="padding:5px 8px;text-align:left;background:${putBg};border-left:2px solid #444;">${fmtOI(p.open_interest, putHighOI)}</td>
+        <td style="padding:5px 8px;text-align:left;background:${putBg};color:#aaa">${p.volume?.toLocaleString?.() ?? '—'}</td>
+        <td style="padding:5px 8px;text-align:left;background:${putBg};color:#ccc">${fmt(p.last)}</td>
+        <td style="padding:5px 8px;text-align:left;background:${putBg};color:#ccc">${fmt(p.ask)}</td>
+        <td style="padding:5px 8px;text-align:left;background:${putBg};color:#ccc">${fmt(p.bid)}</td>
+        <td style="padding:5px 8px;text-align:left;background:${putBg}">${fmtPct(p.change_pct)}</td>
+      </tr>`;
+    });
+
+  body.innerHTML = rows.join('') || '<tr><td colspan="13" style="text-align:center;padding:30px;color:#888;">無資料</td></tr>';
+}
+
+// ============ TICKER SEARCH ============
+const POPULAR_TICKERS = [
+  {s:'AAPL',n:'Apple'},    {s:'NVDA',n:'NVIDIA'},   {s:'TSLA',n:'Tesla'},
+  {s:'MSFT',n:'Microsoft'},{s:'META',n:'Meta'},      {s:'AMZN',n:'Amazon'},
+  {s:'GOOGL',n:'Alphabet'},{s:'SPY',n:'S&P500 ETF'},{s:'QQQ',n:'Nasdaq ETF'},
+  {s:'AEHR',n:'Aehr Test'},{s:'AMD',n:'AMD'},        {s:'CRWD',n:'CrowdStrike'},
+  {s:'PLTR',n:'Palantir'}, {s:'COIN',n:'Coinbase'},  {s:'MSTR',n:'MicroStrategy'},
+  {s:'CRWV',n:'CoreWeave'},{s:'GLD',n:'Gold ETF'},   {s:'EEM',n:'Emerging Mkt'},
+  {s:'IBIT',n:'Bitcoin ETF'},{s:'LUNR',n:'Intuitive Machines'},{s:'ISRG',n:'Intuitive Surgical'},
+  {s:'NEE',n:'NextEra'},   {s:'CRCL',n:'Circle'},    {s:'EWY',n:'South Korea ETF'},
+  {s:'IWM',n:'Russell 2000'},{s:'VIX',n:'Volatility'},{s:'TLT',n:'Treasury ETF'},
+  {s:'SOFI',n:'SoFi'},     {s:'RIVN',n:'Rivian'},    {s:'SMCI',n:'Super Micro'},
+];
+
+let tickerSearchTimeout;
+async function tickerSearch(val) {
+  const dd = document.getElementById('ticker-dropdown');
+  if (!val || val.length < 1) { dd.style.display = 'none'; return; }
+  
+  clearTimeout(tickerSearchTimeout);
+  tickerSearchTimeout = setTimeout(async () => {
+    const q = val.toUpperCase();
+    // Local fuzzy match first
+    let matches = POPULAR_TICKERS.filter(t => 
+      t.s.includes(q) || t.n.toUpperCase().includes(q)
+    ).slice(0, 8);
+    
+    // If no local match, try UW search
+    if (matches.length === 0 && UW_API_KEY && UW_API_KEY !== '在這裡貼上你的UW_API_KEY') {
+      try {
+        const data = await fetchUW(`/api/tickers/search?search=${q}&limit=8`);
+        if (Array.isArray(data)) {
+          matches = data.map(d => ({ s: d.ticker || d.symbol, n: d.name || d.company || '' }));
+        }
+      } catch(e) {}
+    }
+    
+    if (!matches.length) { dd.style.display = 'none'; return; }
+    
+    dd.innerHTML = matches.map(t => 
+      `<div onclick="selectTicker('${t.s}')" style="padding:8px 12px;cursor:pointer;display:flex;justify-content:space-between;border-bottom:1px solid #2a2a2a;font-family:var(--mono);" 
+       onmouseover="this.style.background='rgba(255,45,120,0.08)'" onmouseout="this.style.background=''">
+        <span style="color:#ff2d78;font-size:14px;">${t.s}</span>
+        <span style="color:#888;font-size:13px;">${t.n}</span>
+      </div>`
+    ).join('');
+    dd.style.display = 'block';
+  }, 200);
+}
+
+function selectTicker(sym) {
+  document.getElementById('p-ticker').value = sym;
+  document.getElementById('ticker-dropdown').style.display = 'none';
+  document.getElementById('p-strike').focus();
+}
+
+// Close dropdown on outside click
+document.addEventListener('click', e => {
+  if (!e.target.closest('#p-ticker') && !e.target.closest('#ticker-dropdown')) {
+    const dd = document.getElementById('ticker-dropdown');
+    if (dd) dd.style.display = 'none';
+  }
+});
 
 // ============ CHART (TradingView) ============
 function loadChart() {
@@ -805,7 +1230,7 @@ async function sendMsg() {
   if (!msgContent) return;
   msgEl.value = '';
   msgEl.disabled = true;
-  await db.from('messages').insert({ user_name: currentUser, content: msgContent });
+  await db.from('messages').insert([{ user_name: String(currentUser), content: String(msgContent) }]);
   setTimeout(() => { msgEl.disabled = false; msgEl.focus(); }, 300);
 }
 
