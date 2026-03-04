@@ -13,7 +13,7 @@
   --border:#21293a;--border2:#2d3748;
   --accent:#00e5b0;--accent2:#0ea5e9;--accent3:#a78bfa;
   --red:#f43f5e;--green:#00e5b0;--yellow:#fbbf24;--orange:#fb923c;
-  --text:#e2e8f0;--text2:#94a3b8;--text3:#475569;
+  --text:#f0f6ff;--text2:#b0bec5;--text3:#6b7a8d;
   --mono:'IBM Plex Mono',monospace;--sans:'Noto Sans TC',sans-serif;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -661,14 +661,28 @@ function renderFlow(containerId, data, filter, limit) {
     const premium = f.total_premium || f.premium || 0;
     const isCall  = type.includes('CALL');
     const premStr = typeof premium === 'number' ? premium > 1e6 ? `$${(premium/1e6).toFixed(1)}M` : premium > 1e3 ? `$${(premium/1e3).toFixed(0)}K` : `$${premium}` : `$${premium}`;
-    return `<div class="flow-item">
+    const expFmt = String(expiry).replace(/-/g,'/').replace(/20(\d\d)\/(\d\d)\/(\d\d)/,'$2/$3/$1').replace(/(\d{4})\/(\d{2})\/(\d{2})/,'$2/$3/$1');
+    return `<div class="flow-item" onclick="fillPosition('${ticker}','${type}','${strike}','${expFmt}')" style="cursor:pointer;" title="點擊帶入倉位">
       <div class="flow-row">
-        <div><span class="flow-ticker">${ticker}</span> <span class="tag ${isCall?'tag-call':'tag-put'}">${type||'—'}</span></div>
+        <div><span class="flow-ticker">${ticker}</span> <span class="tag ${isCall?'tag-call':'tag-put'}">${type||'—'}</span> <span style="font-size:11px;color:var(--text3);">點擊帶入</span></div>
         <div class="flow-amt" style="color:${isCall?'var(--green)':'var(--red)'}">${premStr}</div>
       </div>
       <div class="flow-detail">行權 $${strike} · 到期 ${expiry}</div>
     </div>`;
   }).join('');
+}
+
+// ============ FILL POSITION FROM FLOW ============
+function fillPosition(ticker, type, strike, expiry) {
+  showPage('positions', document.querySelector('[onclick*=positions]'));
+  setTimeout(() => {
+    document.getElementById('p-ticker').value = ticker;
+    document.getElementById('p-type').value = type || 'CALL';
+    document.getElementById('p-strike').value = strike || '';
+    document.getElementById('p-expiry').value = expiry || '';
+    document.getElementById('p-cost').focus();
+    showToast(`已帶入 ${ticker} ${type} $${strike}，請填成本和現價`, 'info');
+  }, 200);
 }
 
 // ============ CHART ============
@@ -690,26 +704,36 @@ async function fetchOHLC(symbol, interval) {
   const rngMap = { 'D':'6mo','W':'2y','M':'5y','60':'5d','15':'2d' };
   const iv = ivMap[interval] || '1d';
   const rng = rngMap[interval] || '6mo';
-  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=${iv}&range=${rng}`;
-  const proxies = [u=>`https://corsproxy.io/?${encodeURIComponent(u)}`,u=>`https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`];
-  for (const px of proxies) {
-    try {
-      const res = await fetch(px(url));
-      if (!res.ok) continue;
-      const data = await res.json();
-      const result = data?.chart?.result?.[0];
-      if (!result) continue;
-      const ts = result.timestamp, q = result.indicators.quote[0];
-      const candles = [], volumes = [];
-      for (let i = 0; i < ts.length; i++) {
-        if (!q.open[i]||!q.close[i]) continue;
-        candles.push({time:ts[i],open:+q.open[i].toFixed(2),high:+q.high[i].toFixed(2),low:+q.low[i].toFixed(2),close:+q.close[i].toFixed(2)});
-        volumes.push({time:ts[i],value:q.volume[i]||0,color:q.close[i]>=q.open[i]?'rgba(0,229,176,0.4)':'rgba(244,63,94,0.4)'});
-      }
-      return { candles, volumes };
-    } catch(e) { continue; }
+
+  // Try multiple Yahoo Finance endpoints + proxies
+  const yahooUrl1 = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=${iv}&range=${rng}`;
+  const yahooUrl2 = `https://query2.finance.yahoo.com/v8/finance/chart/${symbol}?interval=${iv}&range=${rng}`;
+  const proxies = [
+    u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
+    u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+    u => `https://thingproxy.freeboard.io/fetch/${u}`,
+  ];
+
+  for (const baseUrl of [yahooUrl1, yahooUrl2]) {
+    for (const proxy of proxies) {
+      try {
+        const res = await fetch(proxy(baseUrl), { signal: AbortSignal.timeout(8000) });
+        if (!res.ok) continue;
+        const data = await res.json();
+        const result = data?.chart?.result?.[0];
+        if (!result || !result.timestamp) continue;
+        const ts = result.timestamp, q = result.indicators.quote[0];
+        const candles = [], volumes = [];
+        for (let i = 0; i < ts.length; i++) {
+          if (!q.open[i]||!q.close[i]) continue;
+          candles.push({time:ts[i],open:+q.open[i].toFixed(2),high:+q.high[i].toFixed(2),low:+q.low[i].toFixed(2),close:+q.close[i].toFixed(2)});
+          volumes.push({time:ts[i],value:q.volume[i]||0,color:q.close[i]>=q.open[i]?'rgba(0,229,176,0.4)':'rgba(244,63,94,0.4)'});
+        }
+        if (candles.length > 0) return { candles, volumes };
+      } catch(e) { continue; }
+    }
   }
-  throw new Error('無法取得資料');
+  throw new Error('無法取得資料，請稍後再試');
 }
 
 function calcRSI(candles, period=14) {
@@ -796,11 +820,16 @@ async function loadChat() {
 }
 
 function subscribeChat() {
-  if (chatChannel) return;
-  chatChannel = db.channel('messages-channel')
+  if (chatChannel) { db.removeChannel(chatChannel); chatChannel = null; }
+  chatChannel = db.channel('messages-realtime-' + Date.now())
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
       appendMessage(payload.new);
-    }).subscribe();
+    })
+    .subscribe(status => {
+      if (status === 'CHANNEL_ERROR') {
+        setTimeout(subscribeChat, 3000); // reconnect on error
+      }
+    });
 }
 
 function renderMessages(msgs) {
@@ -911,21 +940,22 @@ function renderMockEarnings() {
   today.setHours(0,0,0,0);
 
   const known = [
-    {ticker:'ORCL',  date:'2026-03-10', time:'post'},
-    {ticker:'ADBE',  date:'2026-03-19', time:'post'},
-    {ticker:'NKE',   date:'2026-03-19', time:'post'},
-    {ticker:'FDX',   date:'2026-03-24', time:'post'},
-    {ticker:'MU',    date:'2026-03-26', time:'post'},
-    {ticker:'WDFC',  date:'2026-04-07', time:'post'},
+    {ticker:'ORCL',  date:'2026-03-11', time:'post'},
+    {ticker:'ADBE',  date:'2026-03-18', time:'post'},
+    {ticker:'NKE',   date:'2026-03-18', time:'post'},
+    {ticker:'FDX',   date:'2026-03-19', time:'post'},
+    {ticker:'MU',    date:'2026-03-25', time:'post'},
     {ticker:'JPM',   date:'2026-04-14', time:'pre'},
     {ticker:'GS',    date:'2026-04-14', time:'pre'},
+    {ticker:'BAC',   date:'2026-04-15', time:'pre'},
     {ticker:'NFLX',  date:'2026-04-21', time:'post'},
     {ticker:'TSLA',  date:'2026-04-22', time:'post'},
+    {ticker:'GOOGL', date:'2026-04-28', time:'post'},
     {ticker:'META',  date:'2026-04-29', time:'post'},
     {ticker:'MSFT',  date:'2026-04-29', time:'post'},
-    {ticker:'AAPL',  date:'2026-04-30', time:'post'},
+    {ticker:'AAPL',  date:'2026-05-01', time:'post'},
     {ticker:'AMZN',  date:'2026-05-01', time:'post'},
-    {ticker:'NVDA',  date:'2026-05-27', time:'post'},
+    {ticker:'NVDA',  date:'2026-05-28', time:'post'},
   ];
 
   el.innerHTML = `<div style="font-size:12px;color:var(--text3);font-family:var(--mono);padding:4px 0 10px;border-bottom:1px solid var(--border);margin-bottom:8px;">
@@ -969,7 +999,7 @@ window.onload = async function() {
   if (currentUser) await loadMyPositions();
   if (UW_API_KEY && UW_API_KEY !== '在這裡貼上你的UW_API_KEY') {
     setTimeout(() => refreshFlow(true), 1000);
-    setInterval(() => refreshFlow(true), 60000);
+    setInterval(() => refreshFlow(true), 30000);
   }
   // Check Supabase connection
   const { error } = await db.from('messages').select('id').limit(1);
