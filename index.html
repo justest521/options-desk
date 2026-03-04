@@ -680,8 +680,12 @@ function renderPositions() {
   if (!myPositions.length) { tbody.innerHTML = '<tr><td colspan="12"><div class="empty">尚無倉位 · 上方新增</div></td></tr>'; updatePosStats(); return; }
 
   tbody.innerHTML = myPositions.map(p => {
-    const pct   = ((p.current_price - p.cost) / p.cost) * 100;
-    const dollar= (p.current_price - p.cost) * p.qty * 100;
+    // _livePrice = option contract price (from refreshAllPrices)
+    // current_price = stock price stored at entry time (fallback only)
+    // _stockPrice = live stock price
+    const optPrice = p._livePrice != null ? p._livePrice : p.cost; // use cost as fallback if no live yet
+    const pct   = ((optPrice - p.cost) / p.cost) * 100;
+    const dollar= (optPrice - p.cost) * p.qty * 100;
     const dte   = calcDTE(p.expiry);
     const dteCls= dte === null ? '' : dte <= 7 ? 'dte-r' : dte <= 21 ? 'dte-y' : 'dte-g';
     const dteStr= dte !== null ? dte + 'd' : '—';
