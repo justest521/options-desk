@@ -562,10 +562,13 @@ AI 會自動吸收並結合你的倉位來分析。"
       <span class="card-title">/ AI 研究引擎</span>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
         <span id="res-ticker-tags" style="display:flex;gap:4px;flex-wrap:wrap;"></span>
-        <input type="password" id="res-claude-key" class="form-input"
-          placeholder="Claude API Key (sk-ant-...)"
-          style="width:200px;padding:5px 10px;font-size:12px;font-family:var(--mono);"
-          oninput="localStorage.setItem('claude_api_key',this.value)">
+        <div style="display:flex;gap:4px;align-items:center;">
+          <input type="text" id="res-claude-key" class="form-input"
+            placeholder="sk-ant-api03-..."
+            style="width:220px;padding:5px 10px;font-size:11px;font-family:var(--mono);"
+            oninput="saveResKey(this.value)">
+          <button class="btn" onclick="clearResKey()" style="padding:5px 8px;font-size:11px;color:#ff5555;" title="清除儲存的Key">✕</button>
+        </div>
         <button class="btn primary" id="res-run-btn" onclick="runResearch()" style="min-width:120px;padding:7px 20px;font-size:14px;letter-spacing:1px;">⚡ 開始研究</button>
       </div>
     </div>
@@ -1317,6 +1320,18 @@ function buildAIPositionsPreview() {
   posData.textContent = buildPositionsSummary();
   if (preview) preview.style.display = 'block';
 }
+function saveResKey(val) {
+  val = val.trim();
+  localStorage.setItem('claude_api_key', val);
+}
+function clearResKey() {
+  localStorage.removeItem('claude_api_key');
+  const k1 = document.getElementById('res-claude-key');
+  const k2 = document.getElementById('claude-key-input');
+  if (k1) k1.value = '';
+  if (k2) k2.value = '';
+  showToast('API Key 已清除，請重新輸入', 'info');
+}
 function saveClaudioKey(val) {
   if (val && val.startsWith('sk-ant-')) {
     localStorage.setItem('claude_api_key', val);
@@ -1324,10 +1339,21 @@ function saveClaudioKey(val) {
 }
 
 function getClaudeKey() {
-  return document.getElementById('res-claude-key')?.value.trim()
-      || document.getElementById('claude-key-input')?.value.trim() 
-      || localStorage.getItem('claude_api_key') 
-      || '';
+  const sources = [
+    document.getElementById('res-claude-key')?.value,
+    document.getElementById('claude-key-input')?.value,
+    localStorage.getItem('claude_api_key'),
+  ];
+  for (const s of sources) {
+    const k = (s || '').trim().replace(/['"\s]/g, '');
+    if (k.startsWith('sk-ant-')) return k;
+  }
+  // Return whatever is there even if format is wrong
+  for (const s of sources) {
+    const k = (s || '').trim();
+    if (k.length > 10) return k;
+  }
+  return '';
 }
 async function runAIAnalysis() {
   const mode = document.getElementById('ai-mode').value;
