@@ -832,25 +832,117 @@ async function sendMsg() {
 
 function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-// ============ EARNINGS (Mock) ============
-function loadEarnings() {
-  const mock = [
-    {ticker:'NVDA',date:'2026-03-05',time:'post',dte:1},
-    {ticker:'TSLA',date:'2026-03-15',time:'post',dte:11},
-    {ticker:'AAPL',date:'2026-03-20',time:'post',dte:16},
-    {ticker:'MSFT',date:'2026-04-01',time:'post',dte:28},
-    {ticker:'AMZN',date:'2026-04-10',time:'post',dte:37},
-    {ticker:'META',date:'2026-04-15',time:'pre',dte:42},
-    {ticker:'GOOGL',date:'2026-04-20',time:'post',dte:47},
-  ];
+// ============ EARNINGS (Real from UW API) ============
+async function loadEarnings() {
   const el = document.getElementById('dash-earnings');
-  el.innerHTML = mock.map(e => {
-    const c = e.dte<=7?'var(--red)':e.dte<=14?'var(--yellow)':'var(--accent)';
+  if (!el) return;
+  el.innerHTML = '<div class="loading"><div class="spin"></div>載入財報日曆...</div>';
+
+  try {
+    // Get today and 60 days ahead
+    const today = new Date();
+    const future = new Date(today.getTime() + 60 * 24 * 60 * 60 * 1000);
+    const fmt = d => d.toISOString().split('T')[0];
+
+    let earnings = [];
+
+    // Try UW API first
+    if (UW_API_KEY && UW_API_KEY !== '在這裡貼上你的UW_API_KEY') {
+      try {
+        const data = await fetchUW(`/api/earnings/upcoming?date_from=${fmt(today)}&date_to=${fmt(future)}&limit=20`);
+        if (Array.isArray(data) && data.length > 0) earnings = data;
+      } catch(e) {}
+
+      // Try alternative endpoint
+      if (!earnings.length) {
+        try {
+          const data2 = await fetchUW(`/api/market/earnings?from=${fmt(today)}&to=${fmt(future)}`);
+          if (Array.isArray(data2) && data2.length > 0) earnings = data2;
+        } catch(e) {}
+      }
+    }
+
+    // If API works, render real data
+    if (earnings.length > 0) {
+      renderEarnings(earnings);
+      return;
+    }
+  } catch(e) {}
+
+  // Fallback: show upcoming known earnings
+  renderMockEarnings();
+}
+
+function renderEarnings(data) {
+  const el = document.getElementById('dash-earnings');
+  if (!el) return;
+
+  el.innerHTML = data.slice(0, 15).map(e => {
+    const ticker = e.ticker || e.symbol || '—';
+    const date   = e.date || e.report_date || e.earnings_date || '—';
+    const when   = e.time || e.when || e.report_time || '';
+    const whenTxt = when.toLowerCase().includes('pre') ? '開盤前' : when.toLowerCase().includes('post') ? '收盤後' : '—';
+
+    // Calculate DTE
+    let dte = null, dteStr = '—';
+    try {
+      dte = Math.round((new Date(date) - new Date().setHours(0,0,0,0)) / 86400000);
+      dteStr = dte >= 0 ? dte + '天' : '已過';
+    } catch(e) {}
+
+    const c = dte === null ? 'var(--text3)' : dte <= 3 ? 'var(--red)' : dte <= 14 ? 'var(--yellow)' : 'var(--accent)';
+
     return `<div class="earn-item">
-      <div><div class="earn-ticker">${e.ticker}</div><div class="earn-date">${e.date} · ${e.time==='post'?'收盤後':'開盤前'}</div></div>
-      <span class="earn-dte" style="background:rgba(0,0,0,0.3);border:1px solid ${c};color:${c}">${e.dte}天</span>
+      <div>
+        <div class="earn-ticker">${ticker}</div>
+        <div class="earn-date">${date} · ${whenTxt}</div>
+      </div>
+      <span class="earn-dte" style="background:rgba(0,0,0,0.3);border:1px solid ${c};color:${c}">${dteStr}</span>
     </div>`;
   }).join('');
+}
+
+function renderMockEarnings() {
+  const el = document.getElementById('dash-earnings');
+  if (!el) return;
+
+  // Calculate real DTEs from today
+  const today = new Date();
+  today.setHours(0,0,0,0);
+
+  const known = [
+    {ticker:'ORCL',  date:'2026-03-10', time:'post'},
+    {ticker:'ADBE',  date:'2026-03-19', time:'post'},
+    {ticker:'NKE',   date:'2026-03-19', time:'post'},
+    {ticker:'FDX',   date:'2026-03-24', time:'post'},
+    {ticker:'MU',    date:'2026-03-26', time:'post'},
+    {ticker:'WDFC',  date:'2026-04-07', time:'post'},
+    {ticker:'JPM',   date:'2026-04-14', time:'pre'},
+    {ticker:'GS',    date:'2026-04-14', time:'pre'},
+    {ticker:'NFLX',  date:'2026-04-21', time:'post'},
+    {ticker:'TSLA',  date:'2026-04-22', time:'post'},
+    {ticker:'META',  date:'2026-04-29', time:'post'},
+    {ticker:'MSFT',  date:'2026-04-29', time:'post'},
+    {ticker:'AAPL',  date:'2026-04-30', time:'post'},
+    {ticker:'AMZN',  date:'2026-05-01', time:'post'},
+    {ticker:'NVDA',  date:'2026-05-27', time:'post'},
+  ];
+
+  el.innerHTML = `<div style="font-size:12px;color:var(--text3);font-family:var(--mono);padding:4px 0 10px;border-bottom:1px solid var(--border);margin-bottom:8px;">
+    參考資料 · 實際以公司公告為準
+  </div>` + known.map(e => {
+    const dte = Math.round((new Date(e.date) - today) / 86400000);
+    if (dte < -1) return ''; // Skip past earnings
+    const dteStr = dte < 0 ? '今日' : dte === 0 ? '今日' : dte + '天';
+    const c = dte <= 3 ? 'var(--red)' : dte <= 14 ? 'var(--yellow)' : 'var(--accent)';
+    return `<div class="earn-item">
+      <div>
+        <div class="earn-ticker">${e.ticker}</div>
+        <div class="earn-date">${e.date} · ${e.time==='post'?'收盤後':'開盤前'}</div>
+      </div>
+      <span class="earn-dte" style="background:rgba(0,0,0,0.3);border:1px solid ${c};color:${c}">${dteStr}</span>
+    </div>`;
+  }).filter(Boolean).join('');
 }
 
 // ============ CHART.JS ============
