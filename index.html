@@ -444,6 +444,9 @@ header{background:#212121;border-bottom:1px solid #3a3a3a;padding:0 20px;height:
 
 
 
+</div>
+
+
 <!-- PAGE: AI ANALYSIS -->
 <div id="page-ai" class="page">
   <div class="card">
@@ -539,7 +542,6 @@ AI 會自動吸收並結合你的倉位來分析。"
       </div>
     </div>
   </div>
-</div>
 </div>
 
 <script>
@@ -1069,7 +1071,7 @@ ${rules}
 
 ${usePos && posSummary !== '目前沒有持倉。' ? `【我的期權倉位】\n${posSummary}` : ''}
 
-${useArt ? `【參考文章 / 新聞】\n${article.substring(0, 3000)}${article.length > 3000 ? '\n...(文章已截斷)' : ''}` : ''}
+${useArt ? `【參考文章 / 新聞】\n${article.substring(0, 15000)}${article.length > 15000 ? '\n...(文章已截斷)' : ''}` : ''}
 
 ${useFlow && flowSummary ? `【最新大單流向（前5筆）】\n${flowSummary}` : ''}
 
@@ -1130,176 +1132,6 @@ ${userCtx ? `【補充背景】${userCtx}` : ''}
   btn.textContent = '▶ 開始分析';
 }
 
-// ============ OPTIONS CHAIN ============
-let chainData = { calls: [], puts: [] };
-let stockPrice = 0;
-
-async function loadChain() {
-  const sym = document.getElementById('chain-symbol').value.trim().toUpperCase();
-  if (!sym) return;
-  
-  const body = document.getElementById('chain-body');
-  body.innerHTML = '<tr><td colspan="13" style="text-align:center;padding:40px;color:#888;font-family:var(--mono);">載入中...</td></tr>';
-  document.getElementById('chain-status').textContent = '';
-
-  // Step 1: get expiry dates from UW
-  try {
-    const expirySelect = document.getElementById('chain-expiry');
-    expirySelect.innerHTML = '<option>載入中...</option>';
-    
-    let expiries = [];
-    try {
-      const data = await fetchUW(`/api/options/${sym}/expirations`);
-      if (Array.isArray(data)) expiries = data.slice(0, 12);
-    } catch(e) {}
-    
-    if (!expiries.length) {
-      // Generate upcoming Fridays as fallback
-      const d = new Date(); 
-      for (let i = 0; i < 8; i++) {
-        d.setDate(d.getDate() + (5 - d.getDay() + 7) % 7 || 7);
-        expiries.push(d.toISOString().split('T')[0]);
-        d.setDate(d.getDate() + 1);
-      }
-    }
-    
-    expirySelect.innerHTML = expiries.map(e => `<option value="${e}">${e}</option>`).join('');
-    
-    // Load chain for first expiry
-    await fetchChainData(sym, expiries[0]);
-    
-  } catch(e) {
-    body.innerHTML = `<tr><td colspan="13" style="text-align:center;padding:40px;color:#ff5555;">${e.message}</td></tr>`;
-  }
-}
-
-async function fetchChainData(sym, expiry) {
-  const body = document.getElementById('chain-body');
-  const statusEl = document.getElementById('chain-status');
-  body.innerHTML = '<tr><td colspan="13" style="text-align:center;padding:40px;color:#888;">載入 ' + sym + ' ' + expiry + '...</td></tr>';
-
-  try {
-    // Try UW API
-    let calls = [], puts = [];
-    try {
-      const data = await fetchUW(`/api/options/${sym}/chain?expiration=${expiry}`);
-      if (data?.calls) { calls = data.calls; puts = data.puts; }
-      else if (Array.isArray(data)) {
-        calls = data.filter(o => (o.put_call||o.type||'').toUpperCase().includes('CALL'));
-        puts  = data.filter(o => (o.put_call||o.type||'').toUpperCase().includes('PUT'));
-      }
-    } catch(e) {}
-
-    // Fallback: generate mock chain around current price
-    if (!calls.length) {
-      const mockPrice = await getMockStockPrice(sym);
-      stockPrice = mockPrice;
-      document.getElementById('chain-price').textContent = '$' + mockPrice.toFixed(2);
-      
-      const strikes = [];
-      const base = Math.round(mockPrice / 5) * 5;
-      for (let i = -10; i <= 10; i++) strikes.push(base + i * 5);
-      
-      strikes.forEach(s => {
-        const itm_call = s < mockPrice;
-        const itm_put  = s > mockPrice;
-        const dist = Math.abs(s - mockPrice) / mockPrice;
-        
-        calls.push({
-          strike: s, bid: +(Math.random()*2+0.1).toFixed(2),
-          ask: +(Math.random()*2+0.3).toFixed(2),
-          last: +(Math.random()*3+0.1).toFixed(2),
-          change_pct: +((Math.random()-0.5)*20).toFixed(2),
-          volume: Math.floor(Math.random()*2000),
-          open_interest: Math.floor(Math.random()*5000 + (itm_call?2000:500)),
-          itm: itm_call
-        });
-        puts.push({
-          strike: s, bid: +(Math.random()*2+0.1).toFixed(2),
-          ask: +(Math.random()*2+0.3).toFixed(2),
-          last: +(Math.random()*3+0.1).toFixed(2),
-          change_pct: +((Math.random()-0.5)*20).toFixed(2),
-          volume: Math.floor(Math.random()*2000),
-          open_interest: Math.floor(Math.random()*5000 + (itm_put?2000:500)),
-          itm: itm_put
-        });
-      });
-      statusEl.textContent = '示範資料';
-    } else {
-      statusEl.textContent = calls.length + ' 個履約價';
-    }
-
-    chainData = { calls, puts };
-    renderChain();
-
-  } catch(e) {
-    body.innerHTML = `<tr><td colspan="13" style="text-align:center;padding:40px;color:#ff5555;">${e.message}</td></tr>`;
-  }
-}
-
-async function getMockStockPrice(sym) {
-  const prices = {AAPL:220,NVDA:120,TSLA:280,QQQ:510,SPY:575,AMZN:210,META:580,MSFT:420,AEHR:42};
-  return prices[sym] || 100;
-}
-
-document.getElementById('chain-expiry')?.addEventListener('change', function() {
-  const sym = document.getElementById('chain-symbol').value.trim().toUpperCase();
-  if (sym && this.value) fetchChainData(sym, this.value);
-});
-
-function renderChain() {
-  const body = document.getElementById('chain-body');
-  const itmOnly = document.getElementById('chain-itm')?.checked;
-  const highlight = document.getElementById('chain-highlight')?.checked;
-  
-  const { calls, puts } = chainData;
-  if (!calls.length) return;
-
-  // Index puts by strike
-  const putMap = {};
-  puts.forEach(p => putMap[p.strike] = p);
-
-  const maxOI = Math.max(...calls.map(c => c.open_interest || 0), ...puts.map(p => p.open_interest || 0), 1);
-
-  let rows = calls
-    .filter(c => !itmOnly || c.itm)
-    .sort((a, b) => a.strike - b.strike)
-    .map(c => {
-      const p = putMap[c.strike] || {};
-      const isATM = stockPrice && Math.abs(c.strike - stockPrice) < 3;
-      const callHighOI = highlight && (c.open_interest || 0) > maxOI * 0.5;
-      const putHighOI  = highlight && (p.open_interest || 0) > maxOI * 0.5;
-      
-      const callBg = c.itm ? 'rgba(255,45,120,0.06)' : 'transparent';
-      const putBg  = p.itm ? 'rgba(100,100,100,0.06)' : 'transparent';
-      const strikeBg = isATM ? 'rgba(255,45,120,0.15)' : '#1a1a1a';
-      const strikeColor = isATM ? '#ff2d78' : '#ffffff';
-
-      const fmt = v => v != null && v !== undefined ? v : '—';
-      const fmtPct = v => v != null ? `<span style="color:${v>=0?'#ff2d78':'#888'}">${v>=0?'+':''}${v}%</span>` : '—';
-      const fmtOI = (v, hi) => `<span style="${hi?'color:#ff2d78;font-weight:600;':''}">${v?.toLocaleString?.() ?? '—'}</span>`;
-
-      return `<tr style="border-bottom:1px solid #2a2a2a;font-size:13px;" onmouseover="this.style.background='rgba(255,255,255,0.03)'" onmouseout="this.style.background=''">
-        <td style="padding:5px 8px;text-align:right;background:${callBg};color:#ccc">${fmt(c.bid)}</td>
-        <td style="padding:5px 8px;text-align:right;background:${callBg};color:#ccc">${fmt(c.ask)}</td>
-        <td style="padding:5px 8px;text-align:right;background:${callBg};color:#ccc">${fmt(c.last)}</td>
-        <td style="padding:5px 8px;text-align:right;background:${callBg}">${fmtPct(c.change_pct)}</td>
-        <td style="padding:5px 8px;text-align:right;background:${callBg};color:#aaa">${c.volume?.toLocaleString?.() ?? '—'}</td>
-        <td style="padding:5px 8px;text-align:right;background:${callBg};border-right:2px solid #ff2d78;">${fmtOI(c.open_interest, callHighOI)}</td>
-        <td onclick="fillPosition('${document.getElementById('chain-symbol').value.trim().toUpperCase()}','CALL','${c.strike}','')" 
-            style="padding:5px 10px;text-align:center;background:${strikeBg};color:${strikeColor};font-weight:600;font-size:14px;cursor:pointer;border-left:1px solid #3a3a3a;border-right:1px solid #3a3a3a;" 
-            title="點擊帶入倉位">${c.strike}</td>
-        <td style="padding:5px 8px;text-align:left;background:${putBg};border-left:2px solid #444;">${fmtOI(p.open_interest, putHighOI)}</td>
-        <td style="padding:5px 8px;text-align:left;background:${putBg};color:#aaa">${p.volume?.toLocaleString?.() ?? '—'}</td>
-        <td style="padding:5px 8px;text-align:left;background:${putBg};color:#ccc">${fmt(p.last)}</td>
-        <td style="padding:5px 8px;text-align:left;background:${putBg};color:#ccc">${fmt(p.ask)}</td>
-        <td style="padding:5px 8px;text-align:left;background:${putBg};color:#ccc">${fmt(p.bid)}</td>
-        <td style="padding:5px 8px;text-align:left;background:${putBg}">${fmtPct(p.change_pct)}</td>
-      </tr>`;
-    });
-
-  body.innerHTML = rows.join('') || '<tr><td colspan="13" style="text-align:center;padding:30px;color:#888;">無資料</td></tr>';
-}
 
 // ============ TICKER SEARCH ============
 const POPULAR_TICKERS = [
