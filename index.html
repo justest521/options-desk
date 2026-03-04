@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Options Desk ???��?權交?��?表板</title>
+<title>Options Desk — 選擇權交易儀表板</title>
 <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -183,27 +183,27 @@ header{background:rgba(13,17,23,0.95);backdrop-filter:blur(20px);border-bottom:1
 <!-- HEADER -->
 <header>
   <div class="logo">
-    <div class="logo-icon">�?/div>
+    <div class="logo-icon">⬡</div>
     <div>
       <div class="logo-text">OPTIONS DESK</div>
-      <div class="logo-sub">?��?權交?��?表板</div>
+      <div class="logo-sub">選擇權交易儀表板</div>
     </div>
   </div>
   <div class="header-mid">
-    <button class="nav-tab active" onclick="showPage('dashboard',this)">?? 總覽</button>
-    <button class="nav-tab" onclick="showPage('positions',this)">?? ?��?</button>
-    <button class="nav-tab" onclick="showPage('flow',this)">?�� 大單�?/button>
-    <button class="nav-tab" onclick="showPage('chart',this)">?? ?�表</button>
-    <button class="nav-tab" onclick="showPage('chat',this)">?�� 群�?</button>
+    <button class="nav-tab active" onclick="showPage('dashboard',this)">📊 總覽</button>
+    <button class="nav-tab" onclick="showPage('positions',this)">📋 倉位</button>
+    <button class="nav-tab" onclick="showPage('flow',this)">🐳 大單流</button>
+    <button class="nav-tab" onclick="showPage('chart',this)">📈 圖表</button>
+    <button class="nav-tab" onclick="showPage('chat',this)">💬 群組</button>
   </div>
   <div class="header-right">
     <div id="db-dot" class="dot"></div>
     <div class="user-area" id="login-area">
-      <input type="text" id="nickname-input" class="input-sm" placeholder="輸入?��??�入" maxlength="16">
-      <button class="btn" onclick="joinGroup()">?�入</button>
+      <input type="text" id="nickname-input" class="input-sm" placeholder="輸入名字加入" maxlength="16">
+      <button class="btn" onclick="joinGroup()">加入</button>
     </div>
     <span id="user-display" style="display:none;"></span>
-    <button class="btn secondary" onclick="refreshFlow()" style="font-size:10px;">??大單</button>
+    <button class="btn secondary" onclick="refreshFlow()" style="font-size:10px;">⟳ 大單</button>
   </div>
 </header>
 
@@ -211,32 +211,32 @@ header{background:rgba(13,17,23,0.95);backdrop-filter:blur(20px);border-bottom:1
 <div id="page-dashboard" class="page active">
   <!-- Rules -->
   <div class="card">
-    <div class="card-head"><span class="card-title">??交�??��?</span></div>
+    <div class="card-head"><span class="card-title">⚡ 交易鐵則</span></div>
     <div class="card-body">
       <div class="grid-4">
-        <div class="rule-card rule-stop"><div class="rule-icon">??</div><div class="rule-lbl">?��?規�?</div><div class="rule-val" style="color:var(--red)">-50%</div><div class="rule-desc">?��???0%?��?件出??/div></div>
-        <div class="rule-card rule-profit"><div class="rule-icon">?��</div><div class="rule-lbl">?�利了�?</div><div class="rule-val" style="color:var(--yellow)">+100%</div><div class="rule-desc">?�利??00%?��??��???/div></div>
-        <div class="rule-card rule-dte"><div class="rule-icon">??</div><div class="rule-lbl">?�佳到??/div><div class="rule-val" style="color:var(--accent2)">35-45�?/div><div class="rule-desc">標�??�注，財?�另�?/div></div>
-        <div class="rule-card rule-spread"><div class="rule-icon">??</div><div class="rule-lbl">Spread ?�大獲??/div><div class="rule-val" style="color:var(--accent);font-size:14px;">?�價?��?履�???/div><div class="rule-desc">超�?就是封�?</div></div>
+        <div class="rule-card rule-stop"><div class="rule-icon">🛑</div><div class="rule-lbl">停損規則</div><div class="rule-val" style="color:var(--red)">-50%</div><div class="rule-desc">虧損達50%無條件出場</div></div>
+        <div class="rule-card rule-profit"><div class="rule-icon">💰</div><div class="rule-lbl">獲利了結</div><div class="rule-val" style="color:var(--yellow)">+100%</div><div class="rule-desc">獲利達100%至少出一半</div></div>
+        <div class="rule-card rule-dte"><div class="rule-icon">📅</div><div class="rule-lbl">最佳到期</div><div class="rule-val" style="color:var(--accent2)">35-45天</div><div class="rule-desc">標準押注，財報另計</div></div>
+        <div class="rule-card rule-spread"><div class="rule-icon">📊</div><div class="rule-lbl">Spread 最大獲利</div><div class="rule-val" style="color:var(--accent);font-size:14px;">股價≥高履約價</div><div class="rule-desc">超過就是封頂</div></div>
       </div>
     </div>
   </div>
   <!-- Summary + Chart -->
   <div class="grid-2">
     <div class="card">
-      <div class="card-head"><span class="card-title">?? ?��??��?總覽</span></div>
+      <div class="card-head"><span class="card-title">📊 我的倉位總覽</span></div>
       <div class="card-body">
         <div class="grid-2" style="gap:8px;margin-bottom:12px;">
-          <div class="stat-box"><div class="stat-label">總�???/div><div class="stat-val" id="d-cost">$0</div></div>
-          <div class="stat-box"><div class="stat-label">總�???/div><div class="stat-val" id="d-value">$0</div></div>
-          <div class="stat-box"><div class="stat-label">總�???/div><div class="stat-val" id="d-pnl">$0</div></div>
-          <div class="stat-box"><div class="stat-label">?�注�?</div><div class="stat-val" id="d-alert" style="color:var(--yellow)">0</div></div>
+          <div class="stat-box"><div class="stat-label">總成本</div><div class="stat-val" id="d-cost">$0</div></div>
+          <div class="stat-box"><div class="stat-label">總市值</div><div class="stat-val" id="d-value">$0</div></div>
+          <div class="stat-box"><div class="stat-label">總損益</div><div class="stat-val" id="d-pnl">$0</div></div>
+          <div class="stat-box"><div class="stat-label">需注意</div><div class="stat-val" id="d-alert" style="color:var(--yellow)">0</div></div>
         </div>
         <div id="dash-positions"></div>
       </div>
     </div>
     <div class="card">
-      <div class="card-head"><span class="card-title">?? ?��??��?</span></div>
+      <div class="card-head"><span class="card-title">📉 損益分佈</span></div>
       <div class="card-body">
         <div class="pnl-chart-wrap"><canvas id="pnl-chart"></canvas></div>
       </div>
@@ -245,12 +245,12 @@ header{background:rgba(13,17,23,0.95);backdrop-filter:blur(20px);border-bottom:1
   <!-- Flow preview + Earnings -->
   <div class="grid-2">
     <div class="card">
-      <div class="card-head"><span class="card-title">?�� ?��?大單（�?10筆�?</span><button class="btn secondary" style="font-size:10px;" onclick="showPage('flow',document.querySelector('[onclick*=flow]'))">?��??�部</button></div>
+      <div class="card-head"><span class="card-title">🐳 即時大單（前10筆）</span><button class="btn secondary" style="font-size:10px;" onclick="showPage('flow',document.querySelector('[onclick*=flow]'))">查看全部</button></div>
       <div class="card-body" style="padding:12px 16px;"><div id="dash-flow"></div></div>
     </div>
     <div class="card">
-      <div class="card-head"><span class="card-title">?? 財報?��?</span></div>
-      <div class="card-body"><div id="dash-earnings"><div class="loading"><div class="spin"></div>載入�?..</div></div></div>
+      <div class="card-head"><span class="card-title">📆 財報日曆</span></div>
+      <div class="card-body"><div id="dash-earnings"><div class="loading"><div class="spin"></div>載入中...</div></div></div>
     </div>
   </div>
 </div>
@@ -259,36 +259,36 @@ header{background:rgba(13,17,23,0.95);backdrop-filter:blur(20px);border-bottom:1
 <div id="page-positions" class="page">
   <div class="card">
     <div class="card-head">
-      <span class="card-title">?? ?��?追蹤</span>
+      <span class="card-title">📋 倉位追蹤</span>
       <div style="display:flex;gap:6px;">
-        <span id="pos-user-label" style="font-family:var(--mono);font-size:11px;color:var(--text3);">請�?輸入?��?</span>
-        <button class="btn secondary" style="font-size:10px;" onclick="clearMyPositions()">清空?��??��?</button>
+        <span id="pos-user-label" style="font-family:var(--mono);font-size:11px;color:var(--text3);">請先輸入名字</span>
+        <button class="btn secondary" style="font-size:10px;" onclick="clearMyPositions()">清空我的倉位</button>
       </div>
     </div>
     <div class="card-body">
       <div class="pos-form">
-        <input class="form-input" id="p-ticker" placeholder="�?�� AEHR">
+        <input class="form-input" id="p-ticker" placeholder="代碼 AEHR">
         <input class="form-input" id="p-type" placeholder="CALL/PUT">
-        <input class="form-input" id="p-strike" placeholder="履�??? type="number">
-        <input class="form-input" id="p-expiry" placeholder="?��? MM/DD/YY">
-        <input class="form-input" id="p-cost" placeholder="?�本 $" type="number" step="0.01">
-        <input class="form-input" id="p-current" placeholder="?�價 $" type="number" step="0.01">
-        <input class="form-input" id="p-qty" placeholder="??��" type="number">
+        <input class="form-input" id="p-strike" placeholder="履約價" type="number">
+        <input class="form-input" id="p-expiry" placeholder="到期 MM/DD/YY">
+        <input class="form-input" id="p-cost" placeholder="成本 $" type="number" step="0.01">
+        <input class="form-input" id="p-current" placeholder="現價 $" type="number" step="0.01">
+        <input class="form-input" id="p-qty" placeholder="口數" type="number">
       </div>
-      <button class="btn primary" onclick="addPosition()" style="width:100%;margin-bottom:16px;padding:9px;">�??��??��?</button>
+      <button class="btn primary" onclick="addPosition()" style="width:100%;margin-bottom:16px;padding:9px;">＋ 新增倉位</button>
       <div class="stats-row">
-        <div class="stat-cell"><div class="lbl">總�???/div><div class="val" id="p-total-cost">$0</div></div>
-        <div class="stat-cell"><div class="lbl">總�???/div><div class="val" id="p-total-value">$0</div></div>
-        <div class="stat-cell"><div class="lbl">總�???/div><div class="val" id="p-total-pnl">+$0</div></div>
-        <div class="stat-cell"><div class="lbl">警示??/div><div class="val" id="p-alerts" style="color:var(--yellow)">0</div></div>
+        <div class="stat-cell"><div class="lbl">總成本</div><div class="val" id="p-total-cost">$0</div></div>
+        <div class="stat-cell"><div class="lbl">總市值</div><div class="val" id="p-total-value">$0</div></div>
+        <div class="stat-cell"><div class="lbl">總損益</div><div class="val" id="p-total-pnl">+$0</div></div>
+        <div class="stat-cell"><div class="lbl">警示數</div><div class="val" id="p-alerts" style="color:var(--yellow)">0</div></div>
       </div>
       <div style="overflow-x:auto;">
         <table class="tbl">
           <thead><tr>
-            <th>�?��</th><th>類�?</th><th>履�???/th><th>?��?</th><th>DTE</th>
-            <th>?�本</th><th>?�價</th><th>?��?%</th><th>?��?$</th><th>?�??/th><th>?�度</th><th></th>
+            <th>代碼</th><th>類型</th><th>履約價</th><th>到期</th><th>DTE</th>
+            <th>成本</th><th>現價</th><th>損益%</th><th>損益$</th><th>狀態</th><th>進度</th><th></th>
           </tr></thead>
-          <tbody id="pos-tbody"><tr><td colspan="12"><div class="empty">尚無?��? · 上方?��?</div></td></tr></tbody>
+          <tbody id="pos-tbody"><tr><td colspan="12"><div class="empty">尚無倉位 · 上方新增</div></td></tr></tbody>
         </table>
       </div>
     </div>
@@ -299,19 +299,19 @@ header{background:rgba(13,17,23,0.95);backdrop-filter:blur(20px);border-bottom:1
 <div id="page-flow" class="page">
   <div class="card">
     <div class="card-head">
-      <span class="card-title">?�� 大單?�貨�?/span>
-      <button class="btn secondary" style="font-size:10px;" onclick="refreshFlow()">???�新</button>
+      <span class="card-title">🐳 大單掃貨流</span>
+      <button class="btn secondary" style="font-size:10px;" onclick="refreshFlow()">⟳ 更新</button>
     </div>
     <div class="card-body" style="padding:12px 16px;">
       <div class="filter-row">
-        <button class="fbtn active" onclick="filterFlow('all',this)">?�部</button>
+        <button class="fbtn active" onclick="filterFlow('all',this)">全部</button>
         <button class="fbtn" onclick="filterFlow('CALL',this)">CALL</button>
         <button class="fbtn" onclick="filterFlow('PUT',this)">PUT</button>
-        <button class="fbtn" onclick="filterFlow('bullish',this)">?�漲</button>
-        <button class="fbtn" onclick="filterFlow('bearish',this)">?��?</button>
+        <button class="fbtn" onclick="filterFlow('bullish',this)">看漲</button>
+        <button class="fbtn" onclick="filterFlow('bearish',this)">看跌</button>
         <button class="fbtn" onclick="filterFlow('sweep',this)">Sweep</button>
       </div>
-      <div class="flow-scroll" id="flow-full"><div class="empty">點�??��?角「⟳ 大單?��??��???/div></div>
+      <div class="flow-scroll" id="flow-full"><div class="empty">點擊右上角「⟳ 大單」載入資料</div></div>
     </div>
   </div>
 </div>
@@ -320,22 +320,22 @@ header{background:rgba(13,17,23,0.95);backdrop-filter:blur(20px);border-bottom:1
 <div id="page-chart" class="page">
   <div class="card">
     <div class="card-head">
-      <span class="card-title">?? K線�?�?/span>
+      <span class="card-title">📈 K線圖表</span>
       <div class="tv-controls">
-        <input type="text" id="tv-symbol" class="ticker-input" value="AEHR" placeholder="�?��">
+        <input type="text" id="tv-symbol" class="ticker-input" value="AEHR" placeholder="代碼">
         <button class="btn" onclick="loadChart()">載入</button>
-        <button class="fbtn" onclick="setIv('15')">15??/button>
+        <button class="fbtn" onclick="setIv('15')">15分</button>
         <button class="fbtn" onclick="setIv('60')">1H</button>
-        <button class="fbtn active" onclick="setIv('D')">??/button>
-        <button class="fbtn" onclick="setIv('W')">??/button>
-        <button class="fbtn" onclick="setIv('M')">??/button>
+        <button class="fbtn active" onclick="setIv('D')">日</button>
+        <button class="fbtn" onclick="setIv('W')">週</button>
+        <button class="fbtn" onclick="setIv('M')">月</button>
       </div>
     </div>
     <div style="background:var(--bg3);">
       <div id="lw-main" style="height:420px;"></div>
       <div class="rsi-line">
         <span style="font-family:var(--mono);font-size:10px;color:var(--text3);">RSI(14)</span>
-        <span id="rsi-val" style="font-family:var(--mono);font-size:11px;color:var(--yellow)">??/span>
+        <span id="rsi-val" style="font-family:var(--mono);font-size:11px;color:var(--yellow)">—</span>
       </div>
       <div id="lw-rsi" style="height:140px;"></div>
     </div>
@@ -346,23 +346,23 @@ header{background:rgba(13,17,23,0.95);backdrop-filter:blur(20px);border-bottom:1
 <div id="page-chat" class="page">
   <div class="grid-2">
     <div class="card">
-      <div class="card-head"><span class="card-title">?�� 群�??�天�?/span><span style="font-family:var(--mono);font-size:10px;color:var(--text3);" id="online-count"></span></div>
+      <div class="card-head"><span class="card-title">💬 群組聊天室</span><span style="font-family:var(--mono);font-size:10px;color:var(--text3);" id="online-count"></span></div>
       <div class="card-body">
         <div class="chat-box" id="chat-box"></div>
         <div class="chat-input-row">
-          <input class="chat-input" id="chat-msg" placeholder="輸入訊息... (Enter ?�出)" onkeydown="if(event.key==='Enter')sendMsg()">
-          <button class="btn primary" onclick="sendMsg()">?�出</button>
+          <input class="chat-input" id="chat-msg" placeholder="輸入訊息... (Enter 送出)" onkeydown="if(event.key==='Enter')sendMsg()">
+          <button class="btn primary" onclick="sendMsg()">送出</button>
         </div>
       </div>
     </div>
     <div>
       <div class="card" style="margin-bottom:12px;">
-        <div class="card-head"><span class="card-title">?�� ?�?�人?��?</span></div>
+        <div class="card-head"><span class="card-title">👥 所有人倉位</span></div>
         <div class="card-body" style="padding:0;">
           <div style="overflow-x:auto;max-height:400px;">
             <table class="tbl">
-              <thead><tr><th>?�戶</th><th>�?��</th><th>履�???/th><th>?��?%</th><th>?�??/th></tr></thead>
-              <tbody id="all-pos-tbody"><tr><td colspan="5"><div class="empty">尚無資�?</div></td></tr></tbody>
+              <thead><tr><th>用戶</th><th>代碼</th><th>履約價</th><th>損益%</th><th>狀態</th></tr></thead>
+              <tbody id="all-pos-tbody"><tr><td colspan="5"><div class="empty">尚無資料</div></td></tr></tbody>
             </table>
           </div>
         </div>
@@ -375,7 +375,7 @@ header{background:rgba(13,17,23,0.95);backdrop-filter:blur(20px);border-bottom:1
 // ============ CONFIG ============
 const SUPABASE_URL = 'https://kzxunbohppykfkaqioqd.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_4wUaKatN4Ep7rqupZ82RLw_Qq96E-Vn';
-const UW_API_KEY   = '?�這裡貼�?你�?UW_API_KEY';
+const UW_API_KEY   = 'd56cdfa6-0ffb-4421-816c-890629220505';
 
 // ============ INIT SUPABASE ============
 const { createClient } = supabase;
@@ -406,21 +406,21 @@ function showPage(id, btn) {
 // ============ USER ============
 function joinGroup() {
   const name = document.getElementById('nickname-input').value.trim();
-  if (!name) { showToast('請輸?��?�?, 'info'); return; }
+  if (!name) { showToast('請輸入名字', 'info'); return; }
   currentUser = name;
   localStorage.setItem('options_user', name);
   applyUser();
   loadMyPositions();
-  showToast('歡�? ' + name + '�?, 'info');
+  showToast('歡迎 ' + name + '！', 'info');
 }
 
 function applyUser() {
   if (!currentUser) return;
   document.getElementById('login-area').style.display = 'none';
   const d = document.getElementById('user-display');
-  d.textContent = '?�� ' + currentUser;
+  d.textContent = '👤 ' + currentUser;
   d.style.display = 'inline';
-  document.getElementById('pos-user-label').textContent = '?? ' + currentUser + ' ?�倉�?';
+  document.getElementById('pos-user-label').textContent = '📌 ' + currentUser + ' 的倉位';
 }
 
 // ============ POSITIONS (Supabase) ============
@@ -441,7 +441,7 @@ async function loadAllPositions() {
 }
 
 async function addPosition() {
-  if (!currentUser) { showToast('請�?輸入?��?', 'info'); return; }
+  if (!currentUser) { showToast('請先輸入名字', 'info'); return; }
   const ticker  = document.getElementById('p-ticker').value.toUpperCase().trim();
   const type    = document.getElementById('p-type').value.toUpperCase().trim() || 'CALL';
   const strike  = parseFloat(document.getElementById('p-strike').value) || 0;
@@ -449,15 +449,15 @@ async function addPosition() {
   const cost    = parseFloat(document.getElementById('p-cost').value);
   const current = parseFloat(document.getElementById('p-current').value);
   const qty     = parseInt(document.getElementById('p-qty').value) || 1;
-  if (!ticker || !cost || !current) { showToast('請填�?��?��??�、現??, 'info'); return; }
+  if (!ticker || !cost || !current) { showToast('請填代碼、成本、現價', 'info'); return; }
 
   const { error } = await db.from('positions').insert({ user_name: currentUser, ticker, type, strike, expiry, cost, current_price: current, qty });
-  if (error) { showToast('?��?失�?�? + error.message, 'stop'); return; }
+  if (error) { showToast('新增失敗：' + error.message, 'stop'); return; }
 
   ['p-ticker','p-type','p-strike','p-expiry','p-cost','p-current','p-qty'].forEach(id => document.getElementById(id).value = '');
   await loadMyPositions();
   checkAlertForNew(ticker, cost, current);
-  showToast('??已新�?' + ticker, 'info');
+  showToast('✅ 已新增 ' + ticker, 'info');
 }
 
 async function deletePosition(id) {
@@ -466,7 +466,7 @@ async function deletePosition(id) {
 }
 
 async function clearMyPositions() {
-  if (!currentUser || !confirm('確�?清空 ' + currentUser + ' ?��??�倉�?�?)) return;
+  if (!currentUser || !confirm('確定清空 ' + currentUser + ' 的所有倉位？')) return;
   await db.from('positions').delete().eq('user_name', currentUser);
   await loadMyPositions();
 }
@@ -485,25 +485,25 @@ function calcDTE(expiryStr) {
 
 function renderPositions() {
   const tbody = document.getElementById('pos-tbody');
-  if (!myPositions.length) { tbody.innerHTML = '<tr><td colspan="12"><div class="empty">尚無?��? · 上方?��?</div></td></tr>'; updatePosStats(); return; }
+  if (!myPositions.length) { tbody.innerHTML = '<tr><td colspan="12"><div class="empty">尚無倉位 · 上方新增</div></td></tr>'; updatePosStats(); return; }
 
   tbody.innerHTML = myPositions.map(p => {
     const pct   = ((p.current_price - p.cost) / p.cost) * 100;
     const dollar= (p.current_price - p.cost) * p.qty * 100;
     const dte   = calcDTE(p.expiry);
     const dteCls= dte === null ? '' : dte <= 7 ? 'dte-r' : dte <= 21 ? 'dte-y' : 'dte-g';
-    const dteStr= dte !== null ? dte + 'd' : '??;
+    const dteStr= dte !== null ? dte + 'd' : '—';
     let sc, st;
-    if (pct <= -50)     { sc='s-stop';   st='?? ?��?'; }
-    else if (pct >= 100){ sc='s-profit'; st='?�� ?�利'; }
-    else                { sc='s-ok';     st='???��?'; }
+    if (pct <= -50)     { sc='s-stop';   st='🛑 停損'; }
+    else if (pct >= 100){ sc='s-profit'; st='💰 獲利'; }
+    else                { sc='s-ok';     st='✓ 持有'; }
     const prog = Math.min(100, Math.max(0, (pct + 100) / 3));
     const pc   = pct < 0 ? 'var(--red)' : pct >= 100 ? 'var(--yellow)' : 'var(--green)';
     return `<tr>
       <td><strong style="color:white;font-family:var(--mono)">${p.ticker}</strong></td>
       <td><span class="tag ${p.type==='PUT'?'tag-put':'tag-call'}">${p.type||'CALL'}</span></td>
-      <td style="font-family:var(--mono)">$${p.strike||'??}</td>
-      <td style="font-size:12px;color:var(--text2)">${p.expiry||'??}</td>
+      <td style="font-family:var(--mono)">$${p.strike||'—'}</td>
+      <td style="font-size:12px;color:var(--text2)">${p.expiry||'—'}</td>
       <td><span class="${dteCls}">${dteStr}</span></td>
       <td style="font-family:var(--mono)">$${(+p.cost).toFixed(2)}</td>
       <td style="font-family:var(--mono)">$${(+p.current_price).toFixed(2)}</td>
@@ -511,7 +511,7 @@ function renderPositions() {
       <td style="font-family:var(--mono);font-size:12px;color:${dollar>=0?'var(--green)':'var(--red)'}">${dollar>=0?'+':''}$${Math.round(dollar)}</td>
       <td><span class="status-badge ${sc}">${st}</span></td>
       <td style="width:70px"><div class="pbar"><div class="pbar-fill" style="width:${prog}%;background:${pc}"></div></div><div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:2px">${pct.toFixed(0)}%</div></td>
-      <td><button class="del-btn" onclick="deletePosition('${p.id}')">?</button></td>
+      <td><button class="del-btn" onclick="deletePosition('${p.id}')">×</button></td>
     </tr>`;
   }).join('');
   updatePosStats();
@@ -532,15 +532,15 @@ function updatePosStats() {
 
 function renderAllPositions() {
   const tbody = document.getElementById('all-pos-tbody');
-  if (!allPositions.length) { tbody.innerHTML = '<tr><td colspan="5"><div class="empty">尚無資�?</div></td></tr>'; return; }
+  if (!allPositions.length) { tbody.innerHTML = '<tr><td colspan="5"><div class="empty">尚無資料</div></td></tr>'; return; }
   tbody.innerHTML = allPositions.map(p => {
     const pct = ((p.current_price - p.cost) / p.cost) * 100;
     let sc, st;
-    if (pct<=-50){sc='s-stop';st='??';}else if(pct>=100){sc='s-profit';st='?��';}else{sc='s-ok';st='??;}
+    if (pct<=-50){sc='s-stop';st='🛑';}else if(pct>=100){sc='s-profit';st='💰';}else{sc='s-ok';st='✓';}
     return `<tr>
       <td style="font-family:var(--mono);font-size:12px;color:var(--accent2)">${p.user_name}</td>
       <td><strong style="font-family:var(--mono)">${p.ticker}</strong></td>
-      <td style="font-family:var(--mono);font-size:12px">$${p.strike||'??}</td>
+      <td style="font-family:var(--mono);font-size:12px">$${p.strike||'—'}</td>
       <td><span class="badge ${pct>=0?'badge-green':'badge-red'}">${pct>=0?'+':''}${pct.toFixed(1)}%</span></td>
       <td><span class="status-badge ${sc}">${st}</span></td>
     </tr>`;
@@ -549,8 +549,8 @@ function renderAllPositions() {
 
 function checkAlertForNew(ticker, cost, current) {
   const pct = ((current - cost) / cost) * 100;
-  if (pct <= -50) showToast('?? ' + ticker + ' 已�??��? ' + pct.toFixed(1) + '%', 'stop');
-  else if (pct >= 100) showToast('?�� ' + ticker + ' ?�利 +' + pct.toFixed(1) + '%，考慮?�場', 'profit');
+  if (pct <= -50) showToast('🛑 ' + ticker + ' 已達停損 ' + pct.toFixed(1) + '%', 'stop');
+  else if (pct >= 100) showToast('💰 ' + ticker + ' 獲利 +' + pct.toFixed(1) + '%，考慮出場', 'profit');
 }
 
 // ============ DASHBOARD ============
@@ -568,7 +568,7 @@ function updateDashboard() {
 
   // Mini position list
   const dp = document.getElementById('dash-positions');
-  if (!myPositions.length) { dp.innerHTML = '<div class="empty">尚無?��?</div>'; return; }
+  if (!myPositions.length) { dp.innerHTML = '<div class="empty">尚無倉位</div>'; return; }
   dp.innerHTML = myPositions.slice(0,5).map(p => {
     const pct = ((p.current_price-p.cost)/p.cost)*100;
     return `<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(33,41,58,0.5);">
@@ -615,20 +615,20 @@ async function fetchUW(endpoint) {
       return d.data || d || [];
     } catch(e) { continue; }
   }
-  throw new Error('???失�?');
+  throw new Error('連線失敗');
 }
 
 async function refreshFlow() {
-  if (UW_API_KEY === '?�這裡貼�?你�?UW_API_KEY') { showToast('請�?設�? UW API Key', 'info'); return; }
+  if (UW_API_KEY === 'd56cdfa6-0ffb-4421-816c-890629220505') { showToast('請先設定 UW API Key', 'info'); return; }
   try {
     flowData = await fetchUW('/api/option-trades/flow-alerts');
     document.getElementById('db-dot').className = 'dot on';
     renderFlow('flow-full', flowData, flowFilter, 100);
     renderFlow('dash-flow', flowData, 'all', 10);
-    showToast('大單已更??' + flowData.length + ' �?, 'info');
+    showToast('大單已更新 ' + flowData.length + ' 筆', 'info');
   } catch(e) {
     document.getElementById('db-dot').className = 'dot';
-    showToast('大單載入失�?', 'stop');
+    showToast('大單載入失敗', 'stop');
   }
 }
 
@@ -648,22 +648,22 @@ function renderFlow(containerId, data, filter, limit) {
   if (filter === 'bullish') d = data.filter(f => (f.sentiment||'').toLowerCase().includes('bull') || (f.put_call||'').toUpperCase().includes('CALL'));
   if (filter === 'bearish') d = data.filter(f => (f.sentiment||'').toLowerCase().includes('bear') || (f.put_call||'').toUpperCase().includes('PUT'));
   if (filter === 'sweep')   d = data.filter(f => (f.execution_type||f.trade_type||'').toLowerCase().includes('sweep'));
-  if (!d.length) { el.innerHTML = '<div class="empty">?�無資�?</div>'; return; }
+  if (!d.length) { el.innerHTML = '<div class="empty">暫無資料</div>'; return; }
 
   el.innerHTML = d.slice(0, limit).map(f => {
-    const ticker  = f.ticker || f.symbol || '??;
+    const ticker  = f.ticker || f.symbol || '—';
     const type    = (f.put_call || f.option_type || '').toUpperCase();
-    const strike  = f.strike || f.strike_price || '??;
-    const expiry  = f.expiry || f.expiration_date || '??;
+    const strike  = f.strike || f.strike_price || '—';
+    const expiry  = f.expiry || f.expiration_date || '—';
     const premium = f.total_premium || f.premium || 0;
     const isCall  = type.includes('CALL');
     const premStr = typeof premium === 'number' ? premium > 1e6 ? `$${(premium/1e6).toFixed(1)}M` : premium > 1e3 ? `$${(premium/1e3).toFixed(0)}K` : `$${premium}` : `$${premium}`;
     return `<div class="flow-item">
       <div class="flow-row">
-        <div><span class="flow-ticker">${ticker}</span> <span class="tag ${isCall?'tag-call':'tag-put'}">${type||'??}</span></div>
+        <div><span class="flow-ticker">${ticker}</span> <span class="tag ${isCall?'tag-call':'tag-put'}">${type||'—'}</span></div>
         <div class="flow-amt" style="color:${isCall?'var(--green)':'var(--red)'}">${premStr}</div>
       </div>
-      <div class="flow-detail">行�? $${strike} · ?��? ${expiry}</div>
+      <div class="flow-detail">行權 $${strike} · 到期 ${expiry}</div>
     </div>`;
   }).join('');
 }
@@ -706,7 +706,7 @@ async function fetchOHLC(symbol, interval) {
       return { candles, volumes };
     } catch(e) { continue; }
   }
-  throw new Error('?��??��?資�?');
+  throw new Error('無法取得資料');
 }
 
 function calcRSI(candles, period=14) {
@@ -780,7 +780,7 @@ function renderChart() {
     });
     ro.observe(mainEl);
   }).catch(err => {
-    mainEl.innerHTML = `<div class="empty" style="color:var(--red)">??載入失�?: ${err.message}</div>`;
+    mainEl.innerHTML = `<div class="empty" style="color:var(--red)">❌ 載入失敗: ${err.message}</div>`;
   });
 }
 
@@ -820,7 +820,7 @@ function appendMessage(m, scroll=true) {
 }
 
 async function sendMsg() {
-  if (!currentUser) { showToast('請�?輸入?��?', 'info'); return; }
+  if (!currentUser) { showToast('請先輸入名字', 'info'); return; }
   const content = document.getElementById('chat-msg').value.trim();
   if (!content) return;
   document.getElementById('chat-msg').value = '';
@@ -844,8 +844,8 @@ function loadEarnings() {
   el.innerHTML = mock.map(e => {
     const c = e.dte<=7?'var(--red)':e.dte<=14?'var(--yellow)':'var(--accent)';
     return `<div class="earn-item">
-      <div><div class="earn-ticker">${e.ticker}</div><div class="earn-date">${e.date} · ${e.time==='post'?'?�盤�?:'?�盤??}</div></div>
-      <span class="earn-dte" style="background:rgba(0,0,0,0.3);border:1px solid ${c};color:${c}">${e.dte}�?/span>
+      <div><div class="earn-ticker">${e.ticker}</div><div class="earn-date">${e.date} · ${e.time==='post'?'收盤後':'開盤前'}</div></div>
+      <span class="earn-dte" style="background:rgba(0,0,0,0.3);border:1px solid ${c};color:${c}">${e.dte}天</span>
     </div>`;
   }).join('');
 }
@@ -872,7 +872,7 @@ window.onload = async function() {
   loadEarnings();
   setTimeout(() => renderChart(), 300);
   if (currentUser) await loadMyPositions();
-  if (UW_API_KEY !== '?�這裡貼�?你�?UW_API_KEY') {
+  if (UW_API_KEY !== 'd56cdfa6-0ffb-4421-816c-890629220505') {
     setTimeout(refreshFlow, 1000);
     setInterval(refreshFlow, 60000);
   }
