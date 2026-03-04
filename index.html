@@ -593,7 +593,7 @@ async function addPosition() {
     const { data, error } = await db.from('positions').insert([{
       user_name: String(currentUser),
       ticker:    String(ticker),
-      type:      String(type),
+      option_type: String(type),
       strike:    Number(strike),
       expiry:    String(expiry),
       cost:      Number(cost),
@@ -662,7 +662,7 @@ function renderPositions() {
     const pc   = pct < 0 ? 'var(--red)' : pct >= 100 ? 'var(--yellow)' : 'var(--green)';
     return `<tr>
       <td><strong style="color:white;font-family:var(--mono)">${p.ticker}</strong></td>
-      <td><span class="tag ${p.type==='PUT'?'tag-put':'tag-call'}">${p.type||'CALL'}</span></td>
+      <td><span class="tag ${p.option_type==='PUT'?'tag-put':'tag-call'}">${p.option_type||'CALL'}</span></td>
       <td style="font-family:var(--mono)">$${p.strike||'—'}</td>
       <td style="font-size:15px;color:#eeeeee">${p.expiry||'—'}</td>
       <td><span class="${dteCls}">${dteStr}</span></td>
