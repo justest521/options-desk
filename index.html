@@ -12,7 +12,7 @@
   --border:#21293a;--border2:#2d3748;
   --accent:#00e5b0;--accent2:#0ea5e9;--accent3:#a78bfa;
   --red:#f43f5e;--green:#00e5b0;--yellow:#fbbf24;--orange:#fb923c;
-  --text:#f0f6ff;--text2:#b0bec5;--text3:#6b7a8d;
+  --text:#f0f6ff;--text2:#b0bec5;--text3:#8899aa;
   --mono:'IBM Plex Mono',monospace;--sans:'Noto Sans TC',sans-serif;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -24,9 +24,9 @@ header{background:rgba(13,17,23,0.95);backdrop-filter:blur(20px);border-bottom:1
 .logo{display:flex;align-items:center;gap:10px;}
 .logo-icon{width:28px;height:28px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;}
 .logo-text{font-family:var(--mono);font-size:16px;color:white;letter-spacing:2px;}
-.logo-sub{font-size:10px;color:var(--text3);font-family:var(--mono);letter-spacing:1px;}
+.logo-sub{font-size:10px;color:#7a9ab0;font-family:var(--mono);letter-spacing:1px;}
 .header-mid{display:flex;align-items:center;gap:6px;}
-.nav-tab{padding:5px 14px;border-radius:4px;border:none;background:transparent;color:var(--text2);font-family:var(--mono);font-size:13px;letter-spacing:1px;cursor:pointer;transition:all 0.15s;}
+.nav-tab{padding:5px 14px;border-radius:4px;border:none;background:transparent;color:#c8d8e8;font-family:var(--mono);font-size:13px;letter-spacing:1px;cursor:pointer;transition:all 0.15s;}
 .nav-tab:hover,.nav-tab.active{background:var(--bg3);color:var(--accent);}
 .header-right{display:flex;align-items:center;gap:10px;}
 .user-area{display:flex;align-items:center;gap:8px;}
@@ -35,7 +35,7 @@ header{background:rgba(13,17,23,0.95);backdrop-filter:blur(20px);border-bottom:1
 .input-sm:focus{outline:none;border-color:var(--accent);}
 .btn{background:transparent;border:1px solid var(--accent);color:var(--accent);padding:6px 14px;border-radius:4px;cursor:pointer;font-family:var(--mono);font-size:13px;letter-spacing:1px;transition:all 0.15s;}
 .btn:hover,.btn.primary{background:var(--accent);color:var(--bg);}
-.btn.secondary{border-color:var(--border2);color:var(--text2);}
+.btn.secondary{border-color:var(--border2);color:#c8d8e8;}
 .btn.secondary:hover{border-color:var(--accent2);color:var(--accent2);}
 .dot{width:7px;height:7px;border-radius:50%;background:var(--text3);}
 .dot.on{background:var(--green);box-shadow:0 0 6px var(--green);}
@@ -58,7 +58,7 @@ header{background:rgba(13,17,23,0.95);backdrop-filter:blur(20px);border-bottom:1
 
 /* STATS */
 .stat-box{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:12px 16px;}
-.stat-label{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:1px;margin-bottom:4px;}
+.stat-label{font-family:var(--mono);font-size:10px;color:#9ab;letter-spacing:1px;margin-bottom:4px;}
 .stat-val{font-family:var(--mono);font-size:26px;font-weight:600;}
 .stat-sub{font-size:11px;color:var(--text3);margin-top:2px;}
 
@@ -82,7 +82,7 @@ header{background:rgba(13,17,23,0.95);backdrop-filter:blur(20px);border-bottom:1
 
 /* TABLE */
 .tbl{width:100%;border-collapse:collapse;}
-.tbl th{font-family:var(--mono);font-size:12px;letter-spacing:1px;color:var(--text3);text-align:left;padding:7px 10px;border-bottom:1px solid var(--border);text-transform:uppercase;}
+.tbl th{font-family:var(--mono);font-size:12px;letter-spacing:1px;color:#aabbcc;text-align:left;padding:7px 10px;border-bottom:1px solid var(--border);text-transform:uppercase;}
 .tbl td{padding:10px;border-bottom:1px solid rgba(33,41,58,0.5);font-size:14px;}
 .tbl tr:hover td{background:rgba(255,255,255,0.015);}
 .badge{padding:3px 8px;border-radius:3px;font-family:var(--mono);font-size:13px;font-weight:600;}
@@ -107,7 +107,7 @@ header{background:rgba(13,17,23,0.95);backdrop-filter:blur(20px);border-bottom:1
 @keyframes fadeIn{from{opacity:0;transform:translateX(8px);}to{opacity:1;transform:translateX(0);}}
 .flow-row{display:flex;justify-content:space-between;align-items:flex-start;}
 .flow-ticker{font-family:var(--mono);font-size:16px;font-weight:600;color:white;}
-.flow-detail{font-size:13px;color:var(--text3);margin-top:2px;}
+.flow-detail{font-size:13px;color:#9ab0c0;margin-top:2px;}
 .flow-amt{font-family:var(--mono);font-size:15px;}
 .tag{display:inline-block;padding:2px 7px;border-radius:2px;font-size:12px;font-family:var(--mono);margin-right:3px;}
 .tag-call{background:rgba(0,229,176,0.15);color:var(--green);}
@@ -330,14 +330,7 @@ header{background:rgba(13,17,23,0.95);backdrop-filter:blur(20px);border-bottom:1
         <button class="fbtn" onclick="setIv('M')">月</button>
       </div>
     </div>
-    <div style="background:var(--bg3);">
-      <div id="lw-main" style="height:420px;"></div>
-      <div class="rsi-line">
-        <span style="font-family:var(--mono);font-size:10px;color:var(--text3);">RSI(14)</span>
-        <span id="rsi-val" style="font-family:var(--mono);font-size:11px;color:var(--yellow)">—</span>
-      </div>
-      <div id="lw-rsi" style="height:140px;"></div>
-    </div>
+    <div id="tv-widget-container" style="height:620px;width:100%;"></div>
   </div>
 </div>
 
@@ -502,7 +495,7 @@ function renderPositions() {
       <td><strong style="color:white;font-family:var(--mono)">${p.ticker}</strong></td>
       <td><span class="tag ${p.type==='PUT'?'tag-put':'tag-call'}">${p.type||'CALL'}</span></td>
       <td style="font-family:var(--mono)">$${p.strike||'—'}</td>
-      <td style="font-size:12px;color:var(--text2)">${p.expiry||'—'}</td>
+      <td style="font-size:12px;color:#c8d8e8">${p.expiry||'—'}</td>
       <td><span class="${dteCls}">${dteStr}</span></td>
       <td style="font-family:var(--mono)">$${(+p.cost).toFixed(2)}</td>
       <td style="font-family:var(--mono)">$${(+p.current_price).toFixed(2)}</td>
@@ -702,38 +695,29 @@ function setIv(iv) {
 function renderChart() {
   const container = document.getElementById('tv-widget-container');
   if (!container) return;
-  container.innerHTML = '';
-
-  const wrapper = document.createElement('div');
-  wrapper.className = 'tradingview-widget-container';
-  wrapper.style.cssText = 'height:600px;width:100%;';
-
-  const widgetDiv = document.createElement('div');
-  widgetDiv.id = 'tv-advanced-chart-' + Date.now();
-  widgetDiv.style.cssText = 'height:600px;width:100%;';
-  wrapper.appendChild(widgetDiv);
-
-  const script = document.createElement('script');
-  script.type = 'text/javascript';
-  script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
-  script.async = true;
-  script.innerHTML = JSON.stringify({
-    container_id: widgetDiv.id,
-    autosize: true,
-    symbol: currentSymbol,
-    interval: currentIv === '60' ? '60' : currentIv === '15' ? '15' : currentIv,
-    timezone: "America/New_York",
-    theme: "dark",
-    style: "1",
-    locale: "zh_TW",
-    withdateranges: true,
-    hide_side_toolbar: false,
-    allow_symbol_change: true,
-    studies: ["RSI@tv-basicstudies","MACD@tv-basicstudies","Volume@tv-basicstudies"],
-    support_host: "https://www.tradingview.com"
-  });
-  wrapper.appendChild(script);
-  container.appendChild(wrapper);
+  const uid = 'tv_' + Date.now();
+  container.innerHTML = `
+    <div class="tradingview-widget-container" style="height:620px;width:100%;">
+      <div id="${uid}" style="height:620px;width:100%;"></div>
+      <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+      {
+        "container_id": "${uid}",
+        "autosize": true,
+        "symbol": "${currentSymbol}",
+        "interval": "${currentIv}",
+        "timezone": "America/New_York",
+        "theme": "dark",
+        "style": "1",
+        "locale": "zh_TW",
+        "withdateranges": true,
+        "hide_side_toolbar": false,
+        "allow_symbol_change": true,
+        "watchlist": ["AEHR","NVDA","TSLA","QQQ","SPY","CRWD","META","AAPL"],
+        "studies": ["RSI@tv-basicstudies","MACD@tv-basicstudies","Volume@tv-basicstudies"],
+        "support_host": "https://www.tradingview.com"
+      }
+      <\/script>
+    </div>`;
 }
 
 // ============ CHAT (Supabase Realtime) ============
@@ -742,6 +726,19 @@ async function loadChat() {
   const { data } = await db.from('messages').select('*').order('created_at', { ascending: true }).limit(100);
   renderMessages(data || []);
   subscribeChat();
+  // Polling fallback every 5s for slow connections
+  if (!window._chatPoller) {
+    let lastId = data?.length ? data[data.length-1].id : null;
+    window._chatPoller = setInterval(async () => {
+      const q = db.from('messages').select('*').order('created_at', { ascending: true }).limit(20);
+      if (lastId) q.gt('id', lastId);
+      const { data: newMsgs } = await q;
+      if (newMsgs?.length) {
+        newMsgs.forEach(m => appendMessage(m));
+        lastId = newMsgs[newMsgs.length-1].id;
+      }
+    }, 5000);
+  }
 }
 
 function subscribeChat() {
@@ -778,10 +775,13 @@ function appendMessage(m, scroll=true) {
 
 async function sendMsg() {
   if (!currentUser) { showToast('請先輸入名字', 'info'); return; }
-  const content = document.getElementById('chat-msg').value.trim();
-  if (!content) return;
-  document.getElementById('chat-msg').value = '';
-  await db.from('messages').insert({ user_name: currentUser, content });
+  const msgEl = document.getElementById('chat-msg');
+  const msgContent = msgEl.value.trim();
+  if (!msgContent) return;
+  msgEl.value = '';
+  msgEl.disabled = true;
+  await db.from('messages').insert({ user_name: currentUser, content: msgContent });
+  setTimeout(() => { msgEl.disabled = false; msgEl.focus(); }, 300);
 }
 
 function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
