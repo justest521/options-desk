@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
@@ -619,7 +619,7 @@ async function fetchUW(endpoint) {
 }
 
 async function refreshFlow() {
-  if (UW_API_KEY === 'd56cdfa6-0ffb-4421-816c-890629220505') { showToast('請先設定 UW API Key', 'info'); return; }
+  if (!UW_API_KEY || UW_API_KEY === '在這裡貼上你的UW_API_KEY') { showToast('請先設定 UW API Key', 'info'); return; }
   try {
     flowData = await fetchUW('/api/option-trades/flow-alerts');
     document.getElementById('db-dot').className = 'dot on';
@@ -872,7 +872,7 @@ window.onload = async function() {
   loadEarnings();
   setTimeout(() => renderChart(), 300);
   if (currentUser) await loadMyPositions();
-  if (UW_API_KEY !== 'd56cdfa6-0ffb-4421-816c-890629220505') {
+  if (UW_API_KEY && UW_API_KEY !== '在這裡貼上你的UW_API_KEY') {
     setTimeout(refreshFlow, 1000);
     setInterval(refreshFlow, 60000);
   }
