@@ -193,6 +193,8 @@ header{background:#212121;border-bottom:1px solid #3a3a3a;padding:0 20px;height:
     <button class="nav-tab" onclick="showPage('positions',this)">倉位</button>
     <button class="nav-tab" onclick="showPage('flow',this)">大單流</button>
     <button class="nav-tab" onclick="showPage('chat',this)">群組</button>
+    <button class="nav-tab" onclick="showPage('research',this)">🔬 研究</button>
+    <button class="nav-tab" onclick="showPage('payoff',this)">📈 損益圖</button>
     <button class="nav-tab" onclick="showPage('ai',this)">🤖 AI 分析</button>
   </div>
   <div class="header-right">
@@ -551,6 +553,319 @@ AI 會自動吸收並結合你的倉位來分析。"
   </div>
 </div>
 
+<!-- PAGE: RESEARCH ENGINE -->
+<div id="page-research" class="page">
+
+  <!-- Top: article input + run button -->
+  <div class="card" style="margin-bottom:16px;">
+    <div class="card-head">
+      <span class="card-title">/ AI 研究引擎</span>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <span id="res-ticker-tags" style="display:flex;gap:4px;flex-wrap:wrap;"></span>
+        <button class="btn primary" id="res-run-btn" onclick="runResearch()" style="min-width:120px;padding:7px 20px;font-size:14px;letter-spacing:1px;">⚡ 開始研究</button>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 280px;gap:0;">
+      <!-- Article -->
+      <div style="padding:14px;border-right:1px solid #2a2a2a;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+          <span style="font-family:var(--mono);font-size:11px;color:#ff2d78;letter-spacing:1px;">貼入文章 / 新聞 / 分析師報告</span>
+          <span id="res-char-count" style="font-family:var(--mono);font-size:11px;color:#555;">0 字</span>
+        </div>
+        <textarea id="res-article" style="width:100%;height:140px;background:#111;border:1px solid #2a2a2a;color:#ddd;padding:10px;border-radius:4px;font-family:var(--sans);font-size:13px;resize:vertical;line-height:1.6;box-sizing:border-box;"
+          placeholder="貼入任何文章，AI 會自動識別股票代碼、抓取數據並產出完整研究報告..."
+          oninput="onResArticleInput()"></textarea>
+        <!-- auto-detected tickers -->
+        <div id="res-detected" style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;min-height:24px;"></div>
+      </div>
+      <!-- Settings -->
+      <div style="padding:14px;">
+        <div style="font-family:var(--mono);font-size:11px;color:#888;margin-bottom:10px;letter-spacing:1px;">研究設定</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:#aaa;cursor:pointer;">
+            <input type="checkbox" id="rs-fetch-quote"  checked style="accent-color:#ff2d78;"> 抓取股票報價 &amp; 基本面
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:#aaa;cursor:pointer;">
+            <input type="checkbox" id="rs-fetch-flow"   checked style="accent-color:#ff2d78;"> 抓取期權大單流
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:#aaa;cursor:pointer;">
+            <input type="checkbox" id="rs-include-pos"  checked style="accent-color:#ff2d78;"> 結合我的持倉
+          </label>
+          <div style="border-top:1px solid #2a2a2a;padding-top:8px;margin-top:2px;">
+            <div style="font-family:var(--mono);font-size:11px;color:#555;margin-bottom:6px;">報告深度</div>
+            <select id="rs-depth" class="form-input" style="width:100%;padding:6px 8px;font-size:12px;">
+              <option value="quick">快速摘要 (30秒)</option>
+              <option value="standard" selected>標準報告 (1分鐘)</option>
+              <option value="deep">深度分析 (2分鐘)</option>
+            </select>
+          </div>
+          <div style="font-family:var(--mono);font-size:11px;color:#555;margin-bottom:4px;margin-top:2px;">手動加入代碼</div>
+          <div style="display:flex;gap:4px;">
+            <input type="text" id="rs-manual-ticker" class="form-input" placeholder="如 NVDA" style="flex:1;padding:5px 8px;font-size:13px;text-transform:uppercase;" maxlength="6">
+            <button class="btn" onclick="addManualTicker()" style="padding:5px 10px;font-size:12px;">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Progress bar -->
+  <div id="res-progress-area" style="display:none;margin-bottom:16px;">
+    <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:4px;padding:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span id="res-progress-label" style="font-family:var(--mono);font-size:13px;color:#ff2d78;">初始化...</span>
+        <span id="res-progress-pct" style="font-family:var(--mono);font-size:13px;color:#555;">0%</span>
+      </div>
+      <div style="background:#2a2a2a;border-radius:2px;height:4px;">
+        <div id="res-progress-bar" style="background:#ff2d78;height:4px;border-radius:2px;width:0%;transition:width 0.3s;"></div>
+      </div>
+      <div id="res-progress-steps" style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;"></div>
+    </div>
+  </div>
+
+  <!-- Report output -->
+  <div id="res-report-area" style="display:none;">
+
+    <!-- Report header -->
+    <div class="card" style="margin-bottom:12px;">
+      <div style="padding:16px;display:flex;justify-content:space-between;align-items:start;">
+        <div>
+          <div id="rep-title" style="font-size:20px;font-weight:700;color:#fff;margin-bottom:4px;"></div>
+          <div id="rep-subtitle" style="font-family:var(--mono);font-size:12px;color:#888;"></div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <div id="rep-sentiment" style="padding:6px 16px;border-radius:4px;font-family:var(--mono);font-size:14px;font-weight:600;"></div>
+          <button class="btn" onclick="exportReport()" style="font-size:12px;padding:6px 12px;">⬇ 匯出</button>
+        </div>
+      </div>
+      <!-- Thesis -->
+      <div id="rep-thesis" style="padding:0 16px 16px;font-size:14px;color:#ccc;line-height:1.8;border-top:1px solid #2a2a2a;padding-top:14px;"></div>
+    </div>
+
+    <!-- Stock cards grid -->
+    <div id="rep-stocks-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px;margin-bottom:12px;"></div>
+
+    <!-- Full AI analysis -->
+    <div class="card" style="margin-bottom:12px;">
+      <div class="card-head"><span class="card-title">/ 完整分析</span><span id="rep-timestamp" style="font-family:var(--mono);font-size:11px;color:#555;"></span></div>
+      <div id="rep-full-analysis" style="padding:16px;font-size:14px;line-height:1.9;color:#ccc;"></div>
+    </div>
+
+    <!-- Trade ideas table -->
+    <div class="card">
+      <div class="card-head"><span class="card-title">/ 可操作交易計畫</span></div>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;" id="rep-trades-table">
+          <thead>
+            <tr style="border-bottom:1px solid #2a2a2a;">
+              <th style="padding:10px 14px;text-align:left;font-family:var(--mono);font-size:12px;color:#888;font-weight:400;">代碼</th>
+              <th style="padding:10px 14px;text-align:left;font-family:var(--mono);font-size:12px;color:#888;font-weight:400;">方向</th>
+              <th style="padding:10px 14px;text-align:left;font-family:var(--mono);font-size:12px;color:#888;font-weight:400;">策略</th>
+              <th style="padding:10px 14px;text-align:left;font-family:var(--mono);font-size:12px;color:#888;font-weight:400;">進場條件</th>
+              <th style="padding:10px 14px;text-align:left;font-family:var(--mono);font-size:12px;color:#888;font-weight:400;">目標 / 停損</th>
+              <th style="padding:10px 14px;text-align:left;font-family:var(--mono);font-size:12px;color:#888;font-weight:400;">信心</th>
+            </tr>
+          </thead>
+          <tbody id="rep-trades-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Empty state -->
+  <div id="res-empty" style="text-align:center;padding:60px 0;color:#555;">
+    <div style="font-size:48px;margin-bottom:16px;">🔬</div>
+    <div style="font-family:var(--mono);font-size:14px;color:#888;">貼入文章，按「開始研究」</div>
+    <div style="font-size:12px;color:#444;margin-top:8px;">AI 會自動識別股票、抓取數據、產出完整研究報告</div>
+  </div>
+
+</div>
+
+
+<!-- PAGE: PAYOFF DIAGRAM -->
+<div id="page-payoff" class="page">
+  <div style="display:grid;grid-template-columns:340px 1fr;gap:16px;align-items:start;">
+
+    <!-- LEFT: Controls -->
+    <div>
+      <!-- Load from positions -->
+      <div class="card" style="margin-bottom:12px;">
+        <div class="card-head"><span class="card-title">/ 載入倉位</span></div>
+        <div style="padding:12px;">
+          <select id="pd-pos-select" class="form-input" style="width:100%;margin-bottom:8px;" onchange="loadPosToPayoff()">
+            <option value="">── 從我的倉位選擇 ──</option>
+          </select>
+          <div style="font-family:var(--mono);font-size:11px;color:#555;text-align:center;">或手動輸入以下參數</div>
+        </div>
+      </div>
+
+      <!-- Manual input -->
+      <div class="card" style="margin-bottom:12px;">
+        <div class="card-head"><span class="card-title">/ 合約參數</span></div>
+        <div style="padding:12px;display:flex;flex-direction:column;gap:8px;">
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div style="position:relative;">
+              <span style="position:absolute;top:4px;left:8px;font-size:10px;color:#555;font-family:var(--mono);">股票代碼</span>
+              <input class="form-input" id="pd-ticker" value="NVDA" style="padding-top:18px;" oninput="this.value=this.value.toUpperCase()">
+            </div>
+            <div style="position:relative;">
+              <span style="position:absolute;top:4px;left:8px;font-size:10px;color:#555;font-family:var(--mono);">策略</span>
+              <select class="form-input" id="pd-type" style="padding-top:18px;cursor:pointer;" onchange="toggleLegs()">
+                <option value="CALL">CALL</option>
+                <option value="PUT">PUT</option>
+                <option value="SELL CALL">SHORT CALL</option>
+                <option value="SELL PUT">SHORT PUT</option>
+                <option value="Bull Call Spread">Bull Call Spread</option>
+                <option value="Bear Put Spread">Bear Put Spread</option>
+                <option value="Iron Condor">Iron Condor</option>
+                <option value="Straddle">Straddle</option>
+                <option value="Strangle">Strangle</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div style="position:relative;">
+              <span style="position:absolute;top:4px;left:8px;font-size:10px;color:#555;font-family:var(--mono);">股票現價 $</span>
+              <input class="form-input" id="pd-stock" type="number" value="130" step="0.5" style="padding-top:18px;" oninput="drawPayoff()">
+            </div>
+            <div style="position:relative;">
+              <span style="position:absolute;top:4px;left:8px;font-size:10px;color:#555;font-family:var(--mono);">履約價 $</span>
+              <input class="form-input" id="pd-strike" type="number" value="130" step="0.5" style="padding-top:18px;" oninput="drawPayoff()">
+            </div>
+          </div>
+
+          <!-- Spread second leg -->
+          <div id="pd-leg2-row" style="display:none;grid-template-columns:1fr 1fr;gap:8px;">
+            <div style="position:relative;">
+              <span style="position:absolute;top:4px;left:8px;font-size:10px;color:#555;font-family:var(--mono);">履約價2 $</span>
+              <input class="form-input" id="pd-strike2" type="number" value="140" step="0.5" style="padding-top:18px;" oninput="drawPayoff()">
+            </div>
+            <div style="position:relative;">
+              <span style="position:absolute;top:4px;left:8px;font-size:10px;color:#555;font-family:var(--mono);">履約價3 $</span>
+              <input class="form-input" id="pd-strike3" type="number" value="120" step="0.5" style="padding-top:18px;" oninput="drawPayoff()">
+            </div>
+          </div>
+          <div id="pd-leg4-row" style="display:none;">
+            <div style="position:relative;">
+              <span style="position:absolute;top:4px;left:8px;font-size:10px;color:#555;font-family:var(--mono);">履約價4 $</span>
+              <input class="form-input" id="pd-strike4" type="number" value="150" step="0.5" style="padding-top:18px;" oninput="drawPayoff()">
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div style="position:relative;">
+              <span style="position:absolute;top:4px;left:8px;font-size:10px;color:#555;font-family:var(--mono);">權利金 $ / 口</span>
+              <input class="form-input" id="pd-premium" type="number" value="3.82" step="0.01" style="padding-top:18px;" oninput="drawPayoff()">
+            </div>
+            <div style="position:relative;">
+              <span style="position:absolute;top:4px;left:8px;font-size:10px;color:#555;font-family:var(--mono);">口數</span>
+              <input class="form-input" id="pd-qty" type="number" value="1" step="1" min="1" style="padding-top:18px;" oninput="drawPayoff()">
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div style="position:relative;">
+              <span style="position:absolute;top:4px;left:8px;font-size:10px;color:#555;font-family:var(--mono);">DTE (天)</span>
+              <input class="form-input" id="pd-dte" type="number" value="30" step="1" min="1" style="padding-top:18px;" oninput="drawPayoff()">
+            </div>
+            <div style="position:relative;">
+              <span style="position:absolute;top:4px;left:8px;font-size:10px;color:#555;font-family:var(--mono);">IV (%)</span>
+              <input class="form-input" id="pd-iv" type="number" value="50" step="1" min="1" style="padding-top:18px;" oninput="drawPayoff()">
+            </div>
+          </div>
+
+          <!-- Show at expiry toggle -->
+          <div style="display:flex;align-items:center;gap:10px;padding:4px 0;">
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;color:#aaa;font-family:var(--mono);">
+              <input type="checkbox" id="pd-show-current" checked style="accent-color:#ff2d78;" onchange="drawPayoff()">
+              顯示目前理論價值線
+            </label>
+          </div>
+
+          <button class="btn primary" onclick="drawPayoff()" style="width:100%;padding:9px;font-size:14px;letter-spacing:1px;">重新計算</button>
+        </div>
+      </div>
+
+      <!-- Greeks Card -->
+      <div class="card">
+        <div class="card-head"><span class="card-title">/ Greeks</span><span id="pd-greeks-time" style="font-size:11px;color:#555;font-family:var(--mono);"></span></div>
+        <div style="padding:12px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div style="background:#111;border:1px solid #2a2a2a;border-radius:4px;padding:10px;text-align:center;">
+              <div style="font-family:var(--mono);font-size:11px;color:#888;margin-bottom:4px;">Δ Delta</div>
+              <div id="g-delta" style="font-size:20px;font-family:var(--mono);color:#fff;">—</div>
+              <div style="font-size:10px;color:#555;margin-top:2px;">每$1股價變化</div>
+            </div>
+            <div style="background:#111;border:1px solid #2a2a2a;border-radius:4px;padding:10px;text-align:center;">
+              <div style="font-family:var(--mono);font-size:11px;color:#888;margin-bottom:4px;">Γ Gamma</div>
+              <div id="g-gamma" style="font-size:20px;font-family:var(--mono);color:#fff;">—</div>
+              <div style="font-size:10px;color:#555;margin-top:2px;">Delta變化速率</div>
+            </div>
+            <div style="background:#111;border:1px solid #2a2a2a;border-radius:4px;padding:10px;text-align:center;">
+              <div style="font-family:var(--mono);font-size:11px;color:#888;margin-bottom:4px;">Θ Theta</div>
+              <div id="g-theta" style="font-size:20px;font-family:var(--mono);color:#ff2d78;">—</div>
+              <div style="font-size:10px;color:#555;margin-top:2px;">每天時間損耗</div>
+            </div>
+            <div style="background:#111;border:1px solid #2a2a2a;border-radius:4px;padding:10px;text-align:center;">
+              <div style="font-family:var(--mono);font-size:11px;color:#888;margin-bottom:4px;">ν Vega</div>
+              <div id="g-vega" style="font-size:20px;font-family:var(--mono);color:#fff;">—</div>
+              <div style="font-size:10px;color:#555;margin-top:2px;">每1%IV變化</div>
+            </div>
+          </div>
+          <!-- Theoretical price -->
+          <div style="margin-top:10px;background:#111;border:1px solid #2a2a2a;border-radius:4px;padding:10px;display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-family:var(--mono);font-size:12px;color:#888;">理論價格</span>
+            <span id="g-theo" style="font-family:var(--mono);font-size:18px;color:#ff2d78;">—</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Chart -->
+    <div>
+      <div class="card">
+        <div class="card-head">
+          <span class="card-title">/ 損益圖</span>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <span id="pd-be-label" style="font-family:var(--mono);font-size:12px;color:#888;"></span>
+            <span id="pd-maxprofit-label" style="font-family:var(--mono);font-size:12px;color:#00cc66;"></span>
+            <span id="pd-maxloss-label" style="font-family:var(--mono);font-size:12px;color:#ff5555;"></span>
+          </div>
+        </div>
+        <!-- Canvas -->
+        <div style="padding:16px;position:relative;">
+          <canvas id="payoff-canvas" width="900" height="480" style="width:100%;height:480px;cursor:crosshair;border-radius:4px;"></canvas>
+          <!-- Hover tooltip -->
+          <div id="pd-tooltip" style="display:none;position:absolute;background:rgba(20,20,20,0.95);border:1px solid #3a3a3a;border-radius:4px;padding:8px 12px;pointer-events:none;font-family:var(--mono);font-size:12px;z-index:100;min-width:140px;"></div>
+        </div>
+
+        <!-- Scenario summary -->
+        <div style="padding:0 16px 16px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
+          <div style="background:#111;border:1px solid #2a2a2a;border-radius:4px;padding:10px;text-align:center;">
+            <div style="font-size:11px;color:#888;font-family:var(--mono);margin-bottom:4px;">損益兩平</div>
+            <div id="s-be" style="font-size:15px;font-family:var(--mono);color:#fff;">—</div>
+          </div>
+          <div style="background:#111;border:1px solid #2a2a2a;border-radius:4px;padding:10px;text-align:center;">
+            <div style="font-size:11px;color:#888;font-family:var(--mono);margin-bottom:4px;">最大獲利</div>
+            <div id="s-maxp" style="font-size:15px;font-family:var(--mono);color:#00cc66;">—</div>
+          </div>
+          <div style="background:#111;border:1px solid #2a2a2a;border-radius:4px;padding:10px;text-align:center;">
+            <div style="font-size:11px;color:#888;font-family:var(--mono);margin-bottom:4px;">最大虧損</div>
+            <div id="s-maxl" style="font-size:15px;font-family:var(--mono);color:#ff5555;">—</div>
+          </div>
+          <div style="background:#111;border:1px solid #2a2a2a;border-radius:4px;padding:10px;text-align:center;">
+            <div style="font-size:11px;color:#888;font-family:var(--mono);margin-bottom:4px;">目前損益</div>
+            <div id="s-cur" style="font-size:15px;font-family:var(--mono);color:#fff;">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 // ============ CONFIG ============
 const SUPABASE_URL = 'https://kzxunbohppykfkaqioqd.supabase.co';
@@ -585,6 +900,8 @@ function showPage(id, btn) {
   if(id === 'positions') { loadMyPositions(); startPriceRefresh(); }
   if(id === 'flow')      refreshFlow(true);
   if(id === 'ai')        buildAIPositionsPreview();
+  if(id === 'research')  initResearch();
+  if(id === 'payoff')    initPayoff();
 }
 
 // ============ USER ============
@@ -1501,6 +1818,900 @@ async function fetchExpiryDates(sym) {
     const label = f.label + (f.dte <= 7 ? ' 🔥' : f.dte <= 21 ? '' : '');
     return `<option value="${f.value}" ${i===0?'selected':''}>${label}</option>`;
   }).join('');
+}
+
+
+// ============ PAYOFF DIAGRAM ============
+
+// ── Black-Scholes ──────────────────────────────────────────────
+function normCDF(x) {
+  const a1=0.254829592,a2=-0.284496736,a3=1.421413741,a4=-1.453152027,a5=1.061405429,p=0.3275911;
+  const sign = x < 0 ? -1 : 1;
+  x = Math.abs(x) / Math.sqrt(2);
+  const t = 1 / (1 + p * x);
+  const y = 1 - (((((a5*t+a4)*t)+a3)*t+a2)*t+a1)*t*Math.exp(-x*x);
+  return 0.5 * (1 + sign * y);
+}
+function normPDF(x) { return Math.exp(-0.5*x*x) / Math.sqrt(2*Math.PI); }
+
+function bsPrice(S, K, T, r, sigma, isCall) {
+  if (T <= 0) {
+    const intrinsic = isCall ? Math.max(S-K,0) : Math.max(K-S,0);
+    return intrinsic;
+  }
+  const sqrtT = Math.sqrt(T);
+  const d1 = (Math.log(S/K) + (r + 0.5*sigma*sigma)*T) / (sigma*sqrtT);
+  const d2 = d1 - sigma*sqrtT;
+  if (isCall) return S*normCDF(d1) - K*Math.exp(-r*T)*normCDF(d2);
+  return K*Math.exp(-r*T)*normCDF(-d2) - S*normCDF(-d1);
+}
+
+function bsGreeks(S, K, T, r, sigma, isCall) {
+  if (T <= 0.0001) T = 0.0001;
+  const sqrtT = Math.sqrt(T);
+  const d1 = (Math.log(S/K) + (r + 0.5*sigma*sigma)*T) / (sigma*sqrtT);
+  const d2 = d1 - sigma*sqrtT;
+  const pdf1 = normPDF(d1);
+  const delta = isCall ? normCDF(d1) : normCDF(d1) - 1;
+  const gamma = pdf1 / (S * sigma * sqrtT);
+  const theta = isCall
+    ? (-(S * pdf1 * sigma) / (2*sqrtT) - r*K*Math.exp(-r*T)*normCDF(d2)) / 365
+    : (-(S * pdf1 * sigma) / (2*sqrtT) + r*K*Math.exp(-r*T)*normCDF(-d2)) / 365;
+  const vega  = S * pdf1 * sqrtT / 100; // per 1% IV
+  const price = bsPrice(S, K, T, r, sigma, isCall);
+  return { delta, gamma, theta, vega, price };
+}
+
+// ── Strategy leg builder ───────────────────────────────────────
+function getLegs() {
+  const type    = document.getElementById('pd-type').value;
+  const S       = parseFloat(document.getElementById('pd-stock').value) || 100;
+  const K1      = parseFloat(document.getElementById('pd-strike').value) || 100;
+  const K2      = parseFloat(document.getElementById('pd-strike2')?.value) || K1+10;
+  const K3      = parseFloat(document.getElementById('pd-strike3')?.value) || K1-10;
+  const K4      = parseFloat(document.getElementById('pd-strike4')?.value) || K1+20;
+  const prem    = parseFloat(document.getElementById('pd-premium').value) || 3;
+  const qty     = parseInt(document.getElementById('pd-qty').value) || 1;
+  const dte     = parseFloat(document.getElementById('pd-dte').value) || 30;
+  const iv      = parseFloat(document.getElementById('pd-iv').value) / 100 || 0.5;
+  const T       = dte / 365;
+  const r       = 0.05;
+
+  // Each leg: { K, isCall, sign (+1 buy / -1 sell), premium, qty }
+  // premium = cost paid (positive = debit, negative = credit)
+  const legPrem = prem; // user enters net premium for simple strategies
+
+  switch(type) {
+    case 'CALL':
+      return [{ K:K1, isCall:true,  sign:1,  prem:legPrem, qty, T, r, iv, S }];
+    case 'PUT':
+      return [{ K:K1, isCall:false, sign:1,  prem:legPrem, qty, T, r, iv, S }];
+    case 'SELL CALL':
+      return [{ K:K1, isCall:true,  sign:-1, prem:legPrem, qty, T, r, iv, S }];
+    case 'SELL PUT':
+      return [{ K:K1, isCall:false, sign:-1, prem:legPrem, qty, T, r, iv, S }];
+    case 'Bull Call Spread': {
+      const p1 = bsPrice(S,K1,T,r,iv,true);
+      const p2 = bsPrice(S,K2,T,r,iv,true);
+      return [
+        { K:K1, isCall:true,  sign:1,  prem:p1, qty, T, r, iv, S },
+        { K:K2, isCall:true,  sign:-1, prem:p2, qty, T, r, iv, S }
+      ];
+    }
+    case 'Bear Put Spread': {
+      const p1 = bsPrice(S,K1,T,r,iv,false);
+      const p2 = bsPrice(S,K3,T,r,iv,false);
+      return [
+        { K:K1, isCall:false, sign:1,  prem:p1, qty, T, r, iv, S },
+        { K:K3, isCall:false, sign:-1, prem:p2, qty, T, r, iv, S }
+      ];
+    }
+    case 'Iron Condor': {
+      const pA = bsPrice(S,K3,T,r,iv,false); // sell put lower
+      const pB = bsPrice(S,K1,T,r,iv,false); // buy put
+      const pC = bsPrice(S,K2,T,r,iv,true);  // sell call
+      const pD = bsPrice(S,K4,T,r,iv,true);  // buy call upper
+      return [
+        { K:K3, isCall:false, sign:1,  prem:pA, qty, T, r, iv, S },
+        { K:K1, isCall:false, sign:-1, prem:pB, qty, T, r, iv, S },
+        { K:K2, isCall:true,  sign:-1, prem:pC, qty, T, r, iv, S },
+        { K:K4, isCall:true,  sign:1,  prem:pD, qty, T, r, iv, S }
+      ];
+    }
+    case 'Straddle': {
+      const pc = bsPrice(S,K1,T,r,iv,true);
+      const pp = bsPrice(S,K1,T,r,iv,false);
+      return [
+        { K:K1, isCall:true,  sign:1, prem:pc, qty, T, r, iv, S },
+        { K:K1, isCall:false, sign:1, prem:pp, qty, T, r, iv, S }
+      ];
+    }
+    case 'Strangle': {
+      const pc = bsPrice(S,K2,T,r,iv,true);
+      const pp = bsPrice(S,K3,T,r,iv,false);
+      return [
+        { K:K2, isCall:true,  sign:1, prem:pc, qty, T, r, iv, S },
+        { K:K3, isCall:false, sign:1, prem:pp, qty, T, r, iv, S }
+      ];
+    }
+    default:
+      return [{ K:K1, isCall:true, sign:1, prem:legPrem, qty, T, r, iv, S }];
+  }
+}
+
+// Payoff at expiry for a single leg
+function legPayoffAtExpiry(leg, stockPrice) {
+  const intrinsic = leg.isCall
+    ? Math.max(stockPrice - leg.K, 0)
+    : Math.max(leg.K - stockPrice, 0);
+  return leg.sign * (intrinsic - leg.prem) * leg.qty * 100;
+}
+
+// Current theoretical value for a single leg
+function legCurrentValue(leg, stockPrice) {
+  const Tcur = Math.max(leg.T - 0, 0.0001); // current DTE
+  const theo = bsPrice(stockPrice, leg.K, Tcur, leg.r, leg.iv, leg.isCall);
+  return leg.sign * (theo - leg.prem) * leg.qty * 100;
+}
+
+function totalPayoff(legs, stockPrice, atExpiry) {
+  return legs.reduce((sum, leg) =>
+    sum + (atExpiry ? legPayoffAtExpiry(leg, stockPrice) : legCurrentValue(leg, stockPrice)), 0);
+}
+
+function findBreakeven(legs, prices, atExpiry) {
+  const bes = [];
+  for (let i = 1; i < prices.length; i++) {
+    const prev = totalPayoff(legs, prices[i-1], atExpiry);
+    const curr = totalPayoff(legs, prices[i],   atExpiry);
+    if ((prev < 0 && curr >= 0) || (prev >= 0 && curr < 0)) {
+      // Linear interpolation
+      const be = prices[i-1] + (0 - prev) / (curr - prev) * (prices[i] - prices[i-1]);
+      bes.push(be);
+    }
+  }
+  return bes;
+}
+
+// ── Main draw function ─────────────────────────────────────────
+function drawPayoff() {
+  const canvas = document.getElementById('payoff-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  // Responsive canvas
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width  = rect.width  * dpr;
+  canvas.height = rect.height * dpr;
+  ctx.scale(dpr, dpr);
+  const W = rect.width, H = rect.height;
+
+  const legs = getLegs();
+  const S    = parseFloat(document.getElementById('pd-stock').value) || 100;
+  const showCurrent = document.getElementById('pd-show-current')?.checked !== false;
+
+  // Price range: S ± 40%
+  const lo = S * 0.55, hi = S * 1.45;
+  const steps = 300;
+  const prices = Array.from({length:steps}, (_,i) => lo + (hi-lo)*i/(steps-1));
+
+  const expiryPnl  = prices.map(p => totalPayoff(legs, p, true));
+  const currentPnl = showCurrent ? prices.map(p => totalPayoff(legs, p, false)) : [];
+
+  const allVals = [...expiryPnl, ...(showCurrent ? currentPnl : [])];
+  const minPnl  = Math.min(...allVals);
+  const maxPnl  = Math.max(...allVals);
+  const pnlRange = maxPnl - minPnl || 1;
+  const pad = { l:70, r:30, t:30, b:50 };
+
+  function xOf(price) { return pad.l + (price - lo) / (hi - lo) * (W - pad.l - pad.r); }
+  function yOf(pnl)   { return pad.t + (1 - (pnl - minPnl) / pnlRange) * (H - pad.t - pad.b); }
+
+  // ── Background ──
+  ctx.fillStyle = '#111111';
+  ctx.fillRect(0, 0, W, H);
+
+  // ── Grid ──
+  ctx.strokeStyle = '#222';
+  ctx.lineWidth = 1;
+  // Horizontal grid lines
+  const nLines = 6;
+  for (let i = 0; i <= nLines; i++) {
+    const pnl = minPnl + (maxPnl - minPnl) * i / nLines;
+    const y = yOf(pnl);
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(W - pad.r, y); ctx.stroke();
+    ctx.fillStyle = '#555'; ctx.font = '11px monospace';
+    ctx.textAlign = 'right';
+    const label = pnl >= 0 ? '+$'+Math.round(pnl) : '-$'+Math.round(Math.abs(pnl));
+    ctx.fillText(label, pad.l - 6, y + 4);
+  }
+  // Vertical grid lines (price)
+  const nVLines = 8;
+  for (let i = 0; i <= nVLines; i++) {
+    const price = lo + (hi - lo) * i / nVLines;
+    const x = xOf(price);
+    ctx.beginPath(); ctx.moveTo(x, pad.t); ctx.lineTo(x, H - pad.b); ctx.stroke();
+    ctx.fillStyle = '#555'; ctx.font = '11px monospace'; ctx.textAlign = 'center';
+    ctx.fillText('$' + price.toFixed(0), x, H - pad.b + 16);
+  }
+
+  // ── Zero line ──
+  const y0 = yOf(0);
+  ctx.strokeStyle = '#444'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(pad.l, y0); ctx.lineTo(W - pad.r, y0); ctx.stroke();
+
+  // ── Current stock price vertical line ──
+  const xS = xOf(S);
+  ctx.strokeStyle = 'rgba(255,45,120,0.4)'; ctx.lineWidth = 1;
+  ctx.setLineDash([4,4]);
+  ctx.beginPath(); ctx.moveTo(xS, pad.t); ctx.lineTo(xS, H - pad.b); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = '#ff2d78'; ctx.font = 'bold 11px monospace'; ctx.textAlign = 'center';
+  ctx.fillText('現價 $'+S.toFixed(2), xS, pad.t - 8);
+
+  // ── Current value line (theoretical) ──
+  if (showCurrent && currentPnl.length) {
+    ctx.strokeStyle = 'rgba(100,180,255,0.6)';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([6,3]);
+    ctx.beginPath();
+    currentPnl.forEach((pnl, i) => {
+      const x = xOf(prices[i]), y = yOf(pnl);
+      i === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    });
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // ── Expiry payoff line (colored by profit/loss) ──
+  ctx.lineWidth = 2.5;
+  for (let i = 1; i < prices.length; i++) {
+    const x1 = xOf(prices[i-1]), y1 = yOf(expiryPnl[i-1]);
+    const x2 = xOf(prices[i]),   y2 = yOf(expiryPnl[i]);
+    const midPnl = (expiryPnl[i-1] + expiryPnl[i]) / 2;
+    ctx.strokeStyle = midPnl >= 0 ? '#00cc66' : '#ff5555';
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  }
+
+  // ── Fill area under expiry line ──
+  ctx.beginPath();
+  ctx.moveTo(xOf(prices[0]), y0);
+  expiryPnl.forEach((pnl, i) => ctx.lineTo(xOf(prices[i]), yOf(pnl)));
+  ctx.lineTo(xOf(prices[prices.length-1]), y0);
+  ctx.closePath();
+  const grad = ctx.createLinearGradient(0, pad.t, 0, H - pad.b);
+  grad.addColorStop(0, 'rgba(0,204,102,0.15)');
+  grad.addColorStop(0.5, 'rgba(0,0,0,0)');
+  grad.addColorStop(1, 'rgba(255,85,85,0.12)');
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // ── Breakeven points ──
+  const bes = findBreakeven(legs, prices, true);
+  bes.forEach(be => {
+    const x = xOf(be), y = yOf(0);
+    ctx.fillStyle = '#ffcc00';
+    ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#ffcc00'; ctx.font = 'bold 11px monospace'; ctx.textAlign = 'center';
+    ctx.fillText('BE $'+be.toFixed(1), x, y - 12);
+  });
+
+  // ── Strike price markers ──
+  const strikes = [
+    parseFloat(document.getElementById('pd-strike')?.value),
+    parseFloat(document.getElementById('pd-strike2')?.value),
+    parseFloat(document.getElementById('pd-strike3')?.value),
+    parseFloat(document.getElementById('pd-strike4')?.value),
+  ].filter(k => k && k >= lo && k <= hi);
+
+  strikes.forEach(k => {
+    const x = xOf(k);
+    ctx.strokeStyle = 'rgba(255,255,255,0.2)'; ctx.lineWidth = 1;
+    ctx.setLineDash([2,4]);
+    ctx.beginPath(); ctx.moveTo(x, pad.t); ctx.lineTo(x, H-pad.b); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#888'; ctx.font = '10px monospace'; ctx.textAlign = 'center';
+    ctx.fillText('K$'+k, x, H-pad.b+30);
+  });
+
+  // ── Legend ──
+  const lx = W - pad.r - 160, ly = pad.t + 10;
+  ctx.fillStyle = 'rgba(0,0,0,0.7)';
+  ctx.fillRect(lx - 8, ly - 6, 170, showCurrent ? 52 : 30);
+  ctx.strokeStyle = '#00cc66'; ctx.lineWidth = 2.5;
+  ctx.beginPath(); ctx.moveTo(lx, ly+8); ctx.lineTo(lx+24, ly+8); ctx.stroke();
+  ctx.fillStyle = '#ddd'; ctx.font = '11px monospace'; ctx.textAlign = 'left';
+  ctx.fillText('到期損益', lx+28, ly+12);
+  if (showCurrent) {
+    ctx.strokeStyle = 'rgba(100,180,255,0.8)'; ctx.lineWidth = 1.5; ctx.setLineDash([6,3]);
+    ctx.beginPath(); ctx.moveTo(lx, ly+28); ctx.lineTo(lx+24, ly+28); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#ddd'; ctx.fillText('目前理論值', lx+28, ly+32);
+  }
+
+  // ── Update stats ──
+  const maxProfit = Math.max(...expiryPnl);
+  const maxLoss   = Math.min(...expiryPnl);
+  const curPnl    = totalPayoff(legs, S, false);
+
+  document.getElementById('s-be').textContent  = bes.length ? bes.map(b=>'$'+b.toFixed(1)).join(' / ') : '無';
+  document.getElementById('s-maxp').textContent = maxProfit === Infinity ? '無限' : '+$'+Math.round(maxProfit);
+  document.getElementById('s-maxl').textContent = maxLoss === -Infinity   ? '無限' : '-$'+Math.round(Math.abs(maxLoss));
+  document.getElementById('s-cur').textContent  = (curPnl >= 0 ? '+' : '') + '$' + Math.round(curPnl);
+  document.getElementById('s-cur').style.color  = curPnl >= 0 ? '#00cc66' : '#ff5555';
+
+  // ── Greeks (for first/primary leg) ──
+  const leg0  = legs[0];
+  const greeks = bsGreeks(S, leg0.K, leg0.T, leg0.r, leg0.iv, leg0.isCall);
+  const mult   = leg0.sign; // buy/sell
+  document.getElementById('g-delta').textContent = (greeks.delta * mult).toFixed(3);
+  document.getElementById('g-gamma').textContent = greeks.gamma.toFixed(4);
+  document.getElementById('g-theta').textContent = (greeks.theta * mult * leg0.qty * 100).toFixed(2);
+  document.getElementById('g-vega').textContent  = (greeks.vega  * mult * leg0.qty * 100).toFixed(2);
+  document.getElementById('g-theo').textContent  = '$' + greeks.price.toFixed(2);
+  document.getElementById('g-theta').style.color = greeks.theta * mult < 0 ? '#ff2d78' : '#00cc66';
+  document.getElementById('pd-greeks-time').textContent = 'T=' + leg0.T.toFixed(3) + ' σ=' + (leg0.iv*100).toFixed(0) + '%';
+
+  // Store for tooltip
+  canvas._legs   = legs;
+  canvas._prices = prices;
+  canvas._expiryPnl  = expiryPnl;
+  canvas._currentPnl = currentPnl;
+  canvas._lo = lo; canvas._hi = hi;
+  canvas._minPnl = minPnl; canvas._maxPnl = maxPnl;
+  canvas._W = W; canvas._H = H; canvas._pad = pad;
+}
+
+// ── Tooltip on hover ──────────────────────────────────────────
+function setupPayoffTooltip() {
+  const canvas  = document.getElementById('payoff-canvas');
+  const tooltip = document.getElementById('pd-tooltip');
+  if (!canvas || !tooltip) return;
+
+  canvas.addEventListener('mousemove', e => {
+    if (!canvas._legs) return;
+    const rect = canvas.getBoundingClientRect();
+    const mx   = e.clientX - rect.left;
+    const { _lo, _hi, _W, _pad, _legs, _expiryPnl, _currentPnl, _prices } = canvas;
+
+    const price = _lo + (mx - _pad.l) / (_W - _pad.l - _pad.r) * (_hi - _lo);
+    if (price < _lo || price > _hi) { tooltip.style.display='none'; return; }
+
+    const idx = Math.min(Math.round((price - _lo) / (_hi - _lo) * (_prices.length-1)), _prices.length-1);
+    const ep  = _expiryPnl[idx];
+    const cp  = _currentPnl[idx];
+    const S   = parseFloat(document.getElementById('pd-stock').value);
+
+    tooltip.style.display = 'block';
+    tooltip.style.left    = (mx + 16) + 'px';
+    tooltip.style.top     = (e.clientY - rect.top - 40) + 'px';
+    tooltip.innerHTML = `
+      <div style="color:#ff2d78;margin-bottom:4px;font-size:13px;font-weight:600;">$${_prices[idx].toFixed(2)}</div>
+      <div style="color:${ep>=0?'#00cc66':'#ff5555'}">到期: ${ep>=0?'+':''}\$${Math.round(ep)}</div>
+      ${cp !== undefined ? `<div style="color:#64b4ff">目前: ${cp>=0?'+':''}\$${Math.round(cp)}</div>` : ''}
+      <div style="color:#888;font-size:10px;margin-top:4px;">距現價 ${((_prices[idx]-S)/S*100).toFixed(1)}%</div>`;
+  });
+
+  canvas.addEventListener('mouseleave', () => { tooltip.style.display='none'; });
+}
+
+// ── Toggle extra leg inputs ───────────────────────────────────
+function toggleLegs() {
+  const type    = document.getElementById('pd-type').value;
+  const leg2row = document.getElementById('pd-leg2-row');
+  const leg4row = document.getElementById('pd-leg4-row');
+  const multiLeg = ['Bull Call Spread','Bear Put Spread','Iron Condor','Straddle','Strangle'];
+  if (multiLeg.includes(type)) {
+    leg2row.style.display = 'grid';
+    leg4row.style.display = type === 'Iron Condor' ? 'block' : 'none';
+  } else {
+    leg2row.style.display = 'none';
+    leg4row.style.display = 'none';
+  }
+  drawPayoff();
+}
+
+// ── Load from my positions ────────────────────────────────────
+function loadPosToPayoff() {
+  const sel = document.getElementById('pd-pos-select');
+  const idx = parseInt(sel.value);
+  if (isNaN(idx) || !myPositions[idx]) return;
+  const p = myPositions[idx];
+  document.getElementById('pd-ticker').value  = p.ticker  || '';
+  document.getElementById('pd-strike').value  = p.strike  || 100;
+  document.getElementById('pd-premium').value = p.cost    || 3;
+  document.getElementById('pd-qty').value     = p.qty     || 1;
+  const type = p.option_type || p.type || 'CALL';
+  document.getElementById('pd-type').value    = type;
+  if (p._stockPrice) document.getElementById('pd-stock').value = p._stockPrice.toFixed(2);
+  const parts = (p.expiry||'').split('/');
+  if (parts.length === 3) {
+    const exp = new Date(2000+parseInt(parts[2]), parseInt(parts[0])-1, parseInt(parts[1]));
+    const dte = Math.max(1, Math.round((exp - new Date()) / 86400000));
+    document.getElementById('pd-dte').value = dte;
+  }
+  toggleLegs();
+  drawPayoff();
+}
+
+// ── Init ──────────────────────────────────────────────────────
+function initPayoff() {
+  // Populate position selector
+  const sel = document.getElementById('pd-pos-select');
+  if (sel) {
+    sel.innerHTML = '<option value="">── 從我的倉位選擇 ──</option>' +
+      myPositions.map((p,i) =>
+        `<option value="${i}">${p.ticker} ${p.option_type||'CALL'} $${p.strike} (${p.expiry})</option>`
+      ).join('');
+  }
+  setupPayoffTooltip();
+  toggleLegs();
+  drawPayoff();
+}
+
+window.addEventListener('resize', () => {
+  if (document.getElementById('page-payoff')?.classList.contains('active')) drawPayoff();
+});
+
+
+
+// ============ RESEARCH ENGINE ============
+
+let _resDetectedTickers = new Set();
+let _resManualTickers   = new Set();
+let _resReportData      = null;
+
+// ── Ticker detection from article text ───────────────────────
+function extractTickers(text) {
+  // Match $TICKER, (TICKER), or standalone uppercase 1-5 letter words
+  const patterns = [
+    /\$([A-Z]{1,5})\b/g,
+    /\b([A-Z]{2,5})\b(?=\s*(?:stock|shares|calls|puts|options|earnings|rally|drops|surges|falls))/gi,
+  ];
+  const found = new Set();
+  const blacklist = new Set(['AI','THE','FOR','AND','BUT','NOT','ARE','WAS','HAS','HAD',
+    'CAN','USD','ETF','CEO','CFO','IPO','EPS','GDP','FED','SEC','NYSE','NEWS','WEEK',
+    'THIS','THAT','WITH','FROM','WILL','HAVE','BEEN','THEY','THAN','WHEN','YOUR',
+    'WHAT','ALSO','MORE','YEAR','HIGH','LOW','RATE','SELL','CALL','PUT','BULL','BEAR']);
+
+  for (const pat of patterns) {
+    let m;
+    const re = new RegExp(pat.source, 'g');
+    while ((m = re.exec(text)) !== null) {
+      const t = m[1].toUpperCase();
+      if (!blacklist.has(t) && t.length >= 2) found.add(t);
+    }
+  }
+
+  // Also catch $TICKER format more aggressively
+  const dollarRe = /\$([A-Z]{1,5})\b/g;
+  let dm;
+  while ((dm = dollarRe.exec(text)) !== null) found.add(dm[1]);
+
+  return [...found].slice(0, 12); // max 12 tickers
+}
+
+function onResArticleInput() {
+  const text = document.getElementById('res-article').value;
+  document.getElementById('res-char-count').textContent = text.length.toLocaleString() + ' 字';
+  const tickers = extractTickers(text);
+  _resDetectedTickers = new Set(tickers);
+  renderDetectedTickers();
+}
+
+function renderDetectedTickers() {
+  const all = [...new Set([..._resDetectedTickers, ..._resManualTickers])];
+  const det = document.getElementById('res-detected');
+  const tags = document.getElementById('res-ticker-tags');
+  if (!det) return;
+
+  det.innerHTML = all.length
+    ? '<span style="font-family:var(--mono);font-size:11px;color:#555;margin-right:4px;">偵測到:</span>' +
+      all.map(t => `<span class="tag tag-call" style="cursor:pointer;font-size:12px;" onclick="removeTicker('${t}')" title="點擊移除">${t} ×</span>`).join('')
+    : '<span style="font-family:var(--mono);font-size:11px;color:#444;">輸入文章後自動偵測代碼...</span>';
+
+  if (tags) tags.innerHTML = all.map(t =>
+    `<span style="font-family:var(--mono);font-size:11px;color:#ff2d78;background:rgba(255,45,120,0.1);padding:2px 6px;border-radius:2px;">${t}</span>`
+  ).join('');
+}
+
+function removeTicker(t) {
+  _resDetectedTickers.delete(t);
+  _resManualTickers.delete(t);
+  renderDetectedTickers();
+}
+
+function addManualTicker() {
+  const el = document.getElementById('rs-manual-ticker');
+  const t = el.value.trim().toUpperCase();
+  if (t && t.length <= 6) { _resManualTickers.add(t); el.value = ''; renderDetectedTickers(); }
+}
+
+// ── Data fetching ─────────────────────────────────────────────
+function setProgress(label, pct, stepDone) {
+  const bar   = document.getElementById('res-progress-bar');
+  const lbl   = document.getElementById('res-progress-label');
+  const pctEl = document.getElementById('res-progress-pct');
+  const steps = document.getElementById('res-progress-steps');
+  if (bar)   bar.style.width   = pct + '%';
+  if (lbl)   lbl.textContent   = label;
+  if (pctEl) pctEl.textContent = pct + '%';
+  if (stepDone && steps) {
+    const s = document.createElement('span');
+    s.style.cssText = 'font-family:var(--mono);font-size:11px;color:#555;';
+    s.textContent = '✓ ' + stepDone;
+    steps.appendChild(s);
+  }
+}
+
+async function fetchStockData(ticker) {
+  try {
+    const url   = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=1y`;
+    const proxy = u => `https://corsproxy.io/?${encodeURIComponent(u)}`;
+    const res   = await fetch(proxy(url), { signal: AbortSignal.timeout(6000) });
+    if (!res.ok) return null;
+    const json  = await res.json();
+    const meta  = json?.chart?.result?.[0]?.meta;
+    if (!meta) return null;
+
+    const price   = meta.regularMarketPrice || meta.previousClose;
+    const prev    = meta.chartPreviousClose  || meta.previousClose;
+    const week52H = meta.fiftyTwoWeekHigh;
+    const week52L = meta.fiftyTwoWeekLow;
+    const mktCap  = meta.marketCap;
+    const chgPct  = prev ? ((price - prev) / prev * 100) : 0;
+    const distH   = week52H ? ((price - week52H) / week52H * 100) : null;
+    const distL   = week52L ? ((price - week52L) / week52L * 100) : null;
+
+    // Get closes for momentum
+    const closes = json?.chart?.result?.[0]?.indicators?.quote?.[0]?.close?.filter(Boolean) || [];
+    const momentum = closes.length >= 20
+      ? ((closes[closes.length-1] - closes[closes.length-20]) / closes[closes.length-20] * 100).toFixed(1)
+      : null;
+
+    return { ticker, price, chgPct, week52H, week52L, mktCap, distH, distL, momentum };
+  } catch(e) { return null; }
+}
+
+async function fetchFlowForTicker(ticker) {
+  try {
+    const data = await fetchUW(`/api/stocks/${ticker}/options/flow?limit=20`);
+    const rows = Array.isArray(data) ? data : (data?.data || []);
+    if (!rows.length) return null;
+    const calls = rows.filter(r => (r.put_call||r.option_type||'').toUpperCase().includes('CALL'));
+    const puts  = rows.filter(r => (r.put_call||r.option_type||'').toUpperCase().includes('PUT'));
+    const totalPrem = rows.reduce((s,r) => s + parseFloat(r.total_premium||r.premium||0), 0);
+    const callPrem  = calls.reduce((s,r) => s + parseFloat(r.total_premium||r.premium||0), 0);
+    const putPrem   = puts.reduce((s,r) => s + parseFloat(r.total_premium||r.premium||0), 0);
+    const pcRatio   = putPrem > 0 ? (callPrem / putPrem).toFixed(2) : null;
+    const biggestCall = calls.sort((a,b) => parseFloat(b.total_premium||b.premium||0) - parseFloat(a.total_premium||a.premium||0))[0];
+    const biggestPut  = puts.sort((a,b) => parseFloat(b.total_premium||b.premium||0) - parseFloat(a.total_premium||a.premium||0))[0];
+    return { ticker, callCount:calls.length, putCount:puts.length, callPrem, putPrem, pcRatio, totalPrem, biggestCall, biggestPut };
+  } catch(e) { return null; }
+}
+
+// ── Main research runner ──────────────────────────────────────
+async function runResearch() {
+  const article   = document.getElementById('res-article').value.trim();
+  const allTickers = [...new Set([..._resDetectedTickers, ..._resManualTickers])];
+
+  if (!article && !allTickers.length) {
+    showToast('請先貼入文章或輸入代碼', 'info'); return;
+  }
+
+  const apiKey = getClaudeKey();
+  if (!apiKey) { showToast('請在 AI 分析頁輸入 Claude API Key', 'stop'); return; }
+
+  const btn = document.getElementById('res-run-btn');
+  btn.disabled = true; btn.textContent = '研究中...';
+  document.getElementById('res-progress-area').style.display = 'block';
+  document.getElementById('res-report-area').style.display   = 'none';
+  document.getElementById('res-empty').style.display         = 'none';
+  document.getElementById('res-progress-steps').innerHTML    = '';
+
+  const fetchQuote  = document.getElementById('rs-fetch-quote')?.checked !== false;
+  const fetchFlow   = document.getElementById('rs-fetch-flow')?.checked !== false;
+  const includePos  = document.getElementById('rs-include-pos')?.checked !== false;
+  const depth       = document.getElementById('rs-depth')?.value || 'standard';
+
+  // Auto-detect more tickers if we have article
+  if (article && !allTickers.length) {
+    const detected = extractTickers(article);
+    detected.forEach(t => _resDetectedTickers.add(t));
+    renderDetectedTickers();
+    allTickers.push(...detected);
+  }
+
+  setProgress('識別股票代碼...', 5);
+  await new Promise(r => setTimeout(r, 200));
+
+  // Fetch stock data
+  const stockDataMap = {};
+  if (fetchQuote && allTickers.length) {
+    setProgress(`抓取股票數據 (${allTickers.length} 支)...`, 15);
+    const results = await Promise.allSettled(allTickers.map(t => fetchStockData(t)));
+    results.forEach((r, i) => { if (r.status === 'fulfilled' && r.value) stockDataMap[allTickers[i]] = r.value; });
+    setProgress('股票數據完成', 35, `報價: ${Object.keys(stockDataMap).length}/${allTickers.length} 成功`);
+  }
+
+  // Fetch options flow
+  const flowDataMap = {};
+  if (fetchFlow && allTickers.length) {
+    setProgress('抓取期權大單流...', 40);
+    const results = await Promise.allSettled(allTickers.map(t => fetchFlowForTicker(t)));
+    results.forEach((r, i) => { if (r.status === 'fulfilled' && r.value) flowDataMap[allTickers[i]] = r.value; });
+    setProgress('大單流完成', 55, `大單: ${Object.keys(flowDataMap).length}/${allTickers.length} 成功`);
+  }
+
+  // Build prompt
+  setProgress('整合資料，發送 AI 分析...', 60);
+  const depthInstructions = {
+    quick:    '請用條列式給出快速摘要，每支股票不超過3行。',
+    standard: '請給出標準研究報告，每支股票包含：核心論點、技術面、籌碼面、建議期權策略。',
+    deep:     '請給出深度研究報告，包含：詳細基本面分析、技術面、籌碼面、多空辯證、具體期權策略設計（含履約價區間、DTE建議）、風險因素排序。',
+  };
+
+  let dataBlock = '';
+  for (const t of allTickers) {
+    dataBlock += `\n【${t}】\n`;
+    const sd = stockDataMap[t];
+    if (sd) {
+      dataBlock += `  股價: $${sd.price?.toFixed(2)} (今日 ${sd.chgPct?.toFixed(2)}%)\n`;
+      dataBlock += `  52週: 高$${sd.week52H?.toFixed(2)} 低$${sd.week52L?.toFixed(2)} (距高${sd.distH?.toFixed(1)}% 距低+${sd.distL?.toFixed(1)}%)\n`;
+      if (sd.momentum) dataBlock += `  20日動量: ${sd.momentum}%\n`;
+      if (sd.mktCap)   dataBlock += `  市值: $${(sd.mktCap/1e9).toFixed(1)}B\n`;
+    }
+    const fd = flowDataMap[t];
+    if (fd) {
+      dataBlock += `  期權流: CALL ${fd.callCount}筆 PUT ${fd.putCount}筆 C/P溢價比=${fd.pcRatio}\n`;
+      if (fd.biggestCall) dataBlock += `  最大CALL: $${fd.biggestCall.strike} 溢價$${parseFloat(fd.biggestCall.total_premium||0).toFixed(0)}\n`;
+      if (fd.biggestPut)  dataBlock += `  最大PUT:  $${fd.biggestPut.strike}  溢價$${parseFloat(fd.biggestPut.total_premium||0).toFixed(0)}\n`;
+    }
+    if (!sd && !fd) dataBlock += '  （無法取得數據）\n';
+  }
+
+  const posBlock = (includePos && myPositions.length)
+    ? '\n【我的持倉】\n' + myPositions.map(p => {
+        const optP = p._livePrice || p.cost;
+        const pct  = ((optP - p.cost)/p.cost*100).toFixed(1);
+        return `  ${p.ticker} ${p.option_type||'CALL'} $${p.strike} 到期${p.expiry} 損益${pct}%`;
+      }).join('\n')
+    : '';
+
+  const fullPrompt = `你是一位頂級的美股分析師，擅長結合新聞、基本面和期權籌碼進行研究分析。請用繁體中文輸出，風格專業但易讀。
+
+${depthInstructions[depth]}
+
+【文章內容】
+${article.substring(0, 12000)}${article.length > 12000 ? '\n...(截斷)' : ''}
+
+【市場數據】
+${dataBlock}
+${posBlock}
+
+請按以下 JSON 格式回應（不要有任何 markdown code block，直接輸出 JSON）：
+{
+  "title": "研究報告標題（15字內）",
+  "sentiment": "bullish/bearish/neutral",
+  "thesis": "核心投資論點（2-3句）",
+  "stocks": [
+    {
+      "ticker": "代碼",
+      "score": 評分(1-10整數),
+      "direction": "bullish/bearish/neutral",
+      "summary": "2句分析摘要",
+      "catalyst": "主要催化劑",
+      "risk": "主要風險",
+      "strategy": "建議期權策略",
+      "entry": "進場條件"
+    }
+  ],
+  "full_analysis": "完整分析內容（markdown格式，500-1000字）",
+  "trades": [
+    {
+      "ticker": "代碼",
+      "direction": "看多/看空",
+      "strategy": "策略名稱",
+      "entry": "進場條件",
+      "target_stop": "目標/停損",
+      "confidence": "高/中/低"
+    }
+  ],
+  "risks": ["風險1", "風險2", "風險3"]
+}`;
+
+  try {
+    setProgress('Claude 分析中...', 70);
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 2500,
+        messages: [{ role: 'user', content: fullPrompt }]
+      })
+    });
+
+    const data = await res.json();
+    if (!res.ok || data.error) throw new Error(data?.error?.message || 'API 錯誤');
+    const rawText = data?.content?.[0]?.text || '';
+    setProgress('解析報告...', 90, 'AI分析完成');
+
+    // Parse JSON from response
+    let report;
+    try {
+      const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+      report = JSON.parse(jsonMatch?.[0] || rawText);
+    } catch(e) {
+      // Fallback: treat as plain text
+      report = { title:'研究報告', sentiment:'neutral', thesis: rawText.substring(0,200),
+                 stocks:[], full_analysis: rawText, trades:[], risks:[] };
+    }
+
+    setProgress('渲染報告...', 95);
+    _resReportData = { report, stockDataMap, flowDataMap, allTickers, timestamp: new Date() };
+    renderReport(_resReportData);
+    setProgress('完成！', 100, '報告生成完畢');
+
+    await new Promise(r => setTimeout(r, 800));
+    document.getElementById('res-progress-area').style.display = 'none';
+    document.getElementById('res-report-area').style.display   = 'block';
+
+  } catch(e) {
+    setProgress('❌ 失敗: ' + e.message, 100);
+    showToast('研究失敗: ' + e.message, 'stop');
+  }
+
+  btn.disabled = false; btn.textContent = '⚡ 開始研究';
+}
+
+// ── Report renderer ───────────────────────────────────────────
+function renderReport({ report, stockDataMap, flowDataMap, timestamp }) {
+  const sentimentColor = { bullish:'#00cc66', bearish:'#ff5555', neutral:'#ffcc00' };
+  const sentimentLabel = { bullish:'📈 看多', bearish:'📉 看空', neutral:'⚖️ 中性' };
+
+  document.getElementById('rep-title').textContent    = report.title || '研究報告';
+  document.getElementById('rep-subtitle').textContent =
+    `分析標的: ${Object.keys(stockDataMap).join(', ') || '無數據'} · ${timestamp.toLocaleTimeString('zh-TW')}`;
+  document.getElementById('rep-timestamp').textContent =
+    timestamp.toLocaleString('en-US',{timeZone:'America/New_York'}) + ' ET';
+
+  const sentEl = document.getElementById('rep-sentiment');
+  const sent   = report.sentiment || 'neutral';
+  sentEl.textContent        = sentimentLabel[sent] || sent;
+  sentEl.style.background   = sentimentColor[sent] + '22';
+  sentEl.style.color        = sentimentColor[sent] || '#fff';
+  sentEl.style.border       = '1px solid ' + (sentimentColor[sent] || '#333');
+
+  document.getElementById('rep-thesis').textContent = report.thesis || '';
+
+  // Stock cards
+  const grid = document.getElementById('rep-stocks-grid');
+  grid.innerHTML = (report.stocks || []).map(s => {
+    const sd    = stockDataMap[s.ticker];
+    const fd    = flowDataMap[s.ticker];
+    const color = s.direction === 'bullish' ? '#00cc66' : s.direction === 'bearish' ? '#ff5555' : '#ffcc00';
+    const score = Math.min(10, Math.max(1, parseInt(s.score) || 5));
+    const scoreFill = Array.from({length:10}, (_,i) =>
+      `<div style="flex:1;height:6px;border-radius:1px;background:${i < score ? color : '#2a2a2a'};"></div>`
+    ).join('');
+
+    return `<div class="card" style="border-top:3px solid ${color};">
+      <div style="padding:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:10px;">
+          <div>
+            <div style="font-size:18px;font-weight:700;color:#fff;font-family:var(--mono);">${s.ticker}</div>
+            ${sd ? `<div style="font-size:13px;color:#888;font-family:var(--mono);">$${sd.price?.toFixed(2)} <span style="color:${sd.chgPct>=0?'#00cc66':'#ff5555'}">${sd.chgPct>=0?'+':''}${sd.chgPct?.toFixed(2)}%</span></div>` : ''}
+          </div>
+          <div style="text-align:right;">
+            <div style="font-family:var(--mono);font-size:11px;color:#888;margin-bottom:4px;">評分</div>
+            <div style="font-size:22px;font-weight:700;color:${color};font-family:var(--mono);">${score}/10</div>
+          </div>
+        </div>
+        <!-- Score bar -->
+        <div style="display:flex;gap:2px;margin-bottom:10px;">${scoreFill}</div>
+        <!-- Summary -->
+        <div style="font-size:13px;color:#ccc;line-height:1.7;margin-bottom:10px;">${s.summary || ''}</div>
+        <!-- Catalyst / Risk -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+          <div style="background:#0d1f0d;border:1px solid #1a3a1a;border-radius:4px;padding:8px;">
+            <div style="font-family:var(--mono);font-size:10px;color:#00cc66;margin-bottom:3px;">▲ 催化劑</div>
+            <div style="font-size:12px;color:#aaa;">${s.catalyst || '—'}</div>
+          </div>
+          <div style="background:#1f0d0d;border:1px solid #3a1a1a;border-radius:4px;padding:8px;">
+            <div style="font-family:var(--mono);font-size:10px;color:#ff5555;margin-bottom:3px;">▼ 風險</div>
+            <div style="font-size:12px;color:#aaa;">${s.risk || '—'}</div>
+          </div>
+        </div>
+        <!-- Strategy & flow -->
+        <div style="background:#111;border:1px solid #2a2a2a;border-radius:4px;padding:8px;">
+          <div style="font-family:var(--mono);font-size:10px;color:#ff2d78;margin-bottom:3px;">期權策略</div>
+          <div style="font-size:12px;color:#ddd;">${s.strategy || '—'}</div>
+          ${s.entry ? `<div style="font-size:11px;color:#555;margin-top:3px;">進場: ${s.entry}</div>` : ''}
+        </div>
+        ${fd ? `<div style="margin-top:8px;display:flex;gap:6px;font-family:var(--mono);font-size:11px;">
+          <span style="color:#00cc66;">CALL ${fd.callCount}筆</span>
+          <span style="color:#555;">|</span>
+          <span style="color:#ff5555;">PUT ${fd.putCount}筆</span>
+          ${fd.pcRatio ? `<span style="color:#555;">|</span><span style="color:#888;">C/P=${fd.pcRatio}</span>` : ''}
+        </div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Full analysis with markdown rendering
+  const fa = document.getElementById('rep-full-analysis');
+  fa.innerHTML = (report.full_analysis || '')
+    .replace(/\*\*(.+?)\*\*/g, '<strong style="color:#ff2d78">$1</strong>')
+    .replace(/^### (.+)$/gm, '<h3 style="color:#ff2d78;margin:14px 0 6px;font-size:15px;">$1</h3>')
+    .replace(/^## (.+)$/gm,  '<h2 style="color:#fff;margin:18px 0 8px;font-size:16px;">$1</h2>')
+    .replace(/^- (.+)$/gm,   '<div style="padding:3px 0 3px 14px;border-left:2px solid #333;margin:3px 0;color:#ccc;">$1</div>')
+    .replace(/\n\n/g, '<br><br>').replace(/\n/g, '<br>');
+
+  // Trade ideas table
+  const tbody = document.getElementById('rep-trades-body');
+  const confColor = { '高':'#00cc66', '中':'#ffcc00', '低':'#ff5555' };
+  tbody.innerHTML = (report.trades || []).map(t => {
+    const dir = t.direction?.includes('多') ? '📈 看多' : t.direction?.includes('空') ? '📉 看空' : t.direction;
+    const dirColor = t.direction?.includes('多') ? '#00cc66' : '#ff5555';
+    const cc = confColor[t.confidence] || '#888';
+    return `<tr style="border-bottom:1px solid #1a1a1a;">
+      <td style="padding:10px 14px;font-family:var(--mono);font-size:14px;font-weight:700;color:#fff;">${t.ticker}</td>
+      <td style="padding:10px 14px;font-family:var(--mono);font-size:13px;color:${dirColor};">${dir}</td>
+      <td style="padding:10px 14px;font-size:13px;color:#ddd;">${t.strategy}</td>
+      <td style="padding:10px 14px;font-size:12px;color:#aaa;">${t.entry}</td>
+      <td style="padding:10px 14px;font-size:12px;color:#aaa;">${t.target_stop}</td>
+      <td style="padding:10px 14px;">
+        <span style="font-family:var(--mono);font-size:12px;color:${cc};background:${cc}22;padding:2px 8px;border-radius:2px;">${t.confidence}</span>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Export report ─────────────────────────────────────────────
+function exportReport() {
+  if (!_resReportData) return;
+  const { report, timestamp } = _resReportData;
+  const lines = [
+    `# ${report.title}`,
+    `生成時間: ${timestamp.toLocaleString('zh-TW')}`,
+    `市場情緒: ${report.sentiment}`,
+    ``,
+    `## 核心論點`,
+    report.thesis,
+    ``,
+    `## 個股分析`,
+    ...(report.stocks||[]).map(s =>
+      `### ${s.ticker} (${s.score}/10)\n${s.summary}\n催化劑: ${s.catalyst}\n風險: ${s.risk}\n策略: ${s.strategy}`
+    ),
+    ``,
+    `## 完整分析`,
+    (report.full_analysis||'').replace(/<[^>]+>/g,''),
+    ``,
+    `## 交易計畫`,
+    ...(report.trades||[]).map(t =>
+      `${t.ticker} | ${t.direction} | ${t.strategy} | 進場: ${t.entry} | ${t.target_stop} | 信心: ${t.confidence}`
+    ),
+  ];
+  const blob = new Blob([lines.join('\n')], { type:'text/plain;charset=utf-8' });
+  const a    = document.createElement('a');
+  a.href     = URL.createObjectURL(blob);
+  a.download = `研究報告_${report.title}_${new Date().toISOString().slice(0,10)}.txt`;
+  a.click();
+}
+
+function initResearch() {
+  // Sync Claude key from AI page
+  const savedKey = localStorage.getItem('claude_api_key');
+  const keyInput = document.getElementById('claude-key-input');
+  if (savedKey && keyInput && !keyInput.value) keyInput.value = savedKey;
+  renderDetectedTickers();
 }
 
 // ============ EXPIRY DATE MASK ============
