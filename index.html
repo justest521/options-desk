@@ -8,35 +8,35 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;600&family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
 :root{
-  --bg:#07090e;--bg2:#0d1117;--bg3:#161b24;--bg4:#1c2330;
-  --border:#21293a;--border2:#2d3748;
-  --accent:#00e5b0;--accent2:#0ea5e9;--accent3:#a78bfa;
-  --red:#f43f5e;--green:#00e5b0;--yellow:#fbbf24;--orange:#fb923c;
-  --text:#f0f6ff;--text2:#b0bec5;--text3:#8899aa;
+  --bg:#1a1a1a;--bg2:#212121;--bg3:#2a2a2a;--bg4:#333333;
+  --border:#3a3a3a;--border2:#444444;
+  --accent:#ff2d78;--accent2:#ff2d78;--accent3:#ff2d78;
+  --red:#ff5555;--green:#ff2d78;--yellow:#ff2d78;--orange:#ff5555;
+  --text:#ffffff;--text2:#cccccc;--text3:#888888;
   --mono:'IBM Plex Mono',monospace;--sans:'Noto Sans TC',sans-serif;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;min-height:100vh;overflow-x:hidden;}
-body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(0,229,176,0.03) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(14,165,233,0.03) 0%,transparent 60%);pointer-events:none;z-index:0;}
+body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(255,45,120,0.03) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(14,165,233,0.03) 0%,transparent 60%);pointer-events:none;z-index:0;}
 
 /* HEADER */
-header{background:rgba(13,17,23,0.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;}
+header{background:#212121;border-bottom:1px solid #3a3a3a;padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;}
 .logo{display:flex;align-items:center;gap:10px;}
-.logo-icon{width:28px;height:28px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;}
-.logo-text{font-family:var(--mono);font-size:16px;color:white;letter-spacing:2px;}
-.logo-sub{font-size:10px;color:#7a9ab0;font-family:var(--mono);letter-spacing:1px;}
+.logo-icon{width:28px;height:28px;background:#2a2a2a;border:1px solid #ff2d78;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:14px;color:#ff2d78;}
+.logo-text{font-family:var(--mono);font-size:14px;color:#ffffff;letter-spacing:3px;}
+.logo-sub{font-size:14px;color:#888888;font-family:var(--mono);letter-spacing:1px;}
 .header-mid{display:flex;align-items:center;gap:6px;}
-.nav-tab{padding:5px 14px;border-radius:4px;border:none;background:transparent;color:#c8d8e8;font-family:var(--mono);font-size:13px;letter-spacing:1px;cursor:pointer;transition:all 0.15s;}
-.nav-tab:hover,.nav-tab.active{background:var(--bg3);color:var(--accent);}
+.nav-tab{padding:5px 14px;border-radius:4px;border:none;background:transparent;color:#eeeeee;font-family:var(--mono);font-size:16px;letter-spacing:1px;cursor:pointer;transition:all 0.15s;}
+.nav-tab:hover{color:#ffffff;background:#2a2a2a;} .nav-tab.active{color:#ff2d78;background:#2a2a2a;}
 .header-right{display:flex;align-items:center;gap:10px;}
 .user-area{display:flex;align-items:center;gap:8px;}
-#user-display{font-family:var(--mono);font-size:12px;color:var(--accent);padding:4px 10px;background:rgba(0,229,176,0.08);border:1px solid rgba(0,229,176,0.2);border-radius:4px;}
-.input-sm{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:6px 12px;border-radius:4px;font-family:var(--mono);font-size:13px;width:110px;}
-.input-sm:focus{outline:none;border-color:var(--accent);}
-.btn{background:transparent;border:1px solid var(--accent);color:var(--accent);padding:6px 14px;border-radius:4px;cursor:pointer;font-family:var(--mono);font-size:13px;letter-spacing:1px;transition:all 0.15s;}
-.btn:hover,.btn.primary{background:var(--accent);color:var(--bg);}
-.btn.secondary{border-color:var(--border2);color:#c8d8e8;}
-.btn.secondary:hover{border-color:var(--accent2);color:var(--accent2);}
+#user-display{font-family:var(--mono);font-size:15px;color:var(--accent);padding:4px 10px;background:rgba(255,45,120,0.08);border:1px solid rgba(255,45,120,0.2);border-radius:4px;}
+.input-sm{background:#1a1a1a;border:1px solid #3a3a3a;color:#ffffff;padding:5px 10px;border-radius:4px;font-family:var(--mono);font-size:15px;width:110px;}
+.input-sm:focus{outline:none;border-color:#ff2d78;}
+.btn{background:transparent;border:1px solid #ff2d78;color:#ff2d78;padding:5px 12px;border-radius:4px;cursor:pointer;font-family:var(--mono);font-size:15px;letter-spacing:1px;transition:all 0.15s;}
+.btn:hover,.btn.primary{background:#ff2d78;color:#000000;}
+.btn.secondary{border-color:var(--border2);color:#eeeeee;}
+.btn.secondary:hover{border-color:#29b6f6;color:#29b6f6;}
 .dot{width:7px;height:7px;border-radius:50%;background:var(--text3);}
 .dot.on{background:var(--green);box-shadow:0 0 6px var(--green);}
 
@@ -46,8 +46,8 @@ header{background:rgba(13,17,23,0.95);backdrop-filter:blur(20px);border-bottom:1
 
 /* CARDS */
 .card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:12px;}
-.card-head{padding:11px 16px;border-bottom:1px solid var(--border);background:var(--bg3);display:flex;align-items:center;justify-content:space-between;}
-.card-title{font-family:var(--mono);font-size:12px;letter-spacing:2px;color:var(--accent);text-transform:uppercase;}
+.card-head{padding:10px 16px;border-bottom:1px solid #3a3a3a;background:#2a2a2a;display:flex;align-items:center;justify-content:space-between;}
+.card-title{font-family:var(--mono);font-size:14px;letter-spacing:2px;color:#ff2d78;text-transform:uppercase;}
 .card-body{padding:16px;}
 
 /* GRID */
@@ -57,42 +57,42 @@ header{background:rgba(13,17,23,0.95);backdrop-filter:blur(20px);border-bottom:1
 .col-span-2{grid-column:span 2;}
 
 /* STATS */
-.stat-box{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:12px 16px;}
-.stat-label{font-family:var(--mono);font-size:10px;color:#9ab;letter-spacing:1px;margin-bottom:4px;}
+.stat-box{background:#2a2a2a;border:1px solid #3a3a3a;border-radius:4px;padding:12px 16px;}
+.stat-label{font-family:var(--mono);font-size:14px;color:#bbb;letter-spacing:1px;margin-bottom:4px;}
 .stat-val{font-family:var(--mono);font-size:26px;font-weight:600;}
-.stat-sub{font-size:11px;color:var(--text3);margin-top:2px;}
+.stat-sub{font-size:14px;color:var(--text3);margin-top:2px;}
 
 /* RULES */
-.rule-card{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:14px;position:relative;overflow:hidden;}
+.rule-card{background:#2a2a2a;border:1px solid #3a3a3a;border-radius:4px;padding:14px;position:relative;overflow:hidden;}
 .rule-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
-.rule-stop::before{background:var(--red);}
-.rule-profit::before{background:var(--yellow);}
-.rule-dte::before{background:var(--accent2);}
-.rule-spread::before{background:var(--accent);}
+
+
+
+
 .rule-icon{font-size:20px;margin-bottom:6px;}
-.rule-lbl{font-family:var(--mono);font-size:12px;color:var(--text3);letter-spacing:1px;margin-bottom:2px;}
+.rule-lbl{font-family:var(--mono);font-size:14px;color:#888888;letter-spacing:1px;margin-bottom:2px;}
 .rule-val{font-family:var(--mono);font-size:22px;font-weight:700;}
-.rule-desc{font-size:13px;color:var(--text3);margin-top:3px;}
+.rule-desc{font-size:16px;color:var(--text3);margin-top:3px;}
 
 /* POSITION FORM */
 .pos-form{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:14px;}
-.form-input{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:4px;font-family:var(--mono);font-size:13px;width:100%;}
-.form-input:focus{outline:none;border-color:var(--accent2);}
-.form-input::placeholder{color:var(--text3);font-size:11px;}
+.form-input{background:#1a1a1a;border:1px solid #3a3a3a;color:#ffffff;padding:8px 12px;border-radius:4px;font-family:var(--mono);font-size:16px;width:100%;}
+.form-input:focus{outline:none;border-color:#ff2d78;}
+.form-input::placeholder{color:var(--text3);font-size:14px;}
 
 /* TABLE */
 .tbl{width:100%;border-collapse:collapse;}
-.tbl th{font-family:var(--mono);font-size:12px;letter-spacing:1px;color:#aabbcc;text-align:left;padding:7px 10px;border-bottom:1px solid var(--border);text-transform:uppercase;}
+.tbl th{font-family:var(--mono);font-size:14px;letter-spacing:1px;color:#888888;text-align:left;padding:7px 10px;border-bottom:1px solid #3a3a3a;text-transform:uppercase;}
 .tbl td{padding:10px;border-bottom:1px solid rgba(33,41,58,0.5);font-size:14px;}
 .tbl tr:hover td{background:rgba(255,255,255,0.015);}
-.badge{padding:3px 8px;border-radius:3px;font-family:var(--mono);font-size:13px;font-weight:600;}
-.badge-green{background:rgba(0,229,176,0.12);color:var(--green);}
+.badge{padding:3px 8px;border-radius:3px;font-family:var(--mono);font-size:16px;font-weight:600;}
+.badge-green{background:rgba(255,45,120,0.12);color:var(--green);}
 .badge-red{background:rgba(244,63,94,0.12);color:var(--red);}
 .badge-yellow{background:rgba(251,191,36,0.12);color:var(--yellow);}
-.status-badge{padding:2px 8px;border-radius:3px;font-size:12px;font-family:var(--mono);letter-spacing:1px;}
+.status-badge{padding:2px 8px;border-radius:3px;font-size:15px;font-family:var(--mono);letter-spacing:1px;}
 .s-stop{background:rgba(244,63,94,0.15);color:var(--red);border:1px solid rgba(244,63,94,0.3);}
 .s-profit{background:rgba(251,191,36,0.15);color:var(--yellow);border:1px solid rgba(251,191,36,0.3);}
-.s-ok{background:rgba(0,229,176,0.08);color:var(--accent);border:1px solid rgba(0,229,176,0.15);}
+.s-ok{background:rgba(255,45,120,0.08);color:var(--accent);border:1px solid rgba(255,45,120,0.15);}
 .dte-r{color:var(--red);font-family:var(--mono);font-size:14px;}
 .dte-y{color:var(--yellow);font-family:var(--mono);font-size:14px;}
 .dte-g{color:var(--green);font-family:var(--mono);font-size:14px;}
@@ -106,50 +106,50 @@ header{background:rgba(13,17,23,0.95);backdrop-filter:blur(20px);border-bottom:1
 .flow-item:last-child{border:none;}
 @keyframes fadeIn{from{opacity:0;transform:translateX(8px);}to{opacity:1;transform:translateX(0);}}
 .flow-row{display:flex;justify-content:space-between;align-items:flex-start;}
-.flow-ticker{font-family:var(--mono);font-size:16px;font-weight:600;color:white;}
-.flow-detail{font-size:13px;color:#9ab0c0;margin-top:2px;}
+.flow-ticker{font-family:var(--mono);font-size:15px;font-weight:600;color:#ffffff;}
+.flow-detail{font-size:16px;color:#cccccc;margin-top:2px;}
 .flow-amt{font-family:var(--mono);font-size:15px;}
-.tag{display:inline-block;padding:2px 7px;border-radius:2px;font-size:12px;font-family:var(--mono);margin-right:3px;}
-.tag-call{background:rgba(0,229,176,0.15);color:var(--green);}
+.tag{display:inline-block;padding:2px 7px;border-radius:2px;font-size:15px;font-family:var(--mono);margin-right:3px;}
+.tag-call{background:rgba(255,45,120,0.15);color:var(--green);}
 .tag-put{background:rgba(244,63,94,0.15);color:var(--red);}
 .flow-scroll{max-height:650px;overflow-y:auto;}
 
 /* FILTER ROW */
 .filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
-.fbtn{padding:4px 12px;border-radius:3px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:13px;font-family:var(--mono);cursor:pointer;transition:all 0.15s;}
-.fbtn:hover,.fbtn.active{border-color:var(--accent);color:var(--accent);background:rgba(0,229,176,0.07);}
+.fbtn{padding:3px 10px;border-radius:4px;border:1px solid #3a3a3a;background:transparent;color:#888888;font-size:15px;font-family:var(--mono);cursor:pointer;transition:all 0.15s;}
+.fbtn:hover,.fbtn.active{border-color:#ff2d78;color:#ff2d78;background:rgba(255,45,120,0.05);}
 
 /* CHAT */
-.chat-box{height:420px;overflow-y:auto;background:var(--bg3);border-radius:6px;padding:14px;display:flex;flex-direction:column;gap:10px;}
+.chat-box{height:420px;overflow-y:auto;background:#1a1a1a;border-radius:4px;padding:14px;display:flex;flex-direction:column;gap:8px;border:1px solid #3a3a3a;}
 .msg{display:flex;flex-direction:column;gap:2px;}
 .msg-meta{display:flex;align-items:center;gap:8px;}
-.msg-user{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--accent2);}
-.msg-time{font-family:var(--mono);font-size:10px;color:var(--text3);}
-.msg-text{font-size:15px;color:var(--text);background:var(--bg4);padding:8px 12px;border-radius:4px;border-left:2px solid var(--border2);width:fit-content;max-width:80%;}
-.msg.mine .msg-text{border-left-color:var(--accent);background:rgba(0,229,176,0.06);}
+.msg-user{font-family:var(--mono);font-size:15px;font-weight:600;color:#ff2d78;}
+.msg-time{font-family:var(--mono);font-size:14px;color:var(--text3);}
+.msg-text{font-size:14px;color:#ffffff;background:#2a2a2a;padding:6px 12px;border-radius:4px;border-left:2px solid #3a3a3a;width:fit-content;max-width:80%;}
+.msg.mine .msg-text{border-left-color:#ff2d78;background:rgba(255,45,120,0.1);color:#ffffff;}
 .msg.mine{align-items:flex-end;}
 .chat-input-row{display:flex;gap:8px;margin-top:10px;}
-.chat-input{flex:1;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:9px 14px;border-radius:6px;font-family:var(--sans);font-size:15px;}
-.chat-input:focus{outline:none;border-color:var(--accent);}
+.chat-input{flex:1;background:#1a1a1a;border:1px solid #3a3a3a;color:#ffffff;padding:8px 14px;border-radius:4px;font-family:var(--sans);font-size:14px;}
+.chat-input:focus{outline:none;border-color:#ff2d78;}
 
 /* CHART */
 #lw-main,#lw-rsi{width:100%;}
 .tv-controls{display:flex;gap:6px;align-items:center;}
-.ticker-input{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:4px;font-family:var(--mono);font-size:12px;width:90px;}
-.ticker-input:focus{outline:none;border-color:var(--accent);}
+.ticker-input{background:#1a1a1a;border:1px solid #3a3a3a;color:#ffffff;padding:5px 10px;border-radius:4px;font-family:var(--mono);font-size:15px;width:90px;}
+.ticker-input:focus{outline:none;border-color:#ff2d78;}
 .rsi-line{display:flex;justify-content:space-between;align-items:center;padding:3px 14px;background:var(--bg3);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
 
 /* EARNINGS */
 .earn-item{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(33,41,58,0.5);}
 .earn-item:last-child{border:none;}
-.earn-ticker{font-family:var(--mono);font-size:15px;font-weight:600;color:white;}
-.earn-date{font-size:13px;color:var(--text3);margin-top:1px;}
-.earn-dte{font-family:var(--mono);font-size:11px;padding:2px 8px;border-radius:3px;}
+.earn-ticker{font-family:var(--mono);font-size:14px;font-weight:600;color:#ffffff;}
+.earn-date{font-size:16px;color:var(--text3);margin-top:1px;}
+.earn-dte{font-family:var(--mono);font-size:14px;padding:2px 8px;border-radius:3px;}
 
 /* TOAST */
 #toasts{position:fixed;top:60px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:6px;}
-.toast{background:var(--bg3);border:1px solid var(--border);padding:12px 16px;border-radius:5px;font-size:14px;min-width:260px;animation:toastIn 0.25s ease;display:flex;align-items:center;gap:8px;}
-.toast.stop{border-left:3px solid var(--red);}
+.toast{background:#2a2a2a;border:1px solid #3a3a3a;border-left:3px solid #ff2d78;padding:10px 14px;border-radius:4px;font-size:16px;min-width:260px;animation:toastIn 0.25s ease;display:flex;align-items:center;gap:8px;}
+.toast.stop{border-left-color:#ff5555;}
 .toast.profit{border-left:3px solid var(--yellow);}
 .toast.info{border-left:3px solid var(--accent2);}
 @keyframes toastIn{from{opacity:0;transform:translateX(16px);}to{opacity:1;transform:translateX(0);}}
@@ -158,15 +158,15 @@ header{background:rgba(13,17,23,0.95);backdrop-filter:blur(20px);border-bottom:1
 .loading{display:flex;align-items:center;gap:8px;color:var(--text3);font-family:var(--mono);font-size:14px;padding:20px;}
 .spin{width:14px;height:14px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
-.empty{text-align:center;padding:28px;color:var(--text3);font-family:var(--mono);font-size:12px;}
+.empty{text-align:center;padding:28px;color:var(--text3);font-family:var(--mono);font-size:15px;}
 
 /* CHART SUMMARY */
 .pnl-chart-wrap{height:220px;position:relative;}
 
 /* Stats row */
-.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border-radius:6px;overflow:hidden;margin-bottom:14px;}
-.stat-cell{background:var(--bg3);padding:10px 14px;}
-.stat-cell .lbl{font-size:12px;color:var(--text3);font-family:var(--mono);letter-spacing:1px;}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:#3a3a3a;border-radius:4px;overflow:hidden;margin-bottom:14px;}
+.stat-cell{background:#2a2a2a;padding:10px 14px;}
+.stat-cell .lbl{font-size:15px;color:#888888;font-family:var(--mono);letter-spacing:1px;}
 .stat-cell .val{font-family:var(--mono);font-size:18px;margin-top:2px;}
 
 /* Scrollbar */
@@ -189,11 +189,11 @@ header{background:rgba(13,17,23,0.95);backdrop-filter:blur(20px);border-bottom:1
     </div>
   </div>
   <div class="header-mid">
-    <button class="nav-tab active" onclick="showPage('dashboard',this)">📊 總覽</button>
-    <button class="nav-tab" onclick="showPage('positions',this)">📋 倉位</button>
-    <button class="nav-tab" onclick="showPage('flow',this)">🐳 大單流</button>
-    <button class="nav-tab" onclick="showPage('chart',this)">📈 圖表</button>
-    <button class="nav-tab" onclick="showPage('chat',this)">💬 群組</button>
+    <button class="nav-tab active" onclick="showPage('dashboard',this)">總覽</button>
+    <button class="nav-tab" onclick="showPage('positions',this)">倉位</button>
+    <button class="nav-tab" onclick="showPage('flow',this)">大單流</button>
+    <button class="nav-tab" onclick="showPage('chart',this)">圖表</button>
+    <button class="nav-tab" onclick="showPage('chat',this)">群組</button>
   </div>
   <div class="header-right">
     <div id="db-dot" class="dot"></div>
@@ -202,7 +202,7 @@ header{background:rgba(13,17,23,0.95);backdrop-filter:blur(20px);border-bottom:1
       <button class="btn" onclick="joinGroup()">加入</button>
     </div>
     <span id="user-display" style="display:none;"></span>
-    <button class="btn secondary" onclick="refreshFlow()" style="font-size:10px;">⟳ 大單</button>
+    <button class="btn secondary" onclick="refreshFlow()" style="font-size:14px;">⟳ 大單</button>
   </div>
 </header>
 
@@ -210,20 +210,40 @@ header{background:rgba(13,17,23,0.95);backdrop-filter:blur(20px);border-bottom:1
 <div id="page-dashboard" class="page active">
   <!-- Rules -->
   <div class="card">
-    <div class="card-head"><span class="card-title">⚡ 交易鐵則</span></div>
+    <div class="card-head"><span class="card-title">/ 交易鐵則</span></div>
     <div class="card-body">
       <div class="grid-4">
-        <div class="rule-card rule-stop"><div class="rule-icon">🛑</div><div class="rule-lbl">停損規則</div><div class="rule-val" style="color:var(--red)">-50%</div><div class="rule-desc">虧損達50%無條件出場</div></div>
-        <div class="rule-card rule-profit"><div class="rule-icon">💰</div><div class="rule-lbl">獲利了結</div><div class="rule-val" style="color:var(--yellow)">+100%</div><div class="rule-desc">獲利達100%至少出一半</div></div>
-        <div class="rule-card rule-dte"><div class="rule-icon">📅</div><div class="rule-lbl">最佳到期</div><div class="rule-val" style="color:var(--accent2)">35-45天</div><div class="rule-desc">標準押注，財報另計</div></div>
-        <div class="rule-card rule-spread"><div class="rule-icon">📊</div><div class="rule-lbl">Spread 最大獲利</div><div class="rule-val" style="color:var(--accent);font-size:14px;">股價≥高履約價</div><div class="rule-desc">超過就是封頂</div></div>
+        <div class="rule-card rule-stop">
+          <div class="rule-icon" style="width:32px;height:32px;background:rgba(255,45,120,0.12);border:1px solid rgba(255,45,120,0.3);border-radius:6px;display:flex;align-items:center;justify-content:center;margin-bottom:8px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ff2d78" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </div>
+          <div class="rule-lbl">停損規則</div><div class="rule-val" style="color:#ff2d78">-50%</div><div class="rule-desc">虧損達50%無條件出場</div>
+        </div>
+        <div class="rule-card rule-profit">
+          <div class="rule-icon" style="width:32px;height:32px;background:rgba(255,45,120,0.12);border:1px solid rgba(255,45,120,0.3);border-radius:6px;display:flex;align-items:center;justify-content:center;margin-bottom:8px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ff2d78" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          </div>
+          <div class="rule-lbl">獲利了結</div><div class="rule-val" style="color:#ff2d78">+100%</div><div class="rule-desc">獲利達100%至少出一半</div>
+        </div>
+        <div class="rule-card rule-dte">
+          <div class="rule-icon" style="width:32px;height:32px;background:rgba(255,45,120,0.12);border:1px solid rgba(255,45,120,0.3);border-radius:6px;display:flex;align-items:center;justify-content:center;margin-bottom:8px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ff2d78" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+          <div class="rule-lbl">最佳到期</div><div class="rule-val" style="color:#ff2d78">35-45天</div><div class="rule-desc">標準押注，財報另計</div>
+        </div>
+        <div class="rule-card rule-spread">
+          <div class="rule-icon" style="width:32px;height:32px;background:rgba(255,45,120,0.12);border:1px solid rgba(255,45,120,0.3);border-radius:6px;display:flex;align-items:center;justify-content:center;margin-bottom:8px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ff2d78" stroke-width="2.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          </div>
+          <div class="rule-lbl">Spread 最大獲利</div><div class="rule-val" style="color:#ff2d78;font-size:16px;">股價≥高履約價</div><div class="rule-desc">超過就是封頂</div>
+        </div>
       </div>
     </div>
   </div>
   <!-- Summary + Chart -->
   <div class="grid-2">
     <div class="card">
-      <div class="card-head"><span class="card-title">📊 我的倉位總覽</span></div>
+      <div class="card-head"><span class="card-title">/ 我的倉位總覽</span></div>
       <div class="card-body">
         <div class="grid-2" style="gap:8px;margin-bottom:12px;">
           <div class="stat-box"><div class="stat-label">總成本</div><div class="stat-val" id="d-cost">$0</div></div>
@@ -235,7 +255,7 @@ header{background:rgba(13,17,23,0.95);backdrop-filter:blur(20px);border-bottom:1
       </div>
     </div>
     <div class="card">
-      <div class="card-head"><span class="card-title">📉 損益分佈</span></div>
+      <div class="card-head"><span class="card-title">/ 損益分佈</span></div>
       <div class="card-body">
         <div class="pnl-chart-wrap"><canvas id="pnl-chart"></canvas></div>
       </div>
@@ -244,11 +264,11 @@ header{background:rgba(13,17,23,0.95);backdrop-filter:blur(20px);border-bottom:1
   <!-- Flow preview + Earnings -->
   <div class="grid-2">
     <div class="card">
-      <div class="card-head"><span class="card-title">🐳 即時大單（前10筆）</span><button class="btn secondary" style="font-size:10px;" onclick="showPage('flow',document.querySelector('[onclick*=flow]'))">查看全部</button></div>
+      <div class="card-head"><span class="card-title">/ 即時大單</span><button class="btn secondary" style="font-size:14px;" onclick="showPage('flow',document.querySelector('[onclick*=flow]'))">查看全部</button></div>
       <div class="card-body" style="padding:12px 16px;"><div id="dash-flow"></div></div>
     </div>
     <div class="card">
-      <div class="card-head"><span class="card-title">📆 財報日曆</span></div>
+      <div class="card-head"><span class="card-title">/ 財報日曆</span></div>
       <div class="card-body"><div id="dash-earnings"><div class="loading"><div class="spin"></div>載入中...</div></div></div>
     </div>
   </div>
@@ -258,10 +278,10 @@ header{background:rgba(13,17,23,0.95);backdrop-filter:blur(20px);border-bottom:1
 <div id="page-positions" class="page">
   <div class="card">
     <div class="card-head">
-      <span class="card-title">📋 倉位追蹤</span>
+      <span class="card-title">/ 倉位追蹤</span>
       <div style="display:flex;gap:6px;">
-        <span id="pos-user-label" style="font-family:var(--mono);font-size:11px;color:var(--text3);">請先輸入名字</span>
-        <button class="btn secondary" style="font-size:10px;" onclick="clearMyPositions()">清空我的倉位</button>
+        <span id="pos-user-label" style="font-family:var(--mono);font-size:14px;color:var(--text3);">請先輸入名字</span>
+        <button class="btn secondary" style="font-size:14px;" onclick="clearMyPositions()">清空我的倉位</button>
       </div>
     </div>
     <div class="card-body">
@@ -298,8 +318,8 @@ header{background:rgba(13,17,23,0.95);backdrop-filter:blur(20px);border-bottom:1
 <div id="page-flow" class="page">
   <div class="card">
     <div class="card-head">
-      <span class="card-title">🐳 大單掃貨流</span>
-      <button class="btn secondary" style="font-size:10px;" onclick="refreshFlow()">⟳ 更新</button>
+      <span class="card-title">/ 大單掃貨流</span>
+      <button class="btn secondary" style="font-size:14px;" onclick="refreshFlow()">⟳ 更新</button>
     </div>
     <div class="card-body" style="padding:12px 16px;">
       <div class="filter-row">
@@ -319,7 +339,7 @@ header{background:rgba(13,17,23,0.95);backdrop-filter:blur(20px);border-bottom:1
 <div id="page-chart" class="page">
   <div class="card">
     <div class="card-head">
-      <span class="card-title">📈 K線圖表</span>
+      <span class="card-title">/ K線圖表</span>
       <div class="tv-controls">
         <input type="text" id="tv-symbol" class="ticker-input" value="AEHR" placeholder="代碼">
         <button class="btn" onclick="loadChart()">載入</button>
@@ -338,7 +358,7 @@ header{background:rgba(13,17,23,0.95);backdrop-filter:blur(20px);border-bottom:1
 <div id="page-chat" class="page">
   <div class="grid-2">
     <div class="card">
-      <div class="card-head"><span class="card-title">💬 群組聊天室</span><span style="font-family:var(--mono);font-size:10px;color:var(--text3);" id="online-count"></span></div>
+      <div class="card-head"><span class="card-title">/ 群組聊天室</span><span style="font-family:var(--mono);font-size:14px;color:var(--text3);" id="online-count"></span></div>
       <div class="card-body">
         <div class="chat-box" id="chat-box"></div>
         <div class="chat-input-row">
@@ -349,7 +369,7 @@ header{background:rgba(13,17,23,0.95);backdrop-filter:blur(20px);border-bottom:1
     </div>
     <div>
       <div class="card" style="margin-bottom:12px;">
-        <div class="card-head"><span class="card-title">👥 所有人倉位</span></div>
+        <div class="card-head"><span class="card-title">/ 所有人倉位</span></div>
         <div class="card-body" style="padding:0;">
           <div style="overflow-x:auto;max-height:400px;">
             <table class="tbl">
@@ -495,14 +515,14 @@ function renderPositions() {
       <td><strong style="color:white;font-family:var(--mono)">${p.ticker}</strong></td>
       <td><span class="tag ${p.type==='PUT'?'tag-put':'tag-call'}">${p.type||'CALL'}</span></td>
       <td style="font-family:var(--mono)">$${p.strike||'—'}</td>
-      <td style="font-size:12px;color:#c8d8e8">${p.expiry||'—'}</td>
+      <td style="font-size:15px;color:#eeeeee">${p.expiry||'—'}</td>
       <td><span class="${dteCls}">${dteStr}</span></td>
       <td style="font-family:var(--mono)">$${(+p.cost).toFixed(2)}</td>
       <td style="font-family:var(--mono)">$${(+p.current_price).toFixed(2)}</td>
       <td><span class="badge ${dollar>=0?'badge-green':'badge-red'}">${pct>=0?'+':''}${pct.toFixed(1)}%</span></td>
-      <td style="font-family:var(--mono);font-size:12px;color:${dollar>=0?'var(--green)':'var(--red)'}">${dollar>=0?'+':''}$${Math.round(dollar)}</td>
+      <td style="font-family:var(--mono);font-size:15px;color:${dollar>=0?'var(--green)':'var(--red)'}">${dollar>=0?'+':''}$${Math.round(dollar)}</td>
       <td><span class="status-badge ${sc}">${st}</span></td>
-      <td style="width:70px"><div class="pbar"><div class="pbar-fill" style="width:${prog}%;background:${pc}"></div></div><div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:2px">${pct.toFixed(0)}%</div></td>
+      <td style="width:70px"><div class="pbar"><div class="pbar-fill" style="width:${prog}%;background:${pc}"></div></div><div style="font-size:14px;color:var(--text3);font-family:var(--mono);margin-top:2px">${pct.toFixed(0)}%</div></td>
       <td><button class="del-btn" onclick="deletePosition('${p.id}')">×</button></td>
     </tr>`;
   }).join('');
@@ -530,9 +550,9 @@ function renderAllPositions() {
     let sc, st;
     if (pct<=-50){sc='s-stop';st='🛑';}else if(pct>=100){sc='s-profit';st='💰';}else{sc='s-ok';st='✓';}
     return `<tr>
-      <td style="font-family:var(--mono);font-size:12px;color:var(--accent2)">${p.user_name}</td>
+      <td style="font-family:var(--mono);font-size:15px;color:var(--accent2)">${p.user_name}</td>
       <td><strong style="font-family:var(--mono)">${p.ticker}</strong></td>
-      <td style="font-family:var(--mono);font-size:12px">$${p.strike||'—'}</td>
+      <td style="font-family:var(--mono);font-size:15px">$${p.strike||'—'}</td>
       <td><span class="badge ${pct>=0?'badge-green':'badge-red'}">${pct>=0?'+':''}${pct.toFixed(1)}%</span></td>
       <td><span class="status-badge ${sc}">${st}</span></td>
     </tr>`;
@@ -564,7 +584,7 @@ function updateDashboard() {
   dp.innerHTML = myPositions.slice(0,5).map(p => {
     const pct = ((p.current_price-p.cost)/p.cost)*100;
     return `<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(33,41,58,0.5);">
-      <span style="font-family:var(--mono);font-size:13px;color:white;">${p.ticker} <span style="font-size:10px;color:var(--text3)">$${p.strike}</span></span>
+      <span style="font-family:var(--mono);font-size:16px;color:white;">${p.ticker} <span style="font-size:14px;color:var(--text3)">$${p.strike}</span></span>
       <span class="badge ${pct>=0?'badge-green':'badge-red'}">${pct>=0?'+':''}${pct.toFixed(1)}%</span>
     </div>`;
   }).join('');
@@ -579,7 +599,7 @@ function renderPnlChart() {
 
   const labels = myPositions.map(p => p.ticker + (p.strike ? ' $'+p.strike : ''));
   const pcts   = myPositions.map(p => +((( p.current_price - p.cost) / p.cost) * 100).toFixed(1));
-  const colors = pcts.map(v => v >= 100 ? 'rgba(251,191,36,0.8)' : v <= -50 ? 'rgba(244,63,94,0.8)' : v >= 0 ? 'rgba(0,229,176,0.7)' : 'rgba(244,63,94,0.5)');
+  const colors = pcts.map(v => v >= 100 ? 'rgba(251,191,36,0.8)' : v <= -50 ? 'rgba(244,63,94,0.8)' : v >= 0 ? 'rgba(255,45,120,0.7)' : 'rgba(244,63,94,0.5)');
 
   pnlChart = new Chart(ctx, {
     type: 'bar',
@@ -588,8 +608,8 @@ function renderPnlChart() {
       responsive: true, maintainAspectRatio: false,
       plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => c.raw + '%' } } },
       scales: {
-        x: { ticks: { color: '#475569', font: { family: 'IBM Plex Mono', size: 10 } }, grid: { color: '#1c2330' } },
-        y: { ticks: { color: '#475569', font: { family: 'IBM Plex Mono', size: 10 }, callback: v => v + '%' }, grid: { color: '#1c2330' } }
+        x: { ticks: { color: '#aaaaaa', font: { family: 'IBM Plex Mono', size: 10 } }, grid: { color: '#1c2330' } },
+        y: { ticks: { color: '#aaaaaa', font: { family: 'IBM Plex Mono', size: 10 }, callback: v => v + '%' }, grid: { color: '#1c2330' } }
       }
     }
   });
@@ -656,7 +676,7 @@ function renderFlow(containerId, data, filter, limit) {
     const expFmt = String(expiry).replace(/-/g,'/').replace(/20(\d\d)\/(\d\d)\/(\d\d)/,'$2/$3/$1').replace(/(\d{4})\/(\d{2})\/(\d{2})/,'$2/$3/$1');
     return `<div class="flow-item" onclick="fillPosition('${ticker}','${type}','${strike}','${expFmt}')" style="cursor:pointer;" title="點擊帶入倉位">
       <div class="flow-row">
-        <div><span class="flow-ticker">${ticker}</span> <span class="tag ${isCall?'tag-call':'tag-put'}">${type||'—'}</span> <span style="font-size:11px;color:var(--text3);">點擊帶入</span></div>
+        <div><span class="flow-ticker">${ticker}</span> <span class="tag ${isCall?'tag-call':'tag-put'}">${type||'—'}</span> <span style="font-size:14px;color:var(--text3);">點擊帶入</span></div>
         <div class="flow-amt" style="color:${isCall?'var(--green)':'var(--red)'}">${premStr}</div>
       </div>
       <div class="flow-detail">行權 $${strike} · 到期 ${expiry}</div>
@@ -757,15 +777,20 @@ function subscribeChat() {
 function renderMessages(msgs) {
   const box = document.getElementById('chat-box');
   box.innerHTML = '';
+  _shownMsgIds.clear();
   msgs.forEach(m => appendMessage(m, false));
   box.scrollTop = box.scrollHeight;
 }
 
+const _shownMsgIds = new Set();
 function appendMessage(m, scroll=true) {
+  if (!m || !m.id) return;
+  if (_shownMsgIds.has(m.id)) return; // prevent duplicates
+  _shownMsgIds.add(m.id);
   const box = document.getElementById('chat-box');
   if (!box) return;
   const isMine = m.user_name === currentUser;
-  const time = new Date(m.created_at).toLocaleTimeString('zh-TW', {hour:'2-digit',minute:'2-digit'});
+  const time = new Date(m.created_at).toLocaleTimeString('zh-TW', {hour:'2-digit',minute:'2-digit',timeZone:'Asia/Taipei'});
   const div = document.createElement('div');
   div.className = 'msg' + (isMine?' mine':'');
   div.innerHTML = `<div class="msg-meta"><span class="msg-user">${m.user_name}</span><span class="msg-time">${time}</span></div><div class="msg-text">${escHtml(m.content)}</div>`;
@@ -883,7 +908,7 @@ function renderMockEarnings() {
     {ticker:'NVDA',  date:'2026-05-28', time:'post'},
   ];
 
-  el.innerHTML = `<div style="font-size:12px;color:var(--text3);font-family:var(--mono);padding:4px 0 10px;border-bottom:1px solid var(--border);margin-bottom:8px;">
+  el.innerHTML = `<div style="font-size:15px;color:var(--text3);font-family:var(--mono);padding:4px 0 10px;border-bottom:1px solid var(--border);margin-bottom:8px;">
     參考資料 · 實際以公司公告為準
   </div>` + known.map(e => {
     const dte = Math.round((new Date(e.date) - today) / 86400000);
