@@ -290,7 +290,7 @@ header{background:#212121;border-bottom:1px solid #3a3a3a;padding:0 20px;height:
       <div style="position:relative;margin-bottom:8px;">
         <div style="display:flex;gap:8px;align-items:center;">
           <div style="position:relative;flex:1;">
-            <input class="form-input" id="p-ticker" placeholder="股票代碼，例：AAPL、NVDA、TSLA" autocomplete="off" oninput="tickerSearch(this.value)" style="padding-right:36px;">
+            <input class="form-input" id="p-ticker" placeholder="股票代碼，例：AAPL、NVDA、TSLA" autocomplete="off" oninput="tickerSearch(this.value)" onblur="if(this.value)fetchLivePrice(this.value.trim().toUpperCase())" style="padding-right:36px;">
             <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:11px;color:#555;font-family:var(--mono);">AI</span>
             <div id="ticker-dropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:#212121;border:1px solid #3a3a3a;border-radius:4px;z-index:100;max-height:200px;overflow-y:auto;"></div>
           </div>
@@ -330,7 +330,9 @@ header{background:#212121;border-bottom:1px solid #3a3a3a;padding:0 20px;height:
           <span style="position:absolute;top:5px;left:10px;font-size:11px;color:#555;font-family:var(--mono);pointer-events:none;">履約價 $</span>
         </div>
         <div style="position:relative;">
-          <input class="form-input" id="p-expiry" placeholder="03/21/26" style="padding-top:20px;">
+          <input class="form-input" id="p-expiry" placeholder="MM/DD/YY" maxlength="8"
+            style="padding-top:20px;letter-spacing:2px;"
+            oninput="fmtExpiry(this)" onkeydown="handleExpiryKey(event,this)">
           <span style="position:absolute;top:5px;left:10px;font-size:11px;color:#555;font-family:var(--mono);pointer-events:none;">到期 MM/DD/YY</span>
         </div>
         <div style="position:relative;">
@@ -338,8 +340,9 @@ header{background:#212121;border-bottom:1px solid #3a3a3a;padding:0 20px;height:
           <span style="position:absolute;top:5px;left:10px;font-size:11px;color:#555;font-family:var(--mono);pointer-events:none;">成本 $ / 口</span>
         </div>
         <div style="position:relative;">
-          <input class="form-input" id="p-current" placeholder="當前市價" type="number" step="0.01" style="padding-top:20px;">
+          <input class="form-input" id="p-current" placeholder="自動抓取中..." type="number" step="0.01" style="padding-top:20px;color:#ff2d78;" readonly>
           <span style="position:absolute;top:5px;left:10px;font-size:11px;color:#555;font-family:var(--mono);pointer-events:none;">現價 $ / 口</span>
+          <span id="price-status" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:11px;color:#555;font-family:var(--mono);">—</span>
         </div>
         <div style="position:relative;">
           <input class="form-input" id="p-qty" placeholder="1" type="number" style="padding-top:20px;">
@@ -551,6 +554,7 @@ async function loadMyPositions() {
   renderPositions();
   updateDashboard();
   renderPnlChart();
+  refreshAllPrices(); // auto-update live prices
 }
 
 async function loadAllPositions() {
@@ -1112,6 +1116,7 @@ function selectTicker(sym) {
   document.getElementById('p-ticker').value = sym;
   document.getElementById('ticker-dropdown').style.display = 'none';
   document.getElementById('p-strike').focus();
+  fetchLivePrice(sym);
 }
 
 // Close dropdown on outside click
@@ -1121,6 +1126,103 @@ document.addEventListener('click', e => {
     if (dd) dd.style.display = 'none';
   }
 });
+
+// ============ LIVE PRICE FETCH ============
+async function fetchLivePrice(sym) {
+  const el = document.getElementById('p-current');
+  const st = document.getElementById('price-status');
+  if (!el || !sym) return;
+  el.placeholder = '抓取中...';
+  if (st) st.textContent = '⟳';
+
+  // Try UW API first
+  if (UW_API_KEY && UW_API_KEY !== '在這裡貼上你的UW_API_KEY') {
+    try {
+      const data = await fetchUW(`/api/stocks/${sym}/quote`);
+      const price = data?.price || data?.last || data?.close || data?.[0]?.price;
+      if (price) {
+        el.value = parseFloat(price).toFixed(2);
+        el.style.color = '#ff2d78';
+        if (st) st.textContent = 'UW ✓';
+        return;
+      }
+    } catch(e) {}
+  }
+
+  // Fallback: Yahoo Finance via CORS proxy
+  try {
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=1d&range=1d`;
+    const proxies = [
+      u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
+      u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+    ];
+    for (const proxy of proxies) {
+      try {
+        const res = await fetch(proxy(url), { signal: AbortSignal.timeout(6000) });
+        if (!res.ok) continue;
+        const json = await res.json();
+        const price = json?.chart?.result?.[0]?.meta?.regularMarketPrice
+                   || json?.chart?.result?.[0]?.meta?.previousClose;
+        if (price) {
+          el.value = parseFloat(price).toFixed(2);
+          el.style.color = '#ff2d78';
+          if (st) st.textContent = 'YF ✓';
+          return;
+        }
+      } catch(e) { continue; }
+    }
+  } catch(e) {}
+
+  // No price found
+  el.placeholder = '請手動輸入';
+  el.removeAttribute('readonly');
+  el.style.color = '#ffffff';
+  if (st) st.textContent = '手動';
+}
+
+// Auto-fetch price when positions are loaded (for P&L calculation)
+async function refreshAllPrices() {
+  const tickers = [...new Set(myPositions.map(p => p.ticker))];
+  for (const ticker of tickers) {
+    try {
+      const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=1d`;
+      const proxy = u => `https://corsproxy.io/?${encodeURIComponent(u)}`;
+      const res = await fetch(proxy(url), { signal: AbortSignal.timeout(5000) });
+      const json = await res.json();
+      const price = json?.chart?.result?.[0]?.meta?.regularMarketPrice;
+      if (price) {
+        // Update all positions with this ticker
+        for (const pos of myPositions) {
+          if (pos.ticker === ticker) {
+            pos._livePrice = parseFloat(price);
+          }
+        }
+      }
+    } catch(e) {}
+  }
+  renderPositions();
+}
+
+// ============ EXPIRY DATE MASK ============
+function fmtExpiry(el) {
+  let v = el.value.replace(/\D/g, '').substring(0, 6);
+  let out = '';
+  if (v.length >= 1) out = v.substring(0, 2);
+  if (v.length >= 3) out += '/' + v.substring(2, 4);
+  if (v.length >= 5) out += '/' + v.substring(4, 6);
+  el.value = out;
+}
+
+function handleExpiryKey(e, el) {
+  // Allow backspace to remove slash too
+  if (e.key === 'Backspace') {
+    const v = el.value;
+    if (v.endsWith('/')) {
+      e.preventDefault();
+      el.value = v.slice(0, -1);
+    }
+  }
+}
 
 // ============ CHART (TradingView) ============
 function loadChart() {
