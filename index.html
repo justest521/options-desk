@@ -173,6 +173,124 @@ header{background:#212121;border-bottom:1px solid #3a3a3a;padding:0 20px;height:
 ::-webkit-scrollbar{width:4px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+
+/* ============ MOBILE RESPONSIVE ============ */
+@media (max-width: 768px) {
+
+  /* Header */
+  header {
+    padding: 8px 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .header-left { min-width: 0; }
+  .header-left .logo-text { font-size: 13px; }
+  .header-left small { display: none; }
+  .header-mid {
+    order: 3;
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    gap: 2px;
+    justify-content: flex-start;
+  }
+  .nav-tab { font-size: 12px; padding: 4px 10px; white-space: nowrap; }
+  .header-right { gap: 6px; }
+  #user-display { font-size: 12px; padding: 3px 8px; }
+
+  /* Pages */
+  .page { padding: 10px; }
+
+  /* Cards */
+  .card { margin-bottom: 10px; }
+  .card-head { padding: 10px 12px; flex-wrap: wrap; gap: 6px; }
+  .card-title { font-size: 13px; }
+
+  /* Grid → single column */
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr !important; }
+
+  /* Stats row */
+  .stats-row {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px;
+  }
+
+  /* Positions form - stack vertically */
+  #page-positions > div:first-child > div:first-child {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Positions table - horizontal scroll */
+  .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { min-width: 700px; font-size: 12px; }
+  td, th { padding: 8px 8px !important; }
+
+  /* Flow table */
+  #flow-full, #flow-my { font-size: 12px; }
+
+  /* AI page */
+  #page-ai .card > div[style*="grid-template-columns:1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+  #ai-article { height: 120px !important; }
+  #ai-context  { height: 70px !important; }
+
+  /* Research page */
+  #page-research .card > div[style*="grid-template-columns:1fr 280px"] {
+    grid-template-columns: 1fr !important;
+  }
+  #res-article { height: 120px !important; }
+  #rep-stocks-grid { grid-template-columns: 1fr !important; }
+
+  /* Payoff page */
+  #page-payoff > div {
+    grid-template-columns: 1fr !important;
+  }
+  #payoff-canvas { height: 280px !important; }
+  #page-payoff > div > div:last-child .card > div[style*="grid-template-columns:repeat(4"] {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  /* Greeks grid */
+  #page-payoff .card > div[style*="grid-template-columns:1fr 1fr"] {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  /* Big single button */
+  .btn.primary { padding: 10px 16px; font-size: 14px; }
+
+  /* Quick buttons */
+  .fbtn { font-size: 11px; padding: 4px 8px; }
+
+  /* Chat */
+  .chat-input-row { gap: 6px; }
+  .chat-input { font-size: 13px; }
+
+  /* Ticker dropdown */
+  #ticker-dropdown { font-size: 13px; }
+
+  /* Toast - full width on mobile */
+  #toast-container {
+    left: 10px !important;
+    right: 10px !important;
+    max-width: none !important;
+  }
+
+  /* Research header key input */
+  #res-claude-key { width: 150px !important; font-size: 10px !important; }
+  
+  /* Scenario summary 4-col → 2-col */
+  #page-payoff .card > div > div[style*="grid-template-columns:repeat(4,1fr)"] {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-row { grid-template-columns: 1fr !important; }
+  .nav-tab { font-size: 11px; padding: 4px 8px; }
+  header { padding: 6px 10px; }
+  .page { padding: 8px; }
+}
 </style>
 </head>
 <body>
@@ -567,7 +685,8 @@ AI 會自動吸收並結合你的倉位來分析。"
             placeholder="sk-ant-api03-..."
             style="width:220px;padding:5px 10px;font-size:11px;font-family:var(--mono);"
             oninput="saveResKey(this.value)">
-          <button class="btn" onclick="clearResKey()" style="padding:5px 8px;font-size:11px;color:#ff5555;" title="清除儲存的Key">✕</button>
+          <button class="btn" onclick="testClaudeKey()" style="padding:5px 8px;font-size:11px;" title="測試Key是否有效">測試</button>
+          <button class="btn" onclick="clearResKey()" style="padding:5px 8px;font-size:11px;color:#ff5555;" title="清除Key">✕</button>
         </div>
         <button class="btn primary" id="res-run-btn" onclick="runResearch()" style="min-width:120px;padding:7px 20px;font-size:14px;letter-spacing:1px;">⚡ 開始研究</button>
       </div>
@@ -1319,6 +1438,39 @@ function buildAIPositionsPreview() {
   if (!posData || !myPositions.length) return;
   posData.textContent = buildPositionsSummary();
   if (preview) preview.style.display = 'block';
+}
+async function testClaudeKey() {
+  const key = getClaudeKey();
+  if (!key) { showToast('請先輸入 API Key', 'stop'); return; }
+  
+  showToast('測試中...', 'info');
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 10,
+        messages: [{ role: 'user', content: 'Hi' }]
+      })
+    });
+    const data = await res.json();
+    console.log('Key test response:', data);
+    if (res.ok && data.content) {
+      showToast('✅ API Key 有效！', 'info');
+    } else {
+      const msg = data?.error?.message || data?.error?.type || 'unknown';
+      showToast('❌ ' + msg, 'stop');
+      console.error('Key error detail:', JSON.stringify(data));
+    }
+  } catch(e) {
+    showToast('❌ 網路錯誤: ' + e.message, 'stop');
+  }
 }
 function saveResKey(val) {
   val = val.trim();
