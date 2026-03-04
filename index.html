@@ -702,7 +702,11 @@ function renderPositions() {
       <td style="font-size:15px;color:#eeeeee">${p.expiry||'—'}</td>
       <td><span class="${dteCls}">${dteStr}</span></td>
       <td style="font-family:var(--mono)">$${(+p.cost).toFixed(2)}</td>
-      <td style="font-family:var(--mono)">$${(+p.current_price).toFixed(2)}</td>
+      <td style="font-family:var(--mono)">
+        <span style="color:#ff2d78;font-size:15px">$${optPrice.toFixed(2)}</span>
+        ${p._stockPrice ? `<br><span style="font-size:11px;color:#666">股 $${ p._stockPrice.toFixed(2)}</span>` : ''}
+        ${p._livePrice == null ? '<br><span style="font-size:10px;color:#555">抓取中...</span>' : ''}
+      </td>
       <td><span class="badge ${dollar>=0?'badge-green':'badge-red'}">${pct>=0?'+':''}${pct.toFixed(1)}%</span></td>
       <td style="font-family:var(--mono);font-size:15px;color:${dollar>=0?'var(--green)':'var(--red)'}">${dollar>=0?'+':''}$${Math.round(dollar)}</td>
       <td><span class="status-badge ${sc}">${st}</span></td>
