@@ -174,7 +174,7 @@ body { padding-top: 0; }
 .earn-item.week{border-left-color:var(--yellow);}
 .earn-ticker{font-family:var(--mono);font-size:14px;font-weight:700;color:#ffffff;}
 .earn-date{font-size:13px;color:#666;font-family:var(--mono);}
-.earn-when{font-size:11px;color:#444;}
+.earn-when{font-size:11px;color:#888;}
 .earn-dte{font-family:var(--mono);font-size:11px;padding:2px 8px;border-radius:2px;white-space:nowrap;font-weight:600;}
 
 /* TOAST */
@@ -261,7 +261,7 @@ body { padding-top: 0; }
   font-weight: 500;
   letter-spacing: 1px;
   text-transform: uppercase;
-  color: #555;
+  color:#999;
 }
 .rule-full-sub {
   font-size: 12px;
@@ -270,7 +270,7 @@ body { padding-top: 0; }
 }
 .rule-full-desc {
   font-size: 11px;
-  color: #555;
+  color:#999;
   line-height: 1.7;
   margin-top: 2px;
 }
@@ -337,7 +337,7 @@ button, .btn, .fbtn, .nav-tab, .hist-item, .flow-item, .earn-item, label {
 
 /* Logo terminal style */
 .logo-text { font-family:var(--mono) !important; letter-spacing:3px; font-size:13px !important; }
-.logo-sub  { font-family:var(--mono) !important; font-size:10px !important; color:#333 !important; letter-spacing:1px; }
+.logo-sub  { font-family:var(--mono) !important; font-size:10px !important; color:#aaa !important; letter-spacing:1px; }
 .logo-icon { color:var(--accent); font-size:20px; }
 
 /* Position P&L colors */
@@ -349,7 +349,7 @@ button, .btn, .fbtn, .nav-tab, .hist-item, .flow-item, .earn-item, label {
 .stat-card:first-child { border-left:2px solid var(--accent); }
 
 /* Empty states */
-.empty { font-family:var(--mono); font-size:12px; color:#333;
+.empty { font-family:var(--mono); font-size:12px; color:#aaa;
          padding:24px; text-align:center; letter-spacing:1px; }
 
 /* Badge/tag in tables */
@@ -380,7 +380,7 @@ button, .btn, .fbtn, .nav-tab, .hist-item, .flow-item, .earn-item, label {
   padding:4px 10px !important;
   border-radius:0 !important;
 }
-#user-display::before { content:'> '; color:#555; }
+#user-display::before { content:'> '; color:#999; }
 
 /* ============================================================
    MOBILE RESPONSIVE  (≤768px)
@@ -395,7 +395,7 @@ button, .btn, .fbtn, .nav-tab, .hist-item, .flow-item, .earn-item, label {
   .btn-primary-sm { font-size: 15px !important; padding: 9px 20px !important; }
   .fbtn { font-size: 14px !important; padding: 8px 16px !important; }
   .tbl td, .tbl th { font-size: 14px !important; }
-  .form-input, select.form-input { font-size: 16px !important; } /* 防止 iOS zoom */
+  .form-input, select.form-input { font-size: 14px !important; } /* 防止 iOS zoom */
   .stat-num { font-size: clamp(20px,5vw,28px) !important; }
   .stat-sub { font-size: 14px !important; }
 
@@ -437,7 +437,14 @@ button, .btn, .fbtn, .nav-tab, .hist-item, .flow-item, .earn-item, label {
 
   .logo-sub { display:none; }
   #login-area input.input-sm { display:none; }
-  header { flex-wrap:wrap; height:auto; padding-bottom:0; }
+  header { flex-wrap:wrap !important; height:auto !important; padding:0 10px !important; padding-bottom:0 !important; }
+  .header-logo { order:1; flex-shrink:0; height:48px; align-items:center; display:flex; }
+  .logo-text { font-size:12px !important; letter-spacing:2px !important; }
+  .logo-icon { width:22px !important; height:22px !important; font-size:11px !important; }
+  #login-area-wrap { order:2; margin-left:auto; flex-shrink:0; gap:6px !important; height:48px; align-items:center; display:flex; }
+  #user-display { font-size:12px !important; padding:3px 8px !important; }
+  #login-area-wrap .btn { font-size:12px !important; padding:4px 8px !important; }
+  .dot { flex-shrink:0; }
   .header-nav {
     order:10; width:100%; flex-basis:100%;
     overflow-x:auto; border-top:1px solid #1e1e1e;
@@ -496,7 +503,7 @@ button, .btn, .fbtn, .nav-tab, .hist-item, .flow-item, .earn-item, label {
     color: #888 !important;
     line-height: 1.4 !important;
   }
-  .rule-pill-txt small { font-size: 10px !important; color: #555 !important; }
+  .rule-pill-txt small { font-size: 10px !important; color:#999 !important; }
 
   /* 倉位總覽 stats */
   #page-dashboard .stat-box { padding: 10px 12px !important; }
@@ -532,6 +539,13 @@ button, .btn, .fbtn, .nav-tab, .hist-item, .flow-item, .earn-item, label {
   /* Smaller Greeks numbers */
   #g-delta, #g-gamma, #g-theta, #g-vega { font-size: 18px !important; }
   #g-theo  { font-size: 16px !important; }
+
+  /* ── 研究輸入區 mobile ── */
+  #res-input-grid { grid-template-columns: 1fr !important; }
+  #res-input-grid > div:first-child { border-right: none !important; border-bottom: 1px solid #2a2a2a; }
+  #res-article { height: 120px !important; font-size: 16px !important; }
+  #page-research .card-head { flex-wrap: wrap; gap: 6px; }
+  #page-research [style*="flex:1;min-width:140px"] { min-width: 100px !important; max-width: 160px !important; }
 
   /* ── 研究頁 mobile ── */
   #rep-stocks-grid {
@@ -647,7 +661,7 @@ button, .btn, .fbtn, .nav-tab, .hist-item, .flow-item, .earn-item, label {
 .hist-item-date{font-family:var(--mono);font-size:13px;color:#ff2d78;}
 .hist-item-tickers{font-family:var(--mono);font-size:13px;color:#ff2d78;}
 .hist-item-sent{font-size:10px;padding:2px 7px;border-radius:2px;}
-.hist-item-del{padding:8px 10px;font-size:13px;color:#444;border:none;background:none;cursor:pointer;opacity:1;flex-shrink:0;min-width:36px;min-height:44px;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;}
+.hist-item-del{padding:8px 10px;font-size:13px;color:#888;border:none;background:none;cursor:pointer;opacity:1;flex-shrink:0;min-width:36px;min-height:44px;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;}
 .hist-item:hover .hist-item-del{opacity:1;}
 .hist-item-del:hover{color:#ff5555;}
 .hist-view{flex:1;overflow-y:auto;padding:16px;display:none;}
@@ -655,7 +669,7 @@ button, .btn, .fbtn, .nav-tab, .hist-item, .flow-item, .earn-item, label {
 .hist-view-head{display:flex;align-items:center;gap:8px;margin-bottom:16px;}
 .hist-back{padding:5px 10px;font-size:13px;color:#ff2d78;border:1px solid #ff2d7844;border-radius:4px;background:#1a1a1a;cursor:pointer;}
 .hist-back:hover{color:#fff;}
-.hist-empty{padding:40px;text-align:center;color:#444;font-family:var(--mono);font-size:13px;}
+.hist-empty{padding:40px;text-align:center;color:#888;font-family:var(--mono);font-size:13px;}
 </style>
 <script>
 // Suppress cross-origin script errors from external APIs on iOS Safari
@@ -692,6 +706,7 @@ window.addEventListener('unhandledrejection', function(e) {
     <button class="nav-tab" onclick="showPage('payoff',this)">% 損益圖</button>
     <button class="nav-tab" onclick="showPage('ai',this)">@ AI 分析</button>
     <button class="nav-tab" onclick="showPage('darkpool',this)">◉ 暗池</button>
+    <button class="nav-tab" onclick="showPage('history',this)">🗄 報告庫</button>
     <button class="nav-tab" onclick="showPage('watchlist',this)">★ 自選股</button>
   </div>
   <div class="header-right" id="login-area-wrap">
@@ -711,7 +726,7 @@ window.addEventListener('unhandledrejection', function(e) {
   <div class="card rules-card">
   <div style="padding:8px 16px;border-bottom:1px solid #1e1e1e;display:flex;align-items:center;justify-content:space-between;">
     <span style="font-family:var(--mono);font-size:10px;color:#ff2d78;letter-spacing:2px;">⚡ 交易鐵則</span>
-    <span style="font-family:var(--mono);font-size:10px;color:#333;">嚴格執行，不容妥協</span>
+    <span style="font-family:var(--mono);font-size:10px;color:#aaa;">嚴格執行，不容妥協</span>
   </div>
 
   <!-- Desktop: 4-col full cards -->
@@ -801,7 +816,7 @@ window.addEventListener('unhandledrejection', function(e) {
       <div class="card-body" style="padding:12px 16px;"><div id="dash-flow"></div></div>
     </div>
     <div class="card">
-      <div class="card-head"><span class="card-title">// 財報日曆</span><span style="font-family:var(--mono);font-size:10px;color:#444;margin-left:10px;">參考資料 · 實際以公司公告為準</span></div>
+      <div class="card-head"><span class="card-title">// 財報日曆</span><span style="font-family:var(--mono);font-size:10px;color:#888;margin-left:10px;">參考資料 · 實際以公司公告為準</span></div>
       <div class="card-body"><div id="dash-earnings"><div class="loading"><div class="spin"></div>載入中...</div></div></div>
     </div>
   </div>
@@ -823,39 +838,39 @@ window.addEventListener('unhandledrejection', function(e) {
 
         <!-- 股票代碼 -->
         <div style="display:flex;flex-direction:column;gap:3px;">
-          <span style="font-size:11px;color:#555;font-family:var(--mono);padding-left:2px;">股票代碼</span>
+          <span style="font-size:11px;color:#999;font-family:var(--mono);padding-left:2px;">股票代碼</span>
           <div style="position:relative;">
             <input class="form-input" id="p-ticker" placeholder="AAPL、NVDA、TSLA..." autocomplete="off"
               oninput="tickerSearch(this.value)"
               onblur="if(this.value){const s=this.value.trim().toUpperCase();fetchLivePrice(s);fetchExpiryDates(s);loadTVChart(s);}">
-            <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:11px;color:#555;font-family:var(--mono);pointer-events:none;">AI</span>
+            <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:11px;color:#999;font-family:var(--mono);pointer-events:none;">AI</span>
             <div id="ticker-dropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:#212121;border:1px solid #3a3a3a;border-radius:4px;z-index:100;max-height:200px;overflow-y:auto;"></div>
           </div>
         </div>
 
         <!-- 期權玩法 -->
         <div style="display:flex;flex-direction:column;gap:3px;">
-          <span style="font-size:11px;color:#555;font-family:var(--mono);padding-left:2px;">期權玩法</span>
+          <span style="font-size:11px;color:#999;font-family:var(--mono);padding-left:2px;">期權玩法</span>
           <select class="form-input" id="p-type" style="cursor:pointer;" onchange="fetchChainPrice()">
-            <optgroup label="─ 單腿 ─" style="color:#555;">
+            <optgroup label="─ 單腿 ─" style="color:#999;">
               <option value="CALL">CALL 買進看漲</option>
               <option value="PUT">PUT 買進看跌</option>
               <option value="SELL CALL">SHORT CALL 賣出看漲</option>
               <option value="SELL PUT">SHORT PUT 賣出看跌</option>
             </optgroup>
-            <optgroup label="─ 價差 ─" style="color:#555;">
+            <optgroup label="─ 價差 ─" style="color:#999;">
               <option value="Bull Call Spread">Bull Call Spread</option>
               <option value="Bear Put Spread">Bear Put Spread</option>
               <option value="Bear Call Spread">Bear Call Spread</option>
               <option value="Bull Put Spread">Bull Put Spread</option>
             </optgroup>
-            <optgroup label="─ 中性 ─" style="color:#555;">
+            <optgroup label="─ 中性 ─" style="color:#999;">
               <option value="Iron Condor">Iron Condor</option>
               <option value="Straddle">Straddle</option>
               <option value="Strangle">Strangle</option>
               <option value="Butterfly">Butterfly</option>
             </optgroup>
-            <optgroup label="─ 其他 ─" style="color:#555;">
+            <optgroup label="─ 其他 ─" style="color:#999;">
               <option value="Covered Call">Covered Call</option>
               <option value="LEAPS">LEAPS</option>
               <option value="其他">其他</option>
@@ -865,13 +880,13 @@ window.addEventListener('unhandledrejection', function(e) {
 
         <!-- 履約價 -->
         <div style="display:flex;flex-direction:column;gap:3px;">
-          <span style="font-size:11px;color:#555;font-family:var(--mono);padding-left:2px;">履約價 $</span>
+          <span style="font-size:11px;color:#999;font-family:var(--mono);padding-left:2px;">履約價 $</span>
           <input class="form-input" id="p-strike" placeholder="150" type="number" oninput="clearTimeout(window._strikeTmr);window._strikeTmr=setTimeout(fetchChainPrice,600)">
         </div>
 
         <!-- 到期日 -->
         <div style="display:flex;flex-direction:column;gap:3px;position:relative;">
-          <span style="font-size:11px;color:#555;font-family:var(--mono);padding-left:2px;">到期日</span>
+          <span style="font-size:11px;color:#999;font-family:var(--mono);padding-left:2px;">到期日</span>
           <select class="form-input" id="p-expiry" style="cursor:pointer;color:#888;" onchange="fetchChainPrice()">
             <option value="">── 先輸入股票代碼 ──</option>
           </select>
@@ -880,13 +895,13 @@ window.addEventListener('unhandledrejection', function(e) {
 
         <!-- 成本 -->
         <div style="display:flex;flex-direction:column;gap:3px;">
-          <span style="font-size:11px;color:#555;font-family:var(--mono);padding-left:2px;">成本 $ / 口</span>
+          <span style="font-size:11px;color:#999;font-family:var(--mono);padding-left:2px;">成本 $ / 口</span>
           <input class="form-input" id="p-cost" placeholder="3.82" type="number" step="0.01">
         </div>
 
         <!-- 口數 -->
         <div style="display:flex;flex-direction:column;gap:3px;">
-          <span style="font-size:11px;color:#555;font-family:var(--mono);padding-left:2px;">口數（張）</span>
+          <span style="font-size:11px;color:#999;font-family:var(--mono);padding-left:2px;">口數（張）</span>
           <input class="form-input" id="p-qty" placeholder="1" type="number" value="1">
         </div>
 
@@ -898,10 +913,10 @@ window.addEventListener('unhandledrejection', function(e) {
         <span id="bar-ticker" style="color:#ff2d78;font-size:15px;font-weight:600;"></span>
         <span id="bar-stock-price" style="color:#ffffff;font-size:15px;"></span>
         <span id="bar-stock-chg" style="font-size:13px;"></span>
-        <span style="color:#555;font-size:12px;">｜</span>
+        <span style="color:#999;font-size:12px;">｜</span>
         <span style="color:#888;font-size:12px;">期權現價</span>
         <span id="bar-option-price" style="color:#ff2d78;font-size:15px;"></span>
-        <span id="bar-price-time" style="color:#555;font-size:11px;margin-left:auto;"></span>
+        <span id="bar-price-time" style="color:#999;font-size:11px;margin-left:auto;"></span>
       </div>
 
       <!-- TradingView K線圖 -->
@@ -912,7 +927,7 @@ window.addEventListener('unhandledrejection', function(e) {
       </div>
 
       <button class="btn primary" onclick="addPosition()" style="width:100%;margin-bottom:16px;padding:11px;font-size:15px;letter-spacing:2px;">＋ 新增倉位</button>
-      <div style="text-align:right;padding:0 4px 6px;"><span id="price-refresh-time" style="font-size:12px;color:#555;font-family:var(--mono);">—</span></div>
+      <div style="text-align:right;padding:0 4px 6px;"><span id="price-refresh-time" style="font-size:12px;color:#999;font-family:var(--mono);">—</span></div>
       <div class="stats-row">
         <div class="stat-cell"><div class="lbl">總成本</div><div class="val" id="p-total-cost">$0</div></div>
         <div class="stat-cell"><div class="lbl">總市值</div><div class="val" id="p-total-value">$0</div></div>
@@ -960,7 +975,7 @@ window.addEventListener('unhandledrejection', function(e) {
     <div class="card-head">
       <span class="card-title">◉ 暗池交易流</span>
       <div style="display:flex;gap:8px;align-items:center;">
-        <span style="font-family:var(--mono);font-size:11px;color:#555;" id="dp-last-update"></span>
+        <span style="font-family:var(--mono);font-size:11px;color:#999;" id="dp-last-update"></span>
         <button class="btn secondary" style="font-size:13px;" onclick="refreshDarkPool()">⟳ 更新</button>
       </div>
     </div>
@@ -985,7 +1000,7 @@ window.addEventListener('unhandledrejection', function(e) {
   <div class="card">
     <div class="card-body" style="padding:0;">
       <div id="dp-list" style="max-height:680px;overflow-y:auto;">
-        <div class="empty">點擊右上角「更新」載入暗池資料<br><span style="font-size:11px;color:#333;">需要 Unusual Whales API Key</span></div>
+        <div class="empty">點擊右上角「更新」載入暗池資料<br><span style="font-size:11px;color:#aaa;">需要 Unusual Whales API Key</span></div>
       </div>
     </div>
   </div>
@@ -1001,7 +1016,7 @@ window.addEventListener('unhandledrejection', function(e) {
     <div class="card-head">
       <span class="card-title">★ 自選股追蹤</span>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-        <span style="font-family:var(--mono);font-size:11px;color:#555;" id="wl-last-update"></span>
+        <span style="font-family:var(--mono);font-size:11px;color:#999;" id="wl-last-update"></span>
         <button class="btn" onclick="runWatchlistAI()" id="wl-ai-btn" style="font-size:12px;background:rgba(255,45,120,0.12);color:#ff2d78;border:1px solid rgba(255,45,120,0.3);padding:5px 12px;">⚡ AI 比對分析</button>
         <button class="btn secondary" style="font-size:13px;" onclick="refreshWatchlist()">⟳ 更新</button>
       </div>
@@ -1013,7 +1028,7 @@ window.addEventListener('unhandledrejection', function(e) {
             style="padding-right:36px;letter-spacing:1px;text-transform:uppercase;"
             oninput="this.value=this.value.toUpperCase();wlTickerSearch(this.value)"
             onkeydown="wlHandleKey(event)">
-          <span id="wl-search-indicator" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:11px;color:#555;font-family:var(--mono);pointer-events:none;">↵</span>
+          <span id="wl-search-indicator" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:11px;color:#999;font-family:var(--mono);pointer-events:none;">↵</span>
           <div id="wl-ticker-dropdown" style="display:none;position:fixed;background:#1a1a1a;border:1px solid #3a3a3a;border-radius:4px;z-index:9999;max-height:280px;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,0.7);min-width:280px;"></div>
         </div>
         <button class="btn-primary-sm" onclick="addWatchlistTicker()" style="flex-shrink:0;">＋ 加入</button>
@@ -1032,7 +1047,7 @@ window.addEventListener('unhandledrejection', function(e) {
     <div class="card" style="border-left:3px solid #ff2d78;">
       <div class="card-head" style="padding:10px 14px;">
         <span style="font-family:var(--mono);font-size:11px;color:#ff2d78;letter-spacing:1px;">⚡ AI 比對結果</span>
-        <span style="font-family:var(--mono);font-size:10px;color:#444;" id="wl-alert-time"></span>
+        <span style="font-family:var(--mono);font-size:10px;color:#888;" id="wl-alert-time"></span>
       </div>
       <div id="wl-alert-content" style="padding:0 14px 14px;font-size:13px;line-height:1.9;color:#ccc;"></div>
     </div>
@@ -1048,7 +1063,7 @@ window.addEventListener('unhandledrejection', function(e) {
 
   <!-- Stock grid -->
   <div id="wl-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;">
-    <div class="empty" style="grid-column:1/-1;">尚未加入任何股票<br><span style="font-size:11px;color:#333;">在上方輸入代碼開始追蹤</span></div>
+    <div class="empty" style="grid-column:1/-1;">尚未加入任何股票<br><span style="font-size:11px;color:#aaa;">在上方輸入代碼開始追蹤</span></div>
   </div>
 </div>
 
@@ -1092,7 +1107,6 @@ window.addEventListener('unhandledrejection', function(e) {
       <span class="card-title">// AI 倉位分析</span>
     </div>
     <div style="padding:10px 14px;border-bottom:1px solid #2a2a2a;display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:#1a1a1a;">
-      <button class="btn" onclick="openHistPanel()" style="font-size:13px;padding:6px 12px;">📋 歷史報告</button>
       <input type="password" id="claude-key-input" class="form-input"
         placeholder="sk-ant-... API Key"
         oninput="saveClaudioKey(this.value)"
@@ -1117,7 +1131,7 @@ window.addEventListener('unhandledrejection', function(e) {
           <span style="font-family:var(--mono);font-size:11px;color:#ff2d78;letter-spacing:1px;">貼入文章 / 新聞 / 財報</span>
           <div style="display:flex;gap:6px;">
             <button class="fbtn" onclick="clearArticle()" style="font-size:11px;padding:2px 8px;">清除</button>
-            <span id="article-count" style="font-family:var(--mono);font-size:11px;color:#555;line-height:24px;">0 字</span>
+            <span id="article-count" style="font-family:var(--mono);font-size:11px;color:#999;line-height:24px;">0 字</span>
           </div>
         </div>
         <textarea id="ai-article" placeholder="貼入任何文章、新聞、財報內容、分析師報告...
@@ -1140,7 +1154,7 @@ AI 會自動吸收並結合你的倉位來分析。"
         <textarea id="ai-context" placeholder="例如：我預期財報後波動很大、我計畫在DTE 7天前出場、我看好半導體..."
           style="width:100%;height:90px;background:#111;border:1px solid #2a2a2a;color:#ddd;padding:10px;border-radius:4px;font-family:var(--sans);font-size:13px;resize:none;line-height:1.6;box-sizing:border-box;"></textarea>
         <div style="margin-top:8px;">
-          <div style="font-family:var(--mono);font-size:11px;color:#555;margin-bottom:6px;">資料來源</div>
+          <div style="font-family:var(--mono);font-size:11px;color:#999;margin-bottom:6px;">資料來源</div>
           <div id="ai-data-source" style="display:flex;gap:6px;flex-wrap:wrap;">
             <label style="display:flex;align-items:center;gap:4px;font-size:12px;color:#888;cursor:pointer;">
               <input type="checkbox" id="src-positions" checked style="accent-color:#ff2d78;"> 我的倉位
@@ -1158,24 +1172,24 @@ AI 會自動吸收並結合你的倉位來分析。"
 
     <!-- Positions summary shown to AI -->
     <div id="ai-positions-preview" style="padding:12px 16px;border-bottom:1px solid #2a2a2a;background:#111;font-family:var(--mono);font-size:12px;color:#666;display:none;">
-      <div style="color:#555;margin-bottom:6px;font-size:11px;letter-spacing:1px;">── 傳給 AI 的倉位資料 ──</div>
+      <div style="color:#999;margin-bottom:6px;font-size:11px;letter-spacing:1px;">── 傳給 AI 的倉位資料 ──</div>
       <div id="ai-pos-data"></div>
     </div>
 
     <!-- AI Response -->
     <div style="padding:16px;min-height:400px;">
       <div id="ai-output" style="font-family:var(--sans);font-size:15px;line-height:1.8;color:#ddd;">
-        <div style="text-align:center;padding:60px 0;color:#555;">
+        <div style="text-align:center;padding:60px 0;color:#999;">
           <div style="font-size:40px;margin-bottom:12px;">🤖</div>
           <div style="font-family:var(--mono);font-size:14px;">選擇分析模式，按開始分析</div>
-          <div style="font-size:13px;color:#444;margin-top:8px;">AI 會根據你的持倉、DTE、損益狀況給出具體建議</div>
+          <div style="font-size:13px;color:#888;margin-top:8px;">AI 會根據你的持倉、DTE、損益狀況給出具體建議</div>
         </div>
       </div>
     </div>
 
     <!-- Quick questions -->
     <div style="padding:0 16px 16px;border-top:1px solid #2a2a2a;padding-top:12px;">
-      <div style="font-size:12px;color:#555;font-family:var(--mono);margin-bottom:8px;">快捷問題</div>
+      <div style="font-size:12px;color:#999;font-family:var(--mono);margin-bottom:8px;">快捷問題</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <button class="fbtn" onclick="askQuick('哪個倉位風險最高？')">哪個倉位風險最高？</button>
         <button class="fbtn" onclick="askQuick('現在應該加倉還是減倉？')">應該加倉還是減倉？</button>
@@ -1197,23 +1211,22 @@ AI 會自動吸收並結合你的倉位來分析。"
       <span class="card-title">// AI 研究引擎</span>
     </div>
     <div style="padding:10px 14px;border-bottom:1px solid #2a2a2a;display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:#1a1a1a;">
-      <button class="btn" onclick="openHistPanel()" style="font-size:13px;padding:6px 12px;">📋 歷史報告</button>
       <span id="res-ticker-tags" style="display:flex;gap:4px;flex-wrap:wrap;"></span>
       <input type="password" id="res-claude-key" class="form-input"
         placeholder="sk-ant-... API Key"
         oninput="saveResKey(this.value)"
         style="flex:1;min-width:140px;max-width:220px;font-size:14px;padding:8px 10px;background:#111;border:1px solid #3a3a3a;color:#888;">
       <button class="btn" onclick="localStorage.removeItem('ai_unlocked');showToast('已登出 AI','info')" style="font-size:13px;padding:6px 10px;">🔒 登出</button>
-      <button class="btn primary" id="res-run-btn" onclick="runResearch()" style="font-size:14px;padding:8px 18px;">⚡ 開始研究</button>
+      <button class="btn primary" id="res-run-btn" onclick="runResearch()" style="font-size:15px;padding:10px 22px;letter-spacing:1px;">⚡ 開始研究</button>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 280px;gap:0;">
+    <div style="display:grid;grid-template-columns:1fr 260px;gap:0;" id="res-input-grid">
       <!-- Article -->
       <div style="padding:14px;border-right:1px solid #2a2a2a;">
         <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-          <span style="font-family:var(--mono);font-size:11px;color:#ff2d78;letter-spacing:1px;">貼入文章 / 新聞 / 分析師報告</span>
-          <span id="res-char-count" style="font-family:var(--mono);font-size:11px;color:#555;">0 字</span>
+          <span style="font-family:var(--mono);font-size:13px;color:#ff2d78;letter-spacing:1px;">貼入文章 / 新聞 / 分析師報告</span>
+          <span id="res-char-count" style="font-family:var(--mono);font-size:13px;color:#999;">0 字</span>
         </div>
-        <textarea id="res-article" style="width:100%;height:140px;background:#111;border:1px solid #2a2a2a;color:#ddd;padding:10px;border-radius:4px;font-family:var(--sans);font-size:13px;resize:vertical;line-height:1.6;box-sizing:border-box;"
+        <textarea id="res-article" style="width:100%;height:140px;background:#111;border:1px solid #2a2a2a;color:#ddd;padding:10px;border-radius:4px;font-family:var(--sans);font-size:15px;resize:vertical;line-height:1.7;box-sizing:border-box;"
           placeholder="貼入任何文章，AI 會自動識別股票代碼、抓取數據並產出完整研究報告..."
           oninput="onResArticleInput()"></textarea>
         <!-- auto-detected tickers -->
@@ -1221,29 +1234,29 @@ AI 會自動吸收並結合你的倉位來分析。"
       </div>
       <!-- Settings -->
       <div style="padding:14px;">
-        <div style="font-family:var(--mono);font-size:11px;color:#888;margin-bottom:10px;letter-spacing:1px;">研究設定</div>
-        <div style="display:flex;flex-direction:column;gap:8px;">
-          <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:#aaa;cursor:pointer;">
-            <input type="checkbox" id="rs-fetch-quote"  checked style="accent-color:#ff2d78;"> 抓取股票報價 &amp; 基本面
+        <div style="font-family:var(--mono);font-size:13px;color:#aaa;margin-bottom:12px;letter-spacing:1px;">研究設定</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <label style="display:flex;align-items:center;gap:8px;font-size:15px;color:#ccc;cursor:pointer;">
+            <input type="checkbox" id="rs-fetch-quote"  checked style="accent-color:#ff2d78;width:16px;height:16px;"> 抓取股票報價 &amp; 基本面
           </label>
-          <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:#aaa;cursor:pointer;">
-            <input type="checkbox" id="rs-fetch-flow"   checked style="accent-color:#ff2d78;"> 抓取期權大單流
+          <label style="display:flex;align-items:center;gap:8px;font-size:15px;color:#ccc;cursor:pointer;">
+            <input type="checkbox" id="rs-fetch-flow"   checked style="accent-color:#ff2d78;width:16px;height:16px;"> 抓取期權大單流
           </label>
-          <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:#aaa;cursor:pointer;">
-            <input type="checkbox" id="rs-include-pos"  checked style="accent-color:#ff2d78;"> 結合我的持倉
+          <label style="display:flex;align-items:center;gap:8px;font-size:15px;color:#ccc;cursor:pointer;">
+            <input type="checkbox" id="rs-include-pos"  checked style="accent-color:#ff2d78;width:16px;height:16px;"> 結合我的持倉
           </label>
-          <div style="border-top:1px solid #2a2a2a;padding-top:8px;margin-top:2px;">
-            <div style="font-family:var(--mono);font-size:11px;color:#555;margin-bottom:6px;">報告深度</div>
-            <select id="rs-depth" class="form-input" style="width:100%;padding:6px 8px;font-size:12px;">
+          <div style="border-top:1px solid #2a2a2a;padding-top:10px;margin-top:2px;">
+            <div style="font-family:var(--mono);font-size:13px;color:#aaa;margin-bottom:8px;">報告深度</div>
+            <select id="rs-depth" class="form-input" style="width:100%;padding:8px;font-size:15px;">
               <option value="quick">快速摘要 (30秒)</option>
               <option value="standard" selected>標準報告 (1分鐘)</option>
               <option value="deep">深度分析 (2分鐘)</option>
             </select>
           </div>
-          <div style="font-family:var(--mono);font-size:11px;color:#555;margin-bottom:4px;margin-top:2px;">手動加入代碼</div>
-          <div style="display:flex;gap:4px;">
-            <input type="text" id="rs-manual-ticker" class="form-input" placeholder="如 NVDA" style="flex:1;padding:5px 8px;font-size:13px;text-transform:uppercase;" maxlength="6">
-            <button class="btn" onclick="addManualTicker()" style="padding:5px 10px;font-size:12px;">+</button>
+          <div style="font-family:var(--mono);font-size:13px;color:#aaa;margin-bottom:4px;margin-top:2px;">手動加入代碼</div>
+          <div style="display:flex;gap:6px;">
+            <input type="text" id="rs-manual-ticker" class="form-input" placeholder="如 NVDA" style="flex:1;padding:8px;font-size:15px;text-transform:uppercase;" maxlength="6">
+            <button class="btn" onclick="addManualTicker()" style="padding:8px 14px;font-size:16px;">+</button>
           </div>
         </div>
       </div>
@@ -1255,7 +1268,7 @@ AI 會自動吸收並結合你的倉位來分析。"
     <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:4px;padding:14px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
         <span id="res-progress-label" style="font-family:var(--mono);font-size:13px;color:#ff2d78;">初始化...</span>
-        <span id="res-progress-pct" style="font-family:var(--mono);font-size:13px;color:#555;">0%</span>
+        <span id="res-progress-pct" style="font-family:var(--mono);font-size:13px;color:#999;">0%</span>
       </div>
       <div style="background:#2a2a2a;border-radius:2px;height:4px;">
         <div id="res-progress-bar" style="background:#ff2d78;height:4px;border-radius:2px;width:0%;transition:width 0.3s;"></div>
@@ -1288,7 +1301,7 @@ AI 會自動吸收並結合你的倉位來分析。"
 
     <!-- Full AI analysis -->
     <div class="card" style="margin-bottom:12px;">
-      <div class="card-head"><span class="card-title">// 完整分析</span><span id="rep-timestamp" style="font-family:var(--mono);font-size:11px;color:#555;"></span></div>
+      <div class="card-head"><span class="card-title">// 完整分析</span><span id="rep-timestamp" style="font-family:var(--mono);font-size:11px;color:#999;"></span></div>
       <div id="rep-full-analysis" style="padding:20px;font-size:15px;line-height:2.0;color:#e0e0e0;"></div>
     </div>
 
@@ -1315,10 +1328,10 @@ AI 會自動吸收並結合你的倉位來分析。"
   </div>
 
   <!-- Empty state -->
-  <div id="res-empty" style="text-align:center;padding:60px 0;color:#555;">
+  <div id="res-empty" style="text-align:center;padding:60px 0;color:#999;">
     <div style="font-size:48px;margin-bottom:16px;">🔬</div>
     <div style="font-family:var(--mono);font-size:14px;color:#888;">貼入文章，按「開始研究」</div>
-    <div style="font-size:12px;color:#444;margin-top:8px;">AI 會自動識別股票、抓取數據、產出完整研究報告</div>
+    <div style="font-size:12px;color:#888;margin-top:8px;">AI 會自動識別股票、抓取數據、產出完整研究報告</div>
   </div>
 
 </div>
@@ -1337,7 +1350,7 @@ AI 會自動吸收並結合你的倉位來分析。"
         <select id="pd-pos-select" class="form-input" style="width:100%;margin-bottom:8px;" onchange="loadPosToPayoff()">
           <option value="">── 從我的倉位選擇 ──</option>
         </select>
-        <div style="font-family:var(--mono);font-size:11px;color:#555;text-align:center;">或手動輸入以下參數</div>
+        <div style="font-family:var(--mono);font-size:11px;color:#999;text-align:center;">或手動輸入以下參數</div>
       </div>
     </div>
 
@@ -1348,11 +1361,11 @@ AI 會自動吸收並結合你的倉位來分析。"
 
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
             <div style="display:flex;flex-direction:column;gap:3px;">
-              <span style="font-size:11px;color:#555;font-family:var(--mono);">股票代碼</span>
+              <span style="font-size:11px;color:#999;font-family:var(--mono);">股票代碼</span>
               <input class="form-input" id="pd-ticker" value="NVDA"  oninput="this.value=this.value.toUpperCase()">
             </div>
             <div style="display:flex;flex-direction:column;gap:3px;">
-              <span style="font-size:11px;color:#555;font-family:var(--mono);">策略</span>
+              <span style="font-size:11px;color:#999;font-family:var(--mono);">策略</span>
               <select class="form-input" id="pd-type" style="cursor:pointer;" onchange="toggleLegs()">
                 <option value="CALL">CALL</option>
                 <option value="PUT">PUT</option>
@@ -1369,11 +1382,11 @@ AI 會自動吸收並結合你的倉位來分析。"
 
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
             <div style="display:flex;flex-direction:column;gap:3px;">
-              <span style="font-size:11px;color:#555;font-family:var(--mono);">股票現價 $</span>
+              <span style="font-size:11px;color:#999;font-family:var(--mono);">股票現價 $</span>
               <input class="form-input" id="pd-stock" type="number" value="130" step="0.5"  oninput="drawPayoff()">
             </div>
             <div style="display:flex;flex-direction:column;gap:3px;">
-              <span style="font-size:11px;color:#555;font-family:var(--mono);">履約價 $</span>
+              <span style="font-size:11px;color:#999;font-family:var(--mono);">履約價 $</span>
               <input class="form-input" id="pd-strike" type="number" value="130" step="0.5"  oninput="drawPayoff()">
             </div>
           </div>
@@ -1381,39 +1394,39 @@ AI 會自動吸收並結合你的倉位來分析。"
           <!-- Spread second leg -->
           <div id="pd-leg2-row" style="display:none;grid-template-columns:1fr 1fr;gap:8px;">
             <div style="display:flex;flex-direction:column;gap:3px;">
-              <span style="font-size:11px;color:#555;font-family:var(--mono);">履約價2 $</span>
+              <span style="font-size:11px;color:#999;font-family:var(--mono);">履約價2 $</span>
               <input class="form-input" id="pd-strike2" type="number" value="140" step="0.5"  oninput="drawPayoff()">
             </div>
             <div style="display:flex;flex-direction:column;gap:3px;">
-              <span style="font-size:11px;color:#555;font-family:var(--mono);">履約價3 $</span>
+              <span style="font-size:11px;color:#999;font-family:var(--mono);">履約價3 $</span>
               <input class="form-input" id="pd-strike3" type="number" value="120" step="0.5"  oninput="drawPayoff()">
             </div>
           </div>
           <div id="pd-leg4-row" style="display:none;">
             <div style="display:flex;flex-direction:column;gap:3px;">
-              <span style="font-size:11px;color:#555;font-family:var(--mono);">履約價4 $</span>
+              <span style="font-size:11px;color:#999;font-family:var(--mono);">履約價4 $</span>
               <input class="form-input" id="pd-strike4" type="number" value="150" step="0.5"  oninput="drawPayoff()">
             </div>
           </div>
 
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
             <div style="display:flex;flex-direction:column;gap:3px;">
-              <span style="font-size:11px;color:#555;font-family:var(--mono);">權利金 $ / 口</span>
+              <span style="font-size:11px;color:#999;font-family:var(--mono);">權利金 $ / 口</span>
               <input class="form-input" id="pd-premium" type="number" value="3.82" step="0.01"  oninput="drawPayoff()">
             </div>
             <div style="display:flex;flex-direction:column;gap:3px;">
-              <span style="font-size:11px;color:#555;font-family:var(--mono);">口數</span>
+              <span style="font-size:11px;color:#999;font-family:var(--mono);">口數</span>
               <input class="form-input" id="pd-qty" type="number" value="1" step="1" min="1"  oninput="drawPayoff()">
             </div>
           </div>
 
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
             <div style="display:flex;flex-direction:column;gap:3px;">
-              <span style="font-size:11px;color:#555;font-family:var(--mono);">DTE (天)</span>
+              <span style="font-size:11px;color:#999;font-family:var(--mono);">DTE (天)</span>
               <input class="form-input" id="pd-dte" type="number" value="30" step="1" min="1"  oninput="drawPayoff()">
             </div>
             <div style="display:flex;flex-direction:column;gap:3px;">
-              <span style="font-size:11px;color:#555;font-family:var(--mono);">IV (%)</span>
+              <span style="font-size:11px;color:#999;font-family:var(--mono);">IV (%)</span>
               <input class="form-input" id="pd-iv" type="number" value="50" step="1" min="1"  oninput="drawPayoff()">
             </div>
           </div>
@@ -1432,28 +1445,28 @@ AI 會自動吸收並結合你的倉位來分析。"
 
     <!-- Greeks Card (3rd column) -->
     <div class="card">
-      <div class="card-head"><span class="card-title">// Greeks</span><span id="pd-greeks-time" style="font-size:11px;color:#555;font-family:var(--mono);"></span></div>
+      <div class="card-head"><span class="card-title">// Greeks</span><span id="pd-greeks-time" style="font-size:11px;color:#999;font-family:var(--mono);"></span></div>
       <div style="padding:12px;">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
           <div style="background:#111;border:1px solid #2a2a2a;border-radius:4px;padding:10px;text-align:center;">
             <div style="font-family:var(--mono);font-size:11px;color:#888;margin-bottom:4px;">Δ Delta</div>
             <div id="g-delta" style="font-size:20px;font-family:var(--mono);color:#fff;">—</div>
-            <div style="font-size:10px;color:#555;margin-top:2px;">每$1股價變化</div>
+            <div style="font-size:10px;color:#999;margin-top:2px;">每$1股價變化</div>
           </div>
           <div style="background:#111;border:1px solid #2a2a2a;border-radius:4px;padding:10px;text-align:center;">
             <div style="font-family:var(--mono);font-size:11px;color:#888;margin-bottom:4px;">Γ Gamma</div>
             <div id="g-gamma" style="font-size:20px;font-family:var(--mono);color:#fff;">—</div>
-            <div style="font-size:10px;color:#555;margin-top:2px;">Delta變化速率</div>
+            <div style="font-size:10px;color:#999;margin-top:2px;">Delta變化速率</div>
           </div>
           <div style="background:#111;border:1px solid #2a2a2a;border-radius:4px;padding:10px;text-align:center;">
             <div style="font-family:var(--mono);font-size:11px;color:#888;margin-bottom:4px;">Θ Theta</div>
             <div id="g-theta" style="font-size:20px;font-family:var(--mono);color:#ff2d78;">—</div>
-            <div style="font-size:10px;color:#555;margin-top:2px;">每天時間損耗</div>
+            <div style="font-size:10px;color:#999;margin-top:2px;">每天時間損耗</div>
           </div>
           <div style="background:#111;border:1px solid #2a2a2a;border-radius:4px;padding:10px;text-align:center;">
             <div style="font-family:var(--mono);font-size:11px;color:#888;margin-bottom:4px;">ν Vega</div>
             <div id="g-vega" style="font-size:20px;font-family:var(--mono);color:#fff;">—</div>
-            <div style="font-size:10px;color:#555;margin-top:2px;">每1%IV變化</div>
+            <div style="font-size:10px;color:#999;margin-top:2px;">每1%IV變化</div>
           </div>
         </div>
         <div style="margin-top:10px;background:#111;border:1px solid #2a2a2a;border-radius:4px;padding:10px;display:flex;justify-content:space-between;align-items:center;">
@@ -1541,6 +1554,7 @@ function showPage(id, btn) {
   if(id === 'payoff')    initPayoff();
   if(id === 'darkpool')  refreshDarkPool(true);
   if(id === 'watchlist') initWatchlist();
+  if(id === 'history')  { initHistoryPage(); backToHpList(); }
 }
 
 // ============ USER ============
@@ -1700,7 +1714,7 @@ function renderPositions() {
       <td style="font-family:var(--mono)">
         <span style="color:#ff2d78;font-size:15px">$${optPrice.toFixed(2)}</span>
         ${p._stockPrice ? `<br><span style="font-size:11px;color:#666">股 $${ p._stockPrice.toFixed(2)}</span>` : ''}
-        ${p._livePrice == null ? '<br><span style="font-size:10px;color:#555">抓取中...</span>' : ''}
+        ${p._livePrice == null ? '<br><span style="font-size:10px;color:#999">抓取中...</span>' : ''}
       </td>
       <td><span class="badge ${dollar>=0?'badge-green':'badge-red'}">${pct>=0?'+':''}${pct.toFixed(1)}%</span></td>
       <td style="font-family:var(--mono);font-size:15px;color:${dollar>=0?'#00cc66':'#ff4455'}">${dollar>=0?'+':''}$${Math.round(dollar)}</td>
@@ -1925,7 +1939,7 @@ function renderFlow(containerId, data, filter, limit) {
     const isCall  = type.includes('CALL');
     const col     = isCall ? '#00cc66' : '#ff4455';
     const n       = Math.max(1, Math.round(premium / maxPrem * BARS));
-    const bar     = `<span style="color:${col}">${'█'.repeat(n)}</span><span style="color:#222">${'█'.repeat(BARS-n)}</span>`;
+    const bar     = `<span style="color:${col}">${'█'.repeat(n)}</span><span style="color:#888">${'█'.repeat(BARS-n)}</span>`;
     const premStr = premium > 1e6 ? `$${(premium/1e6).toFixed(1)}M` : premium > 1e3 ? `$${(premium/1e3).toFixed(0)}K` : `$${premium}`;
     const exType  = (f.execution_type||f.trade_type||'').toLowerCase();
     const sweepTag = exType.includes('sweep') ? '<span style="font-family:var(--mono);font-size:10px;color:#ffcc00;margin-left:6px;">[SWEEP]</span>' : '';
@@ -1936,7 +1950,7 @@ function renderFlow(containerId, data, filter, limit) {
         <div style="width:48px;flex-shrink:0;font-family:var(--mono);font-size:13px;font-weight:700;color:${col};">${typeLabel}</div>
         <div style="width:68px;flex-shrink:0;font-family:var(--mono);font-size:15px;font-weight:700;color:#fff;">${ticker}</div>
         <div style="width:80px;flex-shrink:0;font-family:var(--mono);font-size:13px;color:#ccc;">$${strike}</div>
-        <div style="width:100px;flex-shrink:0;font-family:var(--mono);font-size:12px;color:#555;">${expiry}</div>
+        <div style="width:100px;flex-shrink:0;font-family:var(--mono);font-size:12px;color:#999;">${expiry}</div>
         <div style="flex:1;padding:0 12px;min-width:0;font-family:var(--mono);font-size:13px;letter-spacing:1px;line-height:1;">
           ${bar}${sweepTag}
         </div>
@@ -2173,8 +2187,8 @@ ${userCtx ? `【補充背景】${userCtx}` : ''}
       output.innerHTML = `<div style="padding:30px;text-align:center;color:#888;font-family:var(--mono);">
         <div style="font-size:28px;margin-bottom:12px;">🔑</div>
         <div style="color:#ff2d78;margin-bottom:8px;">請先輸入 Claude API Key</div>
-        <div style="font-size:12px;color:#555;">在右上角貼上 sk-ant-... 格式的 Key</div>
-        <div style="font-size:11px;color:#444;margin-top:8px;">前往 <a href="https://console.anthropic.com/" target="_blank" style="color:#ff2d78;">console.anthropic.com</a> 取得</div>
+        <div style="font-size:12px;color:#999;">在右上角貼上 sk-ant-... 格式的 Key</div>
+        <div style="font-size:11px;color:#888;margin-top:8px;">前往 <a href="https://console.anthropic.com/" target="_blank" style="color:#ff2d78;">console.anthropic.com</a> 取得</div>
       </div>`;
       btn.disabled = false;
       btn.textContent = '▶ 開始分析';
@@ -2204,7 +2218,7 @@ ${userCtx ? `【補充背景】${userCtx}` : ''}
       const errMsg = data?.error?.message || data?.error?.type || `HTTP ${response.status}`;
       output.innerHTML = `<div style="color:#ff5555;padding:20px;font-family:var(--mono);font-size:13px;">
         ❌ API 錯誤：${errMsg}<br><br>
-        <span style="color:#555;font-size:11px;">請確認 API Key 正確且有額度</span>
+        <span style="color:#999;font-size:11px;">請確認 API Key 正確且有額度</span>
       </div>`;
       btn.disabled = false; btn.textContent = '▶ 開始分析';
       return;
@@ -2231,7 +2245,7 @@ ${userCtx ? `【補充背景】${userCtx}` : ''}
     const resultHTML = `
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #2a2a2a;">
         <span style="font-family:var(--mono);font-size:12px;color:#ff2d78;letter-spacing:1px;">${modeLabels[mode]||mode}</span>
-        <span style="font-family:var(--mono);font-size:11px;color:#555;">${timestamp} ET · claude-sonnet</span>
+        <span style="font-family:var(--mono);font-size:11px;color:#999;">${timestamp} ET · claude-sonnet</span>
       </div>
       <div style="line-height:1.9;">${html}</div>`;
     output.innerHTML = resultHTML;
@@ -3156,9 +3170,9 @@ function renderDetectedTickers() {
   if (!det) return;
 
   det.innerHTML = all.length
-    ? '<span style="font-family:var(--mono);font-size:11px;color:#555;margin-right:4px;">偵測到:</span>' +
+    ? '<span style="font-family:var(--mono);font-size:11px;color:#999;margin-right:4px;">偵測到:</span>' +
       all.map(t => `<span class="tag tag-call" style="cursor:pointer;font-size:12px;" onclick="removeTicker('${t}')" title="點擊移除">${t} ×</span>`).join('')
-    : '<span style="font-family:var(--mono);font-size:11px;color:#444;">輸入文章後自動偵測代碼...</span>';
+    : '<span style="font-family:var(--mono);font-size:11px;color:#888;">輸入文章後自動偵測代碼...</span>';
 
   if (tags) tags.innerHTML = all.map(t =>
     `<span style="font-family:var(--mono);font-size:11px;color:#ff2d78;background:rgba(255,45,120,0.1);padding:2px 6px;border-radius:2px;">${t}</span>`
@@ -3188,7 +3202,7 @@ function setProgress(label, pct, stepDone) {
   if (pctEl) pctEl.textContent = pct + '%';
   if (stepDone && steps) {
     const s = document.createElement('span');
-    s.style.cssText = 'font-family:var(--mono);font-size:11px;color:#555;';
+    s.style.cssText = 'font-family:var(--mono);font-size:11px;color:#999;';
     s.textContent = '✓ ' + stepDone;
     steps.appendChild(s);
   }
@@ -3525,7 +3539,7 @@ function renderReport({ report, stockDataMap, flowDataMap, timestamp }) {
           </div>
           <div style="text-align:right;">
             <div style="font-family:var(--mono);font-size:10px;color:#666;letter-spacing:1px;margin-bottom:2px;">SCORE</div>
-            <div style="font-size:28px;font-weight:700;color:${color};font-family:var(--mono);line-height:1;">${score}<span style="font-size:14px;color:#555;">/10</span></div>
+            <div style="font-size:28px;font-weight:700;color:${color};font-family:var(--mono);line-height:1;">${score}<span style="font-size:14px;color:#999;">/10</span></div>
           </div>
         </div>
         <!-- Score bar -->
@@ -3551,9 +3565,9 @@ function renderReport({ report, stockDataMap, flowDataMap, timestamp }) {
         </div>
         ${fd ? `<div style="margin-top:10px;display:flex;gap:8px;font-family:var(--mono);font-size:12px;">
           <span style="color:#00cc66;font-weight:600;">CALL ${fd.callCount}筆</span>
-          <span style="color:#333;">|</span>
+          <span style="color:#aaa;">|</span>
           <span style="color:#ff5555;font-weight:600;">PUT ${fd.putCount}筆</span>
-          ${fd.pcRatio ? `<span style="color:#333;">|</span><span style="color:#888;">C/P=${fd.pcRatio}</span>` : ''}
+          ${fd.pcRatio ? `<span style="color:#aaa;">|</span><span style="color:#888;">C/P=${fd.pcRatio}</span>` : ''}
         </div>` : ''}
       </div>
     </div>`;
@@ -3968,7 +3982,7 @@ function renderEarnings(data) {
         <span class="earn-ticker" style="width:52px;flex-shrink:0;">${ticker}</span>
         <span class="earn-date"   style="width:44px;flex-shrink:0;">${mmdd}</span>
         <span class="earn-when"   style="width:52px;flex-shrink:0;">${whenTxt}</span>
-        ${capStr ? `<span style="font-family:var(--mono);font-size:10px;color:#333;flex-shrink:0;">${capStr}</span>` : ''}
+        ${capStr ? `<span style="font-family:var(--mono);font-size:10px;color:#aaa;flex-shrink:0;">${capStr}</span>` : ''}
       </div>
       <span class="earn-dte" style="background:rgba(0,0,0,0.3);border:1px solid ${c};color:${c};">${dteStr}</span>
     </div>`;
@@ -4066,18 +4080,51 @@ window.onload = async function() {
       onkeydown="if(event.key==='Enter')checkPW()">
     <div id="pw-error" style="font-size:12px;color:#ff5555;height:16px;margin-bottom:12px;"></div>
     <button class="btn primary" onclick="checkPW()" style="width:100%;padding:12px;font-size:15px;">解鎖</button>
-    <div style="font-size:11px;color:#444;margin-top:16px;">同裝置只需輸入一次</div>
+    <div style="font-size:11px;color:#888;margin-top:16px;">同裝置只需輸入一次</div>
   </div>
 </div>
 
 <!-- ══ REPORT HISTORY PANEL ══ -->
 <div class="hist-overlay" id="hist-overlay" onclick="closeHistPanel()"></div>
+<!-- PAGE: HISTORY REPORTS -->
+<div id="page-history" class="page">
+
+  <!-- List / Detail toggle -->
+  <div id="hp-list-section">
+    <div class="card" style="margin-bottom:12px;">
+      <div class="card-head" style="padding:12px 16px;">
+        <span class="card-title">🗄 報告庫</span>
+        <span id="hp-count-badge" style="font-family:var(--mono);font-size:13px;color:#ff2d78;"></span>
+      </div>
+      <div style="display:flex;border-bottom:1px solid #2a2a2a;">
+        <button class="hist-tab active" id="hptab-all"      onclick="filterHistPage('all',this)"      style="flex:1;padding:14px 8px;font-size:15px;">全部</button>
+        <button class="hist-tab"        id="hptab-research" onclick="filterHistPage('research',this)" style="flex:1;padding:14px 8px;font-size:15px;">研究報告</button>
+        <button class="hist-tab"        id="hptab-ai"       onclick="filterHistPage('ai',this)"       style="flex:1;padding:14px 8px;font-size:15px;">AI 分析</button>
+      </div>
+      <div id="hp-list" style="padding:4px 0;"></div>
+    </div>
+  </div>
+
+  <!-- Detail view (full page) -->
+  <div id="hp-detail-section" style="display:none;">
+    <div class="card">
+      <div class="card-head" style="padding:12px 16px;gap:10px;flex-wrap:wrap;">
+        <button onclick="backToHpList()" style="font-family:var(--mono);font-size:14px;color:#ff2d78;background:none;border:1px solid #ff2d7844;padding:6px 14px;cursor:pointer;border-radius:2px;">← 返回</button>
+        <span id="hp-detail-title" style="font-family:var(--mono);font-size:16px;font-weight:700;color:#fff;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+        <button onclick="exportHpReport()" style="font-family:var(--mono);font-size:13px;color:#888;background:none;border:1px solid #2a2a2a;padding:6px 12px;cursor:pointer;border-radius:2px;">⬇ 匯出</button>
+      </div>
+      <div id="hp-detail-body" style="padding:20px;font-size:16px;line-height:2.1;color:#e8e8e8;max-width:800px;margin:0 auto;"></div>
+    </div>
+  </div>
+
+</div>
+
 <div class="hist-panel" id="hist-panel">
   <div class="hist-panel-head">
-    <span style="font-family:var(--mono);font-size:12px;color:#ff2d78;letter-spacing:2px;">📋 報告歷史</span>
+    <span style="font-family:var(--mono);font-size:12px;color:#ff2d78;letter-spacing:2px;">🗄 報告庫</span>
     <div style="display:flex;gap:8px;align-items:center;">
       <span id="hist-count-badge" style="font-family:var(--mono);font-size:12px;color:#ff2d78;"></span>
-      <button onclick="closeHistPanel()" style="background:none;border:none;color:#555;font-size:18px;cursor:pointer;line-height:1;">×</button>
+      <button onclick="closeHistPanel()" style="background:none;border:none;color:#999;font-size:18px;cursor:pointer;line-height:1;">×</button>
     </div>
   </div>
   <div class="hist-panel-tabs">
@@ -4208,7 +4255,7 @@ async function renderHistList() {
   if (badge) badge.textContent = `${idx.length} 份報告`;
 
   if (!filtered.length) {
-    el.innerHTML = '<div class="hist-empty">尚無儲存的報告<br><span style="font-size:11px;color:#333;">完成分析後會自動儲存到雲端</span></div>';
+    el.innerHTML = '<div class="hist-empty">尚無儲存的報告<br><span style="font-size:11px;color:#aaa;">完成分析後會自動儲存到雲端</span></div>';
     return;
   }
 
@@ -4300,6 +4347,122 @@ function escH(s) {
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+// ── History Page (獨立頁面版) ─────────────────────────────────
+let _hpFilter = 'all';
+let _hpViewData = null;
+
+async function initHistoryPage() {
+  const badge = document.getElementById('hp-count-badge');
+  const idx = await histGetIndex();
+  if (badge) badge.textContent = `${idx.length} 份報告`;
+  renderHpList();
+}
+
+function filterHistPage(type, btn) {
+  _hpFilter = type;
+  document.querySelectorAll('#page-history .hist-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  renderHpList();
+}
+
+async function renderHpList() {
+  const el = document.getElementById('hp-list');
+  if (!el) return;
+  el.innerHTML = '<div class="hist-empty" style="padding:20px 16px;">載入中...</div>';
+  const idx = await histGetIndex();
+  const filtered = _hpFilter === 'all' ? idx : idx.filter(r => r.type === _hpFilter);
+
+  const badge = document.getElementById('hp-count-badge');
+  if (badge) badge.textContent = `${idx.length} 份報告`;
+
+  if (!filtered.length) {
+    el.innerHTML = '<div class="hist-empty" style="padding:30px 16px;font-size:15px;color:#aaa;">尚無儲存的報告<br><span style="font-size:13px;color:#666;">完成分析後會自動儲存</span></div>';
+    return;
+  }
+
+  const sentColors = { bullish:'#00cc66', bearish:'#ff5555', neutral:'#ffcc00' };
+  const sentLabels = { bullish:'看多', bearish:'看空', neutral:'中性' };
+
+  el.innerHTML = filtered.map(r => {
+    const d    = new Date(r.ts);
+    const date = d.toLocaleDateString('zh-TW', { month:'2-digit', day:'2-digit' });
+    const time = d.toLocaleTimeString('zh-TW', { hour:'2-digit', minute:'2-digit', hour12:false });
+    const sc   = sentColors[r.sentiment] || '#888';
+    const sl   = sentLabels[r.sentiment] || '';
+    const icon = r.type === 'research' ? '🔬' : '🤖';
+    const tickers = (r.tickers||[]).slice(0,5).join(' · ');
+    return `<div class="hist-item" style="padding:14px 16px;" onclick="viewHpReport('${r.id}','${escH(r.title)}')">
+      <div class="hist-item-icon ${r.type}" style="font-size:20px;width:32px;text-align:center;flex-shrink:0;">${icon}</div>
+      <div class="hist-item-body" style="flex:1;min-width:0;">
+        <div class="hist-item-title" style="font-size:16px;white-space:normal;line-height:1.4;">${escH(r.title)}</div>
+        <div class="hist-item-meta" style="margin-top:5px;">
+          <span class="hist-item-date">${date} ${time}</span>
+          ${tickers ? `<span class="hist-item-tickers" style="margin-left:6px;">${escH(tickers)}</span>` : ''}
+          ${sl ? `<span class="hist-item-sent" style="background:${sc}22;color:${sc};margin-left:6px;">${sl}</span>` : ''}
+        </div>
+      </div>
+      <button class="hist-item-del" onclick="event.stopPropagation();deleteHpReport('${r.id}',this)">🗑</button>
+    </div>`;
+  }).join('');
+}
+
+async function viewHpReport(id, title) {
+  try {
+    let html = null;
+    try {
+      const { data, error } = await db.from('reports').select('html').eq('id', id).single();
+      if (!error && data) html = data.html;
+    } catch {}
+    if (!html) {
+      const local = JSON.parse(localStorage.getItem(id) || 'null');
+      if (local) html = local.html;
+    }
+    if (!html) { showToast('報告不存在', 'stop'); return; }
+
+    // Strip JSON blobs
+    html = html.replace(/\{[\s\S]{20,}\}/g, (m) =>
+      (/"ticker"\s*:/.test(m) || /"sentiment"\s*:/.test(m) || /"stocks"\s*:/.test(m)) ? '' : m
+    );
+
+    _hpViewData = { id, title, html };
+    document.getElementById('hp-list-section').style.display = 'none';
+    document.getElementById('hp-detail-section').style.display = 'block';
+    document.getElementById('hp-detail-title').textContent = title;
+    document.getElementById('hp-detail-body').innerHTML = html;
+    window.scrollTo(0, 0);
+  } catch(e) { showToast('載入失敗', 'stop'); }
+}
+
+function backToHpList() {
+  document.getElementById('hp-list-section').style.display = 'block';
+  document.getElementById('hp-detail-section').style.display = 'none';
+  _hpViewData = null;
+}
+
+function exportHpReport() {
+  if (!_hpViewData) return;
+  const text = (_hpViewData.html || '').replace(/<[^>]+>/g, '');
+  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `報告_${_hpViewData.title}_${new Date().toISOString().slice(0,10)}.txt`;
+  a.click();
+}
+
+async function deleteHpReport(id, btn) {
+  try {
+    try { await db.from('reports').delete().eq('id', id); } catch {}
+    localStorage.removeItem(id);
+    const idx = histLoadLocal();
+    localStorage.setItem('rpt_index', JSON.stringify(idx.filter(r => r.id !== id)));
+    btn.closest('.hist-item')?.remove();
+    showToast('已刪除', 'info');
+    const badge = document.getElementById('hp-count-badge');
+    const newIdx = await histGetIndex();
+    if (badge) badge.textContent = `${newIdx.length} 份報告`;
+  } catch(e) { showToast('刪除失敗', 'stop'); }
+}
+
 
 // ============ DARK POOL ============
 let _dpData = [];
@@ -4387,7 +4550,7 @@ function renderDarkPool() {
     const col      = isBull ? '#00cc66' : isBear ? '#ff4455' : '#ffcc00';
     const sentLabel= isBull ? '▲ 看漲' : isBear ? '▼ 看空' : '— 中性';
     const n        = Math.max(1, Math.round(premium / maxPrem * BARS));
-    const bar      = `<span style="color:${col}">${'█'.repeat(n)}</span><span style="color:#222">${'█'.repeat(BARS-n)}</span>`;
+    const bar      = `<span style="color:${col}">${'█'.repeat(n)}</span><span style="color:#888">${'█'.repeat(BARS-n)}</span>`;
     const premStr  = premium > 1e9 ? `$${(premium/1e9).toFixed(2)}B`
                    : premium > 1e6 ? `$${(premium/1e6).toFixed(1)}M`
                    : premium > 1e3 ? `$${(premium/1e3).toFixed(0)}K`
@@ -4402,10 +4565,10 @@ function renderDarkPool() {
     return `<div class="flow-item dp-item" style="border-left:2px solid ${col};cursor:default;padding:10px 12px;">
       <!-- Row 1: time + ticker + price + size + sentiment + premium -->
       <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:5px;">
-        <span style="font-family:var(--mono);font-size:10px;color:#555;flex-shrink:0;">${timeStr}</span>
+        <span style="font-family:var(--mono);font-size:10px;color:#999;flex-shrink:0;">${timeStr}</span>
         <span style="font-family:var(--mono);font-size:15px;font-weight:700;color:#fff;flex-shrink:0;min-width:52px;">${ticker}</span>
         <span style="font-family:var(--mono);font-size:12px;color:#888;flex-shrink:0;">${price > 0 ? '$'+price.toFixed(2) : '—'}</span>
-        <span style="font-family:var(--mono);font-size:11px;color:#555;flex-shrink:0;">${sizeStr}</span>
+        <span style="font-family:var(--mono);font-size:11px;color:#999;flex-shrink:0;">${sizeStr}</span>
         <span style="flex:1;"></span>
         <span style="font-family:var(--mono);font-size:11px;color:${col};flex-shrink:0;">${sentLabel}${blockTag}</span>
         <span style="font-family:var(--mono);font-size:14px;font-weight:700;color:${col};flex-shrink:0;">${premStr}</span>
@@ -4551,7 +4714,7 @@ async function runWatchlistAI() {
   btn.textContent = '⟳ 分析中...';
   btn.disabled = true;
   panel.style.display = 'block';
-  content.innerHTML = '<div style="padding:16px 0;color:#555;font-family:var(--mono);">⟳ AI 正在比對自選股與最新研究資料...</div>';
+  content.innerHTML = '<div style="padding:16px 0;color:#999;font-family:var(--mono);">⟳ AI 正在比對自選股與最新研究資料...</div>';
 
   // Build context
   const wlList = _wlTickers.map(({ ticker }) => {
@@ -4644,7 +4807,7 @@ ${flowContext}
       .replace(/## (\S+) (⚠️[^\n]*)/g, '<div style="margin:12px 0 6px;padding:8px 12px;background:#1f1a0d;border:1px solid #3a2e1a;border-radius:4px;"><span style="font-family:var(--mono);font-size:14px;font-weight:700;color:#ffcc00;">$1</span> <span style="color:#ffcc00;font-size:13px;">$2</span></div>')
       .replace(/## (\S+) ([❌🔴][^\n]*)/g, '<div style="margin:12px 0 6px;padding:8px 12px;background:#1f0d0d;border:1px solid #3a1a1a;border-radius:4px;"><span style="font-family:var(--mono);font-size:14px;font-weight:700;color:#ff4455;">$1</span> <span style="color:#ff4455;font-size:13px;">$2</span></div>')
       .replace(/\*\*(.+?)\*\*/g, '<strong style="color:#ff2d78">$1</strong>')
-      .replace(/^(評分:|理由:|策略:|風險:)/gm, '<span style="font-family:var(--mono);font-size:10px;color:#555;letter-spacing:1px;">$1</span>')
+      .replace(/^(評分:|理由:|策略:|風險:)/gm, '<span style="font-family:var(--mono);font-size:10px;color:#999;letter-spacing:1px;">$1</span>')
       .replace(/^## 總結/gm, '<div style="margin-top:16px;padding-top:12px;border-top:1px solid #2a2a2a;font-family:var(--mono);font-size:11px;color:#ff2d78;letter-spacing:2px;">總結</div>')
       .replace(/\n/g, '<br>');
 
@@ -4770,7 +4933,7 @@ function renderWatchlistGrid() {
   if (_wlFilter === 'alert') tickers = tickers.filter(t => _wlSignals[t.ticker]?.signal && _wlSignals[t.ticker].signal !== 'neutral');
 
   if (!tickers.length) {
-    grid.innerHTML = `<div class="empty" style="grid-column:1/-1;">${_wlTickers.length ? '無符合條件的股票' : '尚未加入任何股票<br><span style="font-size:11px;color:#333;">在上方輸入代碼開始追蹤</span>'}</div>`;
+    grid.innerHTML = `<div class="empty" style="grid-column:1/-1;">${_wlTickers.length ? '無符合條件的股票' : '尚未加入任何股票<br><span style="font-size:11px;color:#aaa;">在上方輸入代碼開始追蹤</span>'}</div>`;
     return;
   }
 
@@ -4785,7 +4948,7 @@ function renderWatchlistGrid() {
       const range = d.w52H - d.w52L;
       const pct   = range > 0 ? Math.round((d.price - d.w52L) / range * 20) : 0;
       const n     = Math.max(0, Math.min(20, pct));
-      posBar = `<span style="color:${col}">${'█'.repeat(n)}</span><span style="color:#222">${'█'.repeat(20-n)}</span>`;
+      posBar = `<span style="color:${col}">${'█'.repeat(n)}</span><span style="color:#888">${'█'.repeat(20-n)}</span>`;
     }
 
     const fmtVol = d?.vol ? (d.vol > 1e6 ? (d.vol/1e6).toFixed(1)+'M' : (d.vol/1e3).toFixed(0)+'K') : '—';
@@ -4802,7 +4965,7 @@ function renderWatchlistGrid() {
       ${sig.score ? `<span style="font-family:var(--mono);font-size:10px;color:${sigColor};margin-left:4px;">${sig.score}/10</span>` : ''}
     </div>` : '';
     const sigReason = sig?.reason ? `<div style="font-family:var(--mono);font-size:10px;color:#666;margin-top:4px;padding:5px 8px;background:#111;border-radius:2px;border-left:2px solid ${sigColor||'#333'}">${sig.reason}</div>` : '';
-    const sigSource = sig ? `<span style="font-family:var(--mono);font-size:9px;color:#333;">${sig.fromResearch?'研究 ':''}${sig.fromAI?'AI ':''}</span>` : '';
+    const sigSource = sig ? `<span style="font-family:var(--mono);font-size:9px;color:#aaa;">${sig.fromResearch?'研究 ':''}${sig.fromAI?'AI ':''}</span>` : '';
 
     return `<div class="card" style="border-top:${cardBorder};transition:all 0.3s;${sig?.signal==='buy'?'box-shadow:0 0 12px rgba(0,204,102,0.08);':sig?.signal==='sell'?'box-shadow:0 0 12px rgba(255,68,85,0.08);':''}">
       <div style="padding:12px 14px;">
@@ -4812,10 +4975,10 @@ function renderWatchlistGrid() {
         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
           <div>
             <div style="font-family:var(--mono);font-size:17px;font-weight:700;color:#fff;letter-spacing:1px;">${ticker} ${sigSource}</div>
-            <div style="font-family:var(--mono);font-size:10px;color:#444;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px;">${d?.name || '載入中...'}</div>
+            <div style="font-family:var(--mono);font-size:10px;color:#888;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px;">${d?.name || '載入中...'}</div>
           </div>
           <div style="text-align:right;">
-            ${loading ? '<div style="font-family:var(--mono);font-size:11px;color:#555;">⟳ 抓取中</div>' : `
+            ${loading ? '<div style="font-family:var(--mono);font-size:11px;color:#999;">⟳ 抓取中</div>' : `
             <div style="font-family:var(--mono);font-size:20px;font-weight:700;color:#fff;">$${d.price.toFixed(2)}</div>
             <div style="font-family:var(--mono);font-size:13px;color:${col};font-weight:600;">${d.chgPct>=0?'+':''}${d.chgPct.toFixed(2)}%  ${d.chg>=0?'+':''}${d.chg.toFixed(2)}</div>
             `}
@@ -4826,39 +4989,39 @@ function renderWatchlistGrid() {
         <!-- Stats row -->
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-bottom:10px;">
           <div style="background:#161616;border:1px solid #1e1e1e;border-radius:2px;padding:5px 8px;">
-            <div style="font-family:var(--mono);font-size:9px;color:#444;letter-spacing:1px;margin-bottom:1px;">OPEN</div>
+            <div style="font-family:var(--mono);font-size:9px;color:#888;letter-spacing:1px;margin-bottom:1px;">OPEN</div>
             <div style="font-family:var(--mono);font-size:12px;color:#ccc;">$${d.open?.toFixed(2)||'—'}</div>
           </div>
           <div style="background:#161616;border:1px solid #1e1e1e;border-radius:2px;padding:5px 8px;">
-            <div style="font-family:var(--mono);font-size:9px;color:#444;letter-spacing:1px;margin-bottom:1px;">HIGH</div>
+            <div style="font-family:var(--mono);font-size:9px;color:#888;letter-spacing:1px;margin-bottom:1px;">HIGH</div>
             <div style="font-family:var(--mono);font-size:12px;color:#00cc66;">$${d.high?.toFixed(2)||'—'}</div>
           </div>
           <div style="background:#161616;border:1px solid #1e1e1e;border-radius:2px;padding:5px 8px;">
-            <div style="font-family:var(--mono);font-size:9px;color:#444;letter-spacing:1px;margin-bottom:1px;">LOW</div>
+            <div style="font-family:var(--mono);font-size:9px;color:#888;letter-spacing:1px;margin-bottom:1px;">LOW</div>
             <div style="font-family:var(--mono);font-size:12px;color:#ff4455;">$${d.low?.toFixed(2)||'—'}</div>
           </div>
         </div>
 
         <!-- 52W bar -->
         <div style="margin-bottom:8px;">
-          <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:#333;margin-bottom:3px;">
+          <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:#aaa;margin-bottom:3px;">
             <span>52W低 $${d.w52L?.toFixed(0)||'—'}</span>
-            <span style="color:#555;font-size:9px;">52週區間位置</span>
+            <span style="color:#999;font-size:9px;">52週區間位置</span>
             <span>52W高 $${d.w52H?.toFixed(0)||'—'}</span>
           </div>
           <div style="font-family:var(--mono);font-size:11px;letter-spacing:0px;line-height:1;">${posBar}</div>
         </div>
 
         <!-- Vol + Cap -->
-        <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:#444;border-top:1px solid #1e1e1e;padding-top:7px;">
+        <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:#888;border-top:1px solid #1e1e1e;padding-top:7px;">
           <span>VOL <span style="color:#666;">${fmtVol}</span></span>
           <span>CAP <span style="color:#666;">${fmtCap}</span></span>
-          <span style="cursor:pointer;color:#333;" onclick="removeWatchlistTicker('${ticker}')" title="移除">✕</span>
+          <span style="cursor:pointer;color:#aaa;" onclick="removeWatchlistTicker('${ticker}')" title="移除">✕</span>
         </div>
         ` : `
-        <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:#333;border-top:1px solid #1e1e1e;padding-top:7px;">
+        <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:#aaa;border-top:1px solid #1e1e1e;padding-top:7px;">
           <span>等待資料...</span>
-          <span style="cursor:pointer;color:#333;" onclick="removeWatchlistTicker('${ticker}')" title="移除">✕</span>
+          <span style="cursor:pointer;color:#aaa;" onclick="removeWatchlistTicker('${ticker}')" title="移除">✕</span>
         </div>
         `}
       </div>
@@ -4905,7 +5068,7 @@ async function wlTickerSearch(val) {
     dd.style.width  = rect.width + 'px';
     dd.style.display = 'block';
   }
-  dd.innerHTML = `<div style="padding:10px 14px;font-family:var(--mono);font-size:12px;color:#555;">⟳ 搜尋中...</div>`;
+  dd.innerHTML = `<div style="padding:10px 14px;font-family:var(--mono);font-size:12px;color:#999;">⟳ 搜尋中...</div>`;
 
   clearTimeout(_wlSearchTimer);
   _wlSearchTimer = setTimeout(async () => {
@@ -4940,8 +5103,8 @@ async function wlTickerSearch(val) {
 
     if (!matches.length) {
       // No results — show "add directly" hint
-      dd.innerHTML = `<div style="padding:10px 14px;font-family:var(--mono);font-size:12px;color:#444;">
-        <span style="color:#555;">按 Enter 直接加入</span> <strong style="color:#ff2d78;">${q}</strong>
+      dd.innerHTML = `<div style="padding:10px 14px;font-family:var(--mono);font-size:12px;color:#888;">
+        <span style="color:#999;">按 Enter 直接加入</span> <strong style="color:#ff2d78;">${q}</strong>
       </div>`;
       _wlSearchItems = [{ s: q, n: '' }];
       dd.style.display = 'block';
@@ -4961,7 +5124,7 @@ function wlRenderDropdown(q) {
     const sTicker  = t.s.replace(new RegExp(`(${q})`, 'gi'), '<span style="color:#ff2d78;font-weight:700;">$1</span>');
     const sName    = t.n.replace(new RegExp(`(${q})`, 'gi'), '<span style="color:#ff2d78;">$1</span>');
     const inWl     = _wlTickers.find(x => x.ticker === t.s);
-    const wlTag    = inWl ? '<span style="font-family:var(--mono);font-size:9px;color:#555;margin-left:6px;background:#222;padding:1px 5px;border-radius:2px;">已加入</span>' : '';
+    const wlTag    = inWl ? '<span style="font-family:var(--mono);font-size:9px;color:#999;margin-left:6px;background:#222;padding:1px 5px;border-radius:2px;">已加入</span>' : '';
     const active   = i === _wlSearchIdx;
     return `<div 
       data-idx="${i}" data-sym="${t.s}"
@@ -4972,7 +5135,7 @@ function wlRenderDropdown(q) {
       <div>
         <span style="font-size:14px;font-weight:700;">${sTicker}</span>${wlTag}
       </div>
-      <span style="color:#555;font-size:12px;max-width:180px;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${sName}</span>
+      <span style="color:#999;font-size:12px;max-width:180px;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${sName}</span>
     </div>`;
   }).join('');
 }
